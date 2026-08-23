@@ -1,6 +1,5 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
-import React from 'react';
 
 // Mock localStorage
 const localStorageMock = {
@@ -34,36 +33,11 @@ Object.defineProperty(navigator, 'wakeLock', {
 // Mock navigator.onLine
 Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
 
-// Mock fetch
-global.fetch = vi.fn();
-
-// Mock IndexedDB/Dexie
-vi.mock('dexie', () => {
-  const mockTable = {
-    put: vi.fn().mockResolvedValue(undefined),
-    get: vi.fn().mockResolvedValue(undefined),
-    delete: vi.fn().mockResolvedValue(undefined),
-    clear: vi.fn().mockResolvedValue(undefined),
-    orderBy: () => ({
-      reverse: () => ({
-        toArray: vi.fn().mockResolvedValue([]),
-      }),
-    }),
-    where: () => ({
-      equals: () => ({
-        first: vi.fn().mockResolvedValue(undefined),
-      }),
-    }),
-  };
-  return {
-    default: class MockDexie {
-      cases = mockTable;
-      constructor() { }
-      version() { return this; }
-      stores() { return this; }
-      open() { return Promise.resolve(); }
-    },
-  };
+// Mock fetch for the five local corpus files.
+global.fetch = vi.fn().mockResolvedValue({
+  ok: true,
+  status: 200,
+  json: vi.fn().mockResolvedValue([]),
 });
 
 // Mock sql.js
@@ -77,25 +51,6 @@ vi.mock('sql.js', () => ({
       export() { return new Uint8Array(); }
     },
   }),
-}));
-
-// Mock framer-motion
-vi.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: any) => React.createElement('div', props, children),
-    button: ({ children, ...props }: any) => React.createElement('button', props, children),
-  },
-  AnimatePresence: ({ children }: any) => React.createElement(React.Fragment, null, children),
-}));
-
-// Mock react-router-dom
-vi.mock('react-router-dom', () => ({
-  useNavigate: () => vi.fn(),
-  useLocation: () => ({ pathname: '/buscador' }),
-  useSearchParams: () => [new URLSearchParams(), vi.fn()],
-  Navigate: () => null,
-  Routes: ({ children }: any) => React.createElement(React.Fragment, null, children),
-  Route: () => null,
 }));
 
 // Suppress console.error in tests unless explicitly needed

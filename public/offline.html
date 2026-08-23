@@ -69,22 +69,22 @@
       </svg>
     </div>
     <h1>Sin conexión a internet</h1>
-    <p>No puedes realizar búsquedas nuevas sin conexión, pero puedes acceder al historial y favoritos guardados localmente.</p>
-    <a href="/buscador" class="btn" onclick="return navigator.onLine || confirm('Estás offline. ¿Intentar de todos modos?')">
+    <p>Si ya abriste la aplicación y cargaste el corpus, puedes seguir buscando leyes y reglamentos sin conexión.</p>
+    <a href="/" class="btn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M23 4v6h-6" />
         <path d="M1 20v-6h6" />
         <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
       </svg>
-      Reintentar búsqueda
+      Abrir buscador local
     </a>
     <div class="features">
       <h3>Disponible sin conexión</h3>
       <ul>
+        <li>Consulta del corpus federal</li>
         <li>Historial de búsquedas recientes</li>
         <li>Artículos guardados en favoritos</li>
-        <li>Documentos en tu Bóveda local</li>
-        <li>Ajustes y configuración</li>
+        <li>Texto normativo ya almacenado</li>
       </ul>
     </div>
   </div>
@@ -93,10 +93,6 @@
     window.addEventListener('online', () => {
       window.location.reload();
     });
-    // Try to reload periodically
-    setInterval(() => {
-      if (navigator.onLine) window.location.reload();
-    }, 30000);
   </script>
 </body>
 </html>

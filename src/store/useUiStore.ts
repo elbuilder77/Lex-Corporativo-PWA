@@ -9,25 +9,17 @@ export interface AppNotification {
 }
 
 interface UiState {
-  sidebarCollapsed: boolean;
-  sidebarOpen: boolean;
   isOnline: boolean;
   notifications: AppNotification[];
-  setSidebarCollapsed: (collapsed: boolean) => void;
-  setSidebarOpen: (open: boolean) => void;
   setIsOnline: (online: boolean) => void;
   notify: (message: string, type?: 'info' | 'success' | 'warning' | 'error', title?: string) => void;
   dismissNotification: (id: string) => void;
 }
 
 export const useUiStore = create<UiState>((set) => ({
-  sidebarCollapsed: false,
-  sidebarOpen: false,
   isOnline: navigator.onLine,
   notifications: [],
 
-  setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
-  setSidebarOpen: (open) => set({ sidebarOpen: open }),
   setIsOnline: (isOnline) => set({ isOnline }),
 
   notify: (message, type = 'info', title) => {

@@ -31,7 +31,7 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   private handleGoHome = () => {
-    window.location.href = '/buscador';
+    window.location.href = '/';
   };
 
   public render() {
@@ -47,9 +47,9 @@ export class ErrorBoundary extends Component<Props, State> {
               <AlertTriangle size={32} />
             </div>
             <div className="space-y-2">
-              <h2 className="text-lg font-bold text-slate-900">Algo salió mal</h2>
+              <h2 className="text-lg font-bold text-slate-900">No se pudo mostrar esta pantalla</h2>
               <p className="text-sm text-slate-500">
-                Se ha producido un error inesperado. El equipo ha sido notificado.
+                Recarga la aplicación. Tu historial y tus favoritos permanecen guardados en este navegador.
               </p>
               {this.state.error && (
                 <details className="text-left mt-4 p-3 rounded-lg bg-slate-50 text-[11px] font-mono text-red-600">
@@ -63,7 +63,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <button
                 type="button"
                 onClick={this.handleRetry}
-                className="flex-1 rounded-xl bg-legal-gold hover:bg-legal-goldhover text-slate-950 font-bold py-2.5 text-sm transition shadow-xs cursor-pointer flex items-center justify-center gap-2"
+                className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-legal-gold py-2.5 text-sm font-bold text-slate-950 shadow-xs transition hover:bg-legal-goldhover"
               >
                 <RefreshCw size={16} />
                 <span>Reintentar</span>
@@ -71,10 +71,10 @@ export class ErrorBoundary extends Component<Props, State> {
               <button
                 type="button"
                 onClick={this.handleGoHome}
-                className="flex-1 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold py-2.5 text-sm transition cursor-pointer flex items-center justify-center gap-2"
+                className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-100"
               >
                 <Home size={16} />
-                <span>Ir al Buscador</span>
+                <span>Volver al buscador</span>
               </button>
             </div>
             <p className="text-[10px] text-slate-400">

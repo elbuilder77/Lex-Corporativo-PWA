@@ -1,43 +1,59 @@
-# Lex Corporativo — Estación Jurídica PWA
+# Lex Corporativo — Buscador Jurídico Federal
 
-Versión web progresiva (PWA) de **Lex Corporativo**, optimizada especialmente para dispositivos móviles, tablets y navegación web con capacidades offline completas.
+PWA gratuita para consultar un corpus local de legislación federal mexicana. El producto está enfocado en búsqueda normativa rápida y verificable; no requiere licencia, cuenta ni clave de API.
 
----
+La aplicación tiene un solo módulo: el buscador. Historial, favoritos, privacidad, fuentes y la referencia a Desktop se presentan como paneles auxiliares sin rutas ni navegación independiente.
 
-## 🌟 Módulos Principales
+## Alcance del producto
 
-1. **Búsqueda en Normativa Oficial con RAG (Móvil First)**:
-   - Recuperación de artículos y fundamentación en leyes federales mexicanas.
-   - Filtrado inteligente de corpus por materia (**Laboral: LFT**, **Mercantil: CCom/LGSM/LGTOC**, **Fiscal: CFF/LISR/LIVA**, **Aduanal: Ley Aduanera**, **Comercio Exterior: LCE**).
-   - Generación de respuestas ejecutivas y fundamentadas con **Google Gemini (Google AI Studio)**.
-   - Acciones rápidas: Copiar, Compartir (Web Share API para WhatsApp/correo) y Transferir al Redactor.
+- Consulta gratuita de 5,011 disposiciones en 13 leyes y reglamentos federales.
+- Búsqueda determinista en el dispositivo con SQLite WASM.
+- Filtros por área jurídica y ordenamiento.
+- Resultados con ley, artículo y enlace a la biblioteca oficial de la Cámara de Diputados.
+- Historial y favoritos guardados en `localStorage` del navegador.
+- Instalación PWA y funcionamiento offline después de cargar los recursos.
+- Referencia discreta a Lex Corporativo Desktop dentro del panel informativo.
 
-2. **Redactor Jurídico & Plantillas Personalizadas**:
-   - Soporte para plantillas personalizadas en `/public/plantillas/`.
-   - Edición rápida de contratos, pagarés, convenios y actas.
-   - Botón **"Fundamentar y Redactar con IA"** que aplica automáticamente el marco jurídico mexicano aplicable.
-   - Vista de hoja formal con membrete y exportación directa a **PDF** y **Word (.docx)**.
+La aplicación no incorpora IA generativa, BYOK, licencias, autenticación, pagos, carga documental ni redacción asistida.
 
-3. **Portafolio & Bóveda Local (IndexedDB)**:
-   - Almacenamiento 100% privado en el navegador del usuario mediante `Dexie.js`.
-   - Cero fuga de datos hacia servidores externos.
+## Corpus incluido
 
-4. **Modelos de Acceso**:
-   - **Desbloqueo Completo (Licencia Pro)**: Versión llave en mano con API lista para usarse.
-   - **Modo BYOK (Google AI Studio)**: Asistente interactivo paso a paso para que el usuario obtenga su clave de API gratuita en Google AI Studio (`aistudio.google.com`).
+| Área | Ordenamientos |
+| --- | --- |
+| Laboral | LFT |
+| Mercantil | CCom, LGSM, LGTOC |
+| Fiscal | CFF, LISR, LIVA, RLISR, RLIVA |
+| Aduanal | LA, RLA |
+| Comercio exterior | LCE, RLCE |
 
----
+Los archivos del corpus están en `public/corpus/`. Los resultados enlazan a los índices oficiales de leyes o reglamentos para cotejar vigencia y reformas.
 
-## 🚀 Inicio en Desarrollo
+## Desarrollo
+
+Requisitos: Node.js 22 y npm.
 
 ```bash
-cd "C:\Users\52999\Lex Corp Local\Lex-Corp-PAW"
+npm install
 npm run dev
 ```
 
-## 📦 Compilación de Producción PWA
+Validación local:
 
 ```bash
+npm run lint
+npm run test:run
 npm run build
 npm run preview
 ```
+
+## Arquitectura breve
+
+- React, TypeScript, Vite y Tailwind CSS.
+- Una sola pantalla y ningún router de aplicación.
+- `sql.js` para cargar y consultar el corpus dentro del navegador.
+- Zustand para historial, favoritos y estado de interfaz.
+- `vite-plugin-pwa` y Workbox para precachear aplicación, corpus y SQLite WASM.
+
+## Nota de uso
+
+El corpus local facilita la consulta. Antes de citar o tomar una decisión, debe cotejarse el texto, las reformas y la vigencia en la fuente oficial enlazada.

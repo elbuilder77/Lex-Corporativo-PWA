@@ -5,8 +5,6 @@ describe('useUiStore', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useUiStore.setState({
-      sidebarCollapsed: false,
-      sidebarOpen: false,
       isOnline: true,
       notifications: [],
     });
@@ -15,26 +13,12 @@ describe('useUiStore', () => {
   describe('initial state', () => {
     it('should have correct initial values', () => {
       const { result } = renderHook(() => useUiStore());
-      expect(result.current.sidebarCollapsed).toBe(false);
-      expect(result.current.sidebarOpen).toBe(false);
       expect(result.current.isOnline).toBe(true);
       expect(result.current.notifications).toEqual([]);
     });
   });
 
   describe('setters', () => {
-    it('should update sidebarCollapsed', () => {
-      const { result } = renderHook(() => useUiStore());
-      act(() => result.current.setSidebarCollapsed(true));
-      expect(result.current.sidebarCollapsed).toBe(true);
-    });
-
-    it('should update sidebarOpen', () => {
-      const { result } = renderHook(() => useUiStore());
-      act(() => result.current.setSidebarOpen(true));
-      expect(result.current.sidebarOpen).toBe(true);
-    });
-
     it('should update isOnline', () => {
       const { result } = renderHook(() => useUiStore());
       act(() => result.current.setIsOnline(false));

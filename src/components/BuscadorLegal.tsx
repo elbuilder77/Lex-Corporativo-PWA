@@ -1,528 +1,266 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useMemo, useState, type FormEvent } from 'react';
 import {
-  FileSearch,
-  Scale,
-  BriefcaseBusiness,
-  Globe2,
-  ShipWheel,
-  ReceiptText,
-  Search,
-  Loader2,
-  Sparkles,
-  Check,
-  Copy,
-  Share2,
-  FileSignature,
-  ChevronDown,
-  ChevronUp,
-  BookOpen,
-  Cpu,
-  Zap,
-  Star,
-  Sun,
+  BookMarked, BookOpenCheck, Check, ChevronDown, ChevronUp, Clock3, Copy, ExternalLink,
+  FileSearch, Heart, Info, LoaderCircle, Search, Share2, ShieldCheck, WifiOff,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { executeHybridWasmSearch, type HybridSearchResult } from '../services/hybrid-search';
-import { getSqliteDb } from '../services/sqlite-db';
+import { SearchInfoSheet } from './SearchInfoSheet';
+import { SearchLibrarySheet } from './SearchLibrarySheet';
+import { AREA_LABELS, CORPUS_STATS, getLawsForScope } from '../lib/corpus-catalog';
+import { executeCorpusSearch, type CorpusSearchResult } from '../services/corpus-search';
+import { useSearchStore, type SearchHistoryItem } from '../store/useSearchStore';
 import { useUiStore } from '../store/useUiStore';
-import { useCaseStore } from '../store/useCaseStore';
-import { useSearchStore } from '../store/useSearchStore';
-import { requestWakeLock, releaseWakeLock } from '../lib/wake-lock';
-import { SearchResultSkeleton } from './ui/Skeleton';
-import type { LegalEngineeringArea, LegalArticle } from '../types';
+import type { CorpusSearchScope, LegalArticle } from '../types';
 
-interface LawOption {
-  code: string;
-  name: string;
-  shortName: string;
-  area: LegalEngineeringArea;
-  icon: React.ReactNode;
-  activeColor: string;
+const scopes = Object.entries(AREA_LABELS) as Array<[CorpusSearchScope, string]>;
+
+function articlePlainText(article: LegalArticle): string {
+  return `${article.lawName}\n${article.articleNumber}\n\n${article.content}\n\nFuente oficial para cotejo: ${article.sourceUrl}`;
 }
 
-const LAWS_OPTIONS: LawOption[] = [
-  { code: 'LFT', name: 'Ley Federal del Trabajo', shortName: 'LFT (Laboral)', area: 'laboral', icon: <BriefcaseBusiness size={15} />, activeColor: 'border-amber-500 bg-amber-500/10 text-amber-300' },
-  { code: 'CCom', name: 'Código de Comercio', shortName: 'CCom (Mercantil)', area: 'mercantil', icon: <Scale size={15} />, activeColor: 'border-blue-500 bg-blue-500/10 text-blue-300' },
-  { code: 'LGSM', name: 'Ley General de Sociedades Mercantiles', shortName: 'LGSM (Sociedades)', area: 'mercantil', icon: <Scale size={15} />, activeColor: 'border-blue-500 bg-blue-500/10 text-blue-300' },
-  { code: 'LGTOC', name: 'Ley General de Títulos y Operaciones de Crédito', shortName: 'LGTOC (Pagarés)', area: 'mercantil', icon: <Scale size={15} />, activeColor: 'border-blue-500 bg-blue-500/10 text-blue-300' },
-  { code: 'CFF', name: 'Código Fiscal de la Federación', shortName: 'CFF (Fiscal)', area: 'fiscal', icon: <ReceiptText size={15} />, activeColor: 'border-teal-500 bg-teal-500/10 text-teal-300' },
-  { code: 'LISR', name: 'Ley del Impuesto sobre la Renta', shortName: 'LISR (Renta)', area: 'fiscal', icon: <ReceiptText size={15} />, activeColor: 'border-teal-500 bg-teal-500/10 text-teal-300' },
-  { code: 'LIVA', name: 'Ley del Impuesto al Valor Agregado', shortName: 'LIVA (IVA)', area: 'fiscal', icon: <ReceiptText size={15} />, activeColor: 'border-teal-500 bg-teal-500/10 text-teal-300' },
-  { code: 'LA', name: 'Ley Aduanera', shortName: 'LA (Aduanal)', area: 'aduanal', icon: <ShipWheel size={15} />, activeColor: 'border-purple-500 bg-purple-500/10 text-purple-300' },
-  { code: 'LCE', name: 'Ley de Comercio Exterior', shortName: 'LCE (Comercio Ext.)', area: 'comercio_exterior', icon: <Globe2 size={15} />, activeColor: 'border-emerald-500 bg-emerald-500/10 text-emerald-300' },
-];
-
-const SUGGESTED_QUERIES = [
-  { label: 'Causas de rescisión laboral sin responsabilidad patronal', law: 'LFT', query: 'rescisión sin responsabilidad patrón faltas' },
-  { label: 'Requisitos formales indispensables del pagaré', law: 'LGTOC', query: 'requisitos legales del pagaré' },
-  { label: 'Requisitos de las deducciones autorizadas en ISR', law: 'LISR', query: 'requisitos de las deducciones autorizadas' },
-  { label: 'Plazo y requisitos de rectificación del pedimento aduanal', law: 'LA', query: 'rectificación de datos en el pedimento' },
-  { label: 'Convocatoria y quórum de asamblea general ordinaria', law: 'LGSM', query: 'asamblea general ordinaria convocatoria quórum' },
-];
-
-export const BuscadorLegal: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { notify } = useUiStore();
-  const { setDraftContent, setActiveArea } = useCaseStore();
-  const { addToHistory, addToFavorites, isFavorite } = useSearchStore();
-
-  const [query, setQuery] = useState('');
-  const [searchMode, setSearchMode] = useState<'auto_ai' | 'manual_law'>('auto_ai');
-  const [selectedLawCode, setSelectedLawCode] = useState<string>('LFT');
+export function BuscadorLegal() {
+  const searchParams = useMemo(() => new URLSearchParams(window.location.search), []);
+  const [query, setQuery] = useState(searchParams.get('q') ?? '');
+  const [scope, setScope] = useState<CorpusSearchScope>((searchParams.get('scope') as CorpusSearchScope) || 'todos');
+  const [lawCode, setLawCode] = useState(searchParams.get('law') ?? '');
+  const [result, setResult] = useState<CorpusSearchResult | null>(null);
   const [isSearching, setIsSearching] = useState(false);
-  const [searchResult, setSearchResult] = useState<HybridSearchResult | null>(null);
-  const [expandedArticles, setExpandedArticles] = useState<Set<string>>(new Set());
-  const [wasmReady, setWasmReady] = useState(false);
-  const [wakeLockActive, setWakeLockActive] = useState(false);
-  const wakeLockRequestedRef = useRef(false);
+  const [error, setError] = useState('');
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [panel, setPanel] = useState<'library' | 'info' | null>(null);
+  const { isOnline, notify } = useUiStore();
+  const { history, favorites, addToHistory, addToFavorites, removeFromFavorites, isFavorite } = useSearchStore();
 
-  // Screen Wake Lock - activate when viewing expanded articles
-  useEffect(() => {
-    const hasExpandedContent = expandedArticles.size > 0;
-    if (hasExpandedContent && !wakeLockRequestedRef.current) {
-      wakeLockRequestedRef.current = true;
-      requestWakeLock().then((active) => setWakeLockActive(active));
-    } else if (!hasExpandedContent && wakeLockActive) {
-      releaseWakeLock();
-      wakeLockRequestedRef.current = false;
-      setWakeLockActive(false);
+  const availableLaws = useMemo(() => getLawsForScope(scope), [scope]);
+  const activeLawCode = availableLaws.some((law) => law.code === lawCode) ? lawCode : '';
+
+  const performSearch = async (requestedQuery: string, requestedScope: CorpusSearchScope, requestedLawCode?: string) => {
+    const normalizedQuery = requestedQuery.trim();
+    if (normalizedQuery.length < 2) {
+      setError('Escribe al menos dos caracteres para buscar.');
+      return;
     }
-  }, [expandedArticles.size, wakeLockActive]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (wakeLockActive) {
-        releaseWakeLock();
-      }
-    };
-  }, [wakeLockActive]);
-
-  // Handle URL params for opening from history/favorites
-  useEffect(() => {
-    const urlQuery = searchParams.get('query');
-    const urlLaw = searchParams.get('law');
-    const urlArticle = searchParams.get('article');
-
-    if (urlQuery) {
-      setQuery(urlQuery);
-      if (urlLaw) setSelectedLawCode(urlLaw);
-      setSearchMode(urlLaw ? 'manual_law' : 'auto_ai');
-      void handleSearch(urlQuery, urlLaw || undefined);
-      setSearchParams({}, { replace: true });
-    } else if (urlArticle && urlLaw) {
-      // Open specific article - will expand it after search
-      setSelectedLawCode(urlLaw);
-      setSearchMode('manual_law');
-      setQuery(`artículo ${urlArticle}`);
-      void handleSearch(`artículo ${urlArticle}`, urlLaw);
-      setSearchParams({}, { replace: true });
-    }
-  }, [searchParams]);
-
-  // Pre-cargar base de datos SQLite WASM en segundo plano
-  useEffect(() => {
-    getSqliteDb()
-      .then(() => setWasmReady(true))
-      .catch((err) => console.warn('SQLite WASM precarga:', err));
-  }, []);
-
-  const handleSearch = useCallback(async (searchQuery = query, forceLawCode?: string) => {
-    const clean = searchQuery.trim();
-    if (!clean) return;
-
-    setQuery(clean);
+    setError('');
     setIsSearching(true);
-    setSearchResult(null);
-
-    const manualLaw = forceLawCode || (searchMode === 'manual_law' ? selectedLawCode : undefined);
-
+    setExpanded(new Set());
     try {
-      const result = await executeHybridWasmSearch({
-        query: clean,
-        manualLawCode: manualLaw,
+      const nextResult = await executeCorpusSearch({
+        query: normalizedQuery,
+        scope: requestedScope,
+        lawCode: requestedLawCode || undefined,
+        limit: 30,
       });
-
-      setSearchResult(result);
-
-      // Guardar en historial
+      setResult(nextResult);
       addToHistory({
-        query: clean,
-        lawCode: result.router.targetLawCode,
-        lawName: result.router.targetLawName,
-        resultCount: result.articles.length,
+        query: normalizedQuery,
+        scope: requestedScope,
+        scopeLabel: nextResult.scopeLabel,
+        lawCode: requestedLawCode || undefined,
+        resultCount: nextResult.articles.length,
       });
-
-      // Auto-expandir el primer artículo si es match exacto
-      if (result.articles.length > 0) {
-        setExpandedArticles(new Set([result.articles[0].id]));
-      }
-    } catch (err: any) {
-      notify(err?.message || 'Error al ejecutar la búsqueda en SQLite WASM.', 'error');
+      const url = new URL(window.location.href);
+      url.searchParams.set('q', normalizedQuery);
+      url.searchParams.set('scope', requestedScope);
+      if (requestedLawCode) url.searchParams.set('law', requestedLawCode); else url.searchParams.delete('law');
+      window.history.replaceState(null, '', url);
+    } catch {
+      setError('No fue posible abrir el corpus local. Recarga la aplicación e inténtalo de nuevo.');
     } finally {
       setIsSearching(false);
     }
-  }, [query, searchMode, selectedLawCode, addToHistory, notify]);
-
-  const toggleArticle = (id: string) => {
-    setExpandedArticles((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
   };
 
-  const handleCopyArticle = async (content: string, title: string) => {
-    await navigator.clipboard.writeText(`${title}\n\n${content}`);
-    notify('Artículo legal copiado al portapapeles.', 'success');
+  const runSearch = async (event?: FormEvent) => {
+    event?.preventDefault();
+    await performSearch(query, scope, activeLawCode || undefined);
   };
 
-  const handleShareArticle = async (content: string, title: string) => {
-    if (navigator.share) {
-      try {
-        await navigator.share({ title, text: `${title}\n\n${content}` });
-      } catch {
-        // cancelled
-      }
-    } else {
-      await handleCopyArticle(content, title);
+  const repeatSearch = (item: SearchHistoryItem) => {
+    setQuery(item.query);
+    setScope(item.scope);
+    setLawCode(item.lawCode ?? '');
+    setPanel(null);
+    void performSearch(item.query, item.scope, item.lawCode);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const copyArticle = async (article: LegalArticle) => {
+    try {
+      await navigator.clipboard.writeText(articlePlainText(article));
+      setCopiedId(article.id);
+      window.setTimeout(() => setCopiedId(null), 1600);
+    } catch {
+      notify('El navegador no permitió copiar el texto.', 'error');
     }
   };
 
-  const handleToggleFavorite = (article: LegalArticle) => {
+  const shareArticle = async (article: LegalArticle) => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: `${article.lawCode} · ${article.articleNumber}`, text: articlePlainText(article) });
+      } else {
+        await copyArticle(article);
+      }
+    } catch (shareError) {
+      if ((shareError as Error).name !== 'AbortError') notify('No fue posible compartir el artículo.', 'error');
+    }
+  };
+
+  const toggleFavorite = (article: LegalArticle) => {
     if (isFavorite(article.id)) {
-      useSearchStore.getState().removeFromFavorites(article.id);
-      notify('Eliminado de favoritos', 'info');
+      removeFromFavorites(article.id);
+      notify('Artículo eliminado de favoritos.', 'info');
     } else {
       addToFavorites(article);
-      notify('Guardado en favoritos', 'success');
+      notify('Artículo guardado en este navegador.', 'success');
     }
-  };
-
-  const handleInsertInDraft = (content: string, title: string, area: LegalEngineeringArea) => {
-    const snippet = `\n\n### FUNDAMENTACIÓN NORMATIVA APLICABLE\n**${title}**\n\n"${content}"\n`;
-    setDraftContent(snippet);
-    setActiveArea(area);
-    notify('Artículo copiado para redacción externa.', 'success');
   };
 
   return (
-    <div className="min-h-full bg-slate-50 text-slate-900 pb-20">
-      <div className="mx-auto w-full max-w-5xl px-3 sm:px-6 py-4 sm:py-6 space-y-4">
-        {/* Header */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-600">
-              <FileSearch size={22} />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-sm sm:text-base font-bold text-slate-950">Búsqueda en Normativa Oficial</h1>
-                <span className="rounded-full bg-blue-500/15 text-blue-700 border border-blue-500/30 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider flex items-center gap-1">
-                  <Cpu size={10} /> SQLite WASM
-                </span>
-              </div>
-              <p className="text-[11px] sm:text-xs text-slate-500">
-                IA en 1ª línea para enrutamiento y búsqueda vectorial local en 1 sola ley
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            {wasmReady && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 border border-green-500/30 px-2.5 py-0.5 text-[10px] font-bold text-green-700">
-                <Check size={11} /> Motor WASM Listo
-              </span>
-            )}
-            {wakeLockActive && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (wakeLockActive) releaseWakeLock(); else requestWakeLock().then(setWakeLockActive);
-                }}
-                className="flex items-center gap-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 text-[10px] font-bold text-amber-400 transition cursor-pointer"
-                title="Wake Lock activo - pantalla no se apagará. Click para desactivar."
-              >
-                <Sun size={11} />
-                <span>Pantalla activa</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Selector de Modo de Búsqueda */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs space-y-3">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-              Modo de consulta normativa:
-            </p>
-            <div className="flex rounded-xl bg-slate-100 p-1 text-xs">
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchMode('auto_ai');
-                  setSearchResult(null);
-                }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
-                  searchMode === 'auto_ai'
-                    ? 'bg-slate-900 text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Sparkles size={13} className="text-legal-gold" />
-                <span>Auto-Enrutador con IA</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchMode('manual_law');
-                  setSearchResult(null);
-                }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
-                  searchMode === 'manual_law'
-                    ? 'bg-slate-900 text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <BookOpen size={13} className="text-blue-400" />
-                <span>Selección Manual de Ley</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Chips de Selección Manual de Ley (si está en modo manual) */}
-          {searchMode === 'manual_law' && (
-            <div className="space-y-1.5 pt-1">
-              <p className="text-[11px] font-semibold text-slate-600">
-                Selecciona la ley específica donde ejecutará SQLite WASM:
-              </p>
-              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-3 px-3 sm:mx-0 sm:px-0">
-                {LAWS_OPTIONS.map((law) => {
-                  const active = law.code === selectedLawCode;
-                  return (
-                    <button
-                      key={law.code}
-                      type="button"
-                      onClick={() => {
-                        setSelectedLawCode(law.code);
-                        if (query.trim()) void handleSearch(query, law.code);
-                      }}
-                      className={`shrink-0 flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                        active
-                          ? 'border-slate-900 bg-slate-900 text-white shadow-xs'
-                          : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
-                      }`}
-                    >
-                      <span>{law.icon}</span>
-                      <span>{law.shortName}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Barra de Búsqueda */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              void handleSearch();
-            }}
-            className="flex gap-2 pt-1"
-          >
-            <div className="relative flex-1">
-              <Search size={16} className="absolute left-3 top-3 text-slate-400" />
-              <input
-                type="search"
-                enterKeyHint="search"
-                inputMode="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={
-                  searchMode === 'auto_ai'
-                    ? 'Escribe tu consulta en lenguaje natural (la IA detectará la ley aplicable)...'
-                    : `Buscar en ${LAWS_OPTIONS.find((l) => l.code === selectedLawCode)?.name}...`
-                }
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:border-legal-gold focus:bg-white focus:outline-none"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={isSearching || !query.trim()}
-              className="flex items-center justify-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-950 text-white px-4 sm:px-5 py-2.5 text-xs font-bold transition shadow-xs disabled:opacity-50 cursor-pointer"
-            >
-              {isSearching ? <Loader2 size={16} className="animate-spin text-legal-gold" /> : <Zap size={16} className="text-legal-gold" />}
-              <span className="hidden sm:inline">Buscar</span>
+    <div className="min-h-screen bg-slate-50 pb-8">
+      <section className="border-b border-slate-800 bg-legal-shell text-white">
+        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+          <div className="mb-6 flex items-center justify-between gap-3">
+            <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex min-h-11 items-center gap-2 text-left">
+              <BookOpenCheck size={21} className="text-legal-gold" />
+              <span><strong className="block text-xs tracking-wider">LEX CORPORATIVO</strong><span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-slate-500">Buscador Federal</span></span>
             </button>
-          </form>
-
-          {/* Sugerencias Rápidas */}
-          <div className="space-y-1.5 pt-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Ejemplos con enrutamiento automático:
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {SUGGESTED_QUERIES.map((item, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => {
-                    setQuery(item.query);
-                    void handleSearch(item.query);
-                  }}
-                  className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] text-slate-700 hover:border-slate-300 hover:bg-slate-100 transition cursor-pointer"
-                >
-                  <strong className="text-slate-900 font-mono">[{item.law}]</strong> {item.label}
-                </button>
-              ))}
+            <div className="flex items-center gap-1">
+              <button type="button" onClick={() => setPanel('library')} className="inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-xs font-bold text-slate-300 hover:bg-slate-800" aria-label="Abrir guardados"><BookMarked size={17} /><span className="hidden sm:inline">Guardados</span>{history.length + favorites.length > 0 && <span className="rounded-full bg-legal-gold px-1.5 py-0.5 text-[9px] text-slate-950">{history.length + favorites.length}</span>}</button>
+              <button type="button" onClick={() => setPanel('info')} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white" aria-label="Información"><Info size={18} /></button>
             </div>
           </div>
-        </div>
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl space-y-2">
+              <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-legal-gold">
+                <BookOpenCheck size={15} /> Corpus federal gratuito
+              </div>
+              <h1 className="font-serif text-2xl font-bold sm:text-3xl">Consulta normativa local y verificable</h1>
+              <p className="text-sm leading-6 text-slate-300">
+                Busca en {CORPUS_STATS.provisions.toLocaleString('es-MX')} disposiciones de {CORPUS_STATS.instruments} leyes y reglamentos. La consulta se procesa en tu dispositivo.
+              </p>
+            </div>
+            <div className={`inline-flex min-h-11 items-center gap-2 self-start rounded-full border px-4 text-xs font-bold ${isOnline ? 'border-emerald-700/60 bg-emerald-950/40 text-emerald-300' : 'border-amber-700/60 bg-amber-950/40 text-amber-200'}`}>
+              {isOnline ? <ShieldCheck size={16} /> : <WifiOff size={16} />}
+              {isOnline ? 'Motor local listo' : 'Modo sin conexión'}
+            </div>
+          </div>
 
-        {/* Estado de Carga */}
-        {isSearching && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-            <SearchResultSkeleton />
+          <form onSubmit={runSearch} className="mt-6 rounded-2xl border border-slate-700 bg-slate-900/80 p-3 shadow-2xl sm:p-4">
+            <label htmlFor="legal-query" className="mb-2 block text-xs font-bold text-slate-200">Término, concepto o artículo</label>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                <input
+                  id="legal-query"
+                  type="search"
+                  inputMode="search"
+                  enterKeyHint="search"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Ej. rescisión laboral o artículo 47"
+                  autoComplete="off"
+                  className="min-h-12 w-full rounded-xl border border-slate-600 bg-slate-950 py-3 pl-11 pr-4 text-base text-white placeholder:text-slate-500 focus:border-legal-gold focus:outline-none"
+                />
+              </div>
+              <button type="submit" disabled={isSearching} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-legal-gold px-6 text-sm font-extrabold text-slate-950 transition hover:bg-legal-goldhover disabled:cursor-wait disabled:opacity-60">
+                {isSearching ? <LoaderCircle size={18} className="animate-spin" /> : <FileSearch size={18} />} Buscar
+              </button>
+            </div>
+
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <label className="text-xs font-bold text-slate-300">
+                Área
+                <select value={scope} onChange={(event) => { setScope(event.target.value as CorpusSearchScope); setLawCode(''); }} className="mt-1 min-h-11 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 text-base text-white focus:border-legal-gold focus:outline-none sm:text-sm">
+                  {scopes.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                </select>
+              </label>
+              <label className="text-xs font-bold text-slate-300">
+                Ordenamiento <span className="font-normal text-slate-500">(opcional)</span>
+                <select value={activeLawCode} onChange={(event) => setLawCode(event.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 text-base text-white focus:border-legal-gold focus:outline-none sm:text-sm">
+                  <option value="">Todos los ordenamientos del área</option>
+                  {availableLaws.map((law) => <option key={law.code} value={law.code}>{law.code} · {law.name}</option>)}
+                </select>
+              </label>
+            </div>
+            {error && <p role="alert" className="mt-3 rounded-xl border border-red-800 bg-red-950/50 px-3 py-2 text-sm text-red-200">{error}</p>}
+          </form>
+        </div>
+      </section>
+
+      <main className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
+        {!result && !isSearching && (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
+            <Search className="mx-auto text-slate-300" size={30} />
+            <h2 className="mt-3 text-sm font-extrabold text-slate-900">Busca por concepto o artículo</h2>
+            <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-slate-500">Ejemplos: “rescisión laboral”, “prescripción fiscal” o “artículo 47”.</p>
           </div>
         )}
 
-        {/* Resultados */}
-        <AnimatePresence>
-          {searchResult && !isSearching && (
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-4"
-            >
-              {/* Tarjeta de Diagnóstico de Enrutamiento IA */}
-              <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-start sm:items-center gap-2.5">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-500/20 text-blue-600 font-bold">
-                    <Sparkles size={15} />
-                  </span>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-900">
-                        {searchResult.mode === 'ai_routed' ? 'Enrutado por IA a:' : 'Búsqueda en:'}
-                      </span>
-                      <span className="rounded-md bg-blue-600 text-white font-mono px-2 py-0.5 text-[10px] font-bold">
-                        {searchResult.router.targetLawCode}
-                      </span>
-                      <span className="text-xs font-semibold text-slate-700">
-                        {searchResult.router.targetLawName}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
-                      {searchResult.router.explanation}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 self-end sm:self-auto text-[11px] text-slate-400 font-mono">
-                  <span>Tiempo SQLite WASM: <strong className="text-slate-700">{searchResult.executionTimeMs}ms</strong></span>
-                </div>
+        {result && (
+          <div className="space-y-4" aria-live="polite">
+            <div className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-extrabold text-slate-900">{result.articles.length} {result.articles.length === 1 ? 'resultado' : 'resultados'} para “{result.query}”</p>
+                <p className="mt-1 text-xs text-slate-500">Alcance: {result.scopeLabel}</p>
               </div>
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500"><Clock3 size={14} /> {result.executionTimeMs} ms · SQLite local</span>
+            </div>
 
-              {/* Lista de Artículos Recuperados */}
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between px-1">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                    Artículos oficiales recuperados ({searchResult.articles.length})
-                  </h3>
-                </div>
-
-                {searchResult.articles.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center space-y-2">
-                    <p className="text-xs font-bold text-slate-700">No se encontraron artículos exactos en {searchResult.router.targetLawName}</p>
-                    <p className="text-[11px] text-slate-400">Prueba ajustando los términos de búsqueda o seleccionando otra ley.</p>
-                  </div>
-                ) : (
-                  <div className="grid gap-3">
-                    {searchResult.articles.map((art) => {
-                      const isExpanded = expandedArticles.has(art.id);
-                      return (
-                        <div
-                          key={art.id}
-                          className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs hover:border-slate-300 transition"
-                        >
-                          <div className="p-3.5 sm:p-4 flex items-center justify-between gap-2 border-b border-slate-100">
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <span className="shrink-0 rounded-lg bg-slate-900 text-legal-gold font-mono px-2.5 py-1 text-xs font-extrabold">
-                                {art.articleNumber}
-                              </span>
-                              <span className="text-xs sm:text-sm font-bold text-slate-950 truncate">
-                                {art.title}
-                              </span>
+            {result.articles.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
+                <FileSearch className="mx-auto text-slate-400" size={32} />
+                <h2 className="mt-3 text-sm font-extrabold text-slate-900">Sin coincidencias en este alcance</h2>
+                <p className="mt-1 text-xs leading-5 text-slate-500">Prueba términos más breves, selecciona otra área o busca en todo el corpus.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {result.articles.map((article) => {
+                  const isExpanded = expanded.has(article.id);
+                  const favorite = isFavorite(article.id);
+                  return (
+                    <article key={article.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                      <div className="p-4 sm:p-5">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="rounded-md bg-slate-900 px-2 py-1 text-[10px] font-extrabold text-white">{article.lawCode}</span>
+                              <span className="rounded-md bg-blue-50 px-2 py-1 text-[10px] font-bold text-blue-700">{article.articleNumber}</span>
+                              <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{article.sourceKind}</span>
                             </div>
-
-                            {/* Acciones Rápidas */}
-                            <div className="flex items-center gap-1.5">
-                              <button
-                                type="button"
-                                onClick={() => handleCopyArticle(art.content, art.title)}
-                                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 text-[11px] font-semibold flex items-center gap-1 cursor-pointer"
-                                title="Copiar artículo"
-                              >
-                                <Copy size={13} />
-                                <span className="hidden sm:inline">Copiar</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleShareArticle(art.content, art.title)}
-                                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 text-[11px] font-semibold flex items-center gap-1 cursor-pointer"
-                                title="Compartir"
-                              >
-                                <Share2 size={13} />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleToggleFavorite(art)}
-                                className={`p-1.5 rounded-lg transition cursor-pointer ${
-                                  isFavorite(art.id)
-                                    ? 'text-amber-400'
-                                    : 'text-slate-400 hover:text-amber-400'
-                                }`}
-                                title={isFavorite(art.id) ? 'Quitar de favoritos' : 'Guardar en favoritos'}
-                              >
-                                <Star size={16} fill="currentColor" className={isFavorite(art.id) ? '' : 'fill-none'} />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleInsertInDraft(art.content, art.title, art.area)}
-                                className="p-1.5 sm:px-2.5 rounded-lg bg-legal-gold hover:bg-legal-goldhover text-slate-950 text-[11px] font-bold flex items-center gap-1 cursor-pointer shadow-xs"
-                                title="Copiar para redacción"
-                              >
-                                <FileSignature size={13} />
-                                <span className="hidden sm:inline">Copiar</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => toggleArticle(art.id)}
-                                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg transition cursor-pointer"
-                              >
-                                {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                              </button>
-                            </div>
+                            <h2 className="mt-2 text-sm font-extrabold leading-5 text-slate-950 sm:text-base">{article.lawName}</h2>
+                            {article.title && <p className="mt-1 text-xs font-semibold text-slate-500">{article.title}</p>}
                           </div>
-
-                          {/* Contenido Completo del Artículo */}
-                          {isExpanded && (
-                            <div className="p-4 sm:p-5 bg-slate-50/50 text-xs sm:text-sm text-slate-800 leading-relaxed font-serif whitespace-pre-line border-t border-slate-100">
-                              {art.content}
-                            </div>
-                          )}
+                          <div className="flex shrink-0 items-center gap-1">
+                            <button type="button" onClick={() => copyArticle(article)} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Copiar artículo">{copiedId === article.id ? <Check size={18} className="text-emerald-600" /> : <Copy size={18} />}</button>
+                            <button type="button" onClick={() => shareArticle(article)} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Compartir artículo"><Share2 size={18} /></button>
+                            <button type="button" onClick={() => toggleFavorite(article)} className={`flex min-h-11 min-w-11 items-center justify-center rounded-xl hover:bg-rose-50 ${favorite ? 'text-rose-600' : 'text-slate-500 hover:text-rose-600'}`} aria-label={favorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}><Heart size={18} fill={favorite ? 'currentColor' : 'none'} /></button>
+                          </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
+
+                        <p className={`mt-4 whitespace-pre-line text-sm leading-7 text-slate-700 ${isExpanded ? '' : 'line-clamp-5'}`}>{article.content}</p>
+
+                        <div className="mt-4 flex flex-col gap-2 border-t border-slate-100 pt-3 sm:flex-row sm:items-center sm:justify-between">
+                          <a href={article.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-xl text-xs font-bold text-blue-700 hover:text-blue-900"><ExternalLink size={15} /> {article.sourceName}</a>
+                          <button type="button" onClick={() => setExpanded((current) => { const next = new Set(current); if (next.has(article.id)) next.delete(article.id); else next.add(article.id); return next; })} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50">
+                            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />} {isExpanded ? 'Contraer texto' : 'Ver texto completo'}
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+            )}
+
+            <p className="rounded-xl bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900">El texto mostrado pertenece al corpus local. Antes de citar o actuar, coteja reformas, vigencia y publicación en la fuente oficial enlazada.</p>
+          </div>
+        )}
+      </main>
+
+      <SearchLibrarySheet open={panel === 'library'} onClose={() => setPanel(null)} onRepeat={repeatSearch} />
+      <SearchInfoSheet open={panel === 'info'} onClose={() => setPanel(null)} />
     </div>
   );
-};
+}

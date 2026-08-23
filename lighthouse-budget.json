@@ -4,10 +4,7 @@
       "numberOfRuns": 3,
       "startServerCommand": "serve -s dist -l 3000",
       "url": [
-        "http://localhost:3000",
-        "http://localhost:3000/buscador",
-        "http://localhost:3000/historial",
-        "http://localhost:3000/settings"
+        "http://localhost:3000"
       ]
     },
     "assert": {

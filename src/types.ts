@@ -1,6 +1,12 @@
-export type AccessMode = 'unlocked' | 'byok' | 'trial';
+export type LegalEngineeringArea =
+  | 'laboral'
+  | 'mercantil'
+  | 'fiscal'
+  | 'aduanal'
+  | 'comercio_exterior';
 
-export type LegalEngineeringArea = 'laboral' | 'mercantil' | 'fiscal' | 'aduanal' | 'comercio_exterior';
+export type CorpusSearchScope = 'todos' | LegalEngineeringArea;
+export type CorpusSourceKind = 'ley' | 'reglamento';
 
 export interface LegalArticle {
   id: string;
@@ -10,34 +16,8 @@ export interface LegalArticle {
   title: string;
   content: string;
   area: LegalEngineeringArea;
+  sourceKind: CorpusSourceKind;
+  sourceName: string;
+  sourceUrl: string;
   score?: number;
-}
-
-export interface SavedCase {
-  id: string;
-  title: string;
-  area: LegalEngineeringArea;
-  createdAt: string;
-  updatedAt: string;
-  draftContent?: string;
-}
-
-export interface GoogleAiSettings {
-  mode: AccessMode;
-  licenseKey?: string;
-  apiKey: string;
-  model: string;
-  strictPrivacy: boolean;
-  isConfigured: boolean;
-  tutorialCompleted: boolean;
-}
-
-export interface PublicTemplate {
-  id: string;
-  name: string;
-  category: LegalEngineeringArea;
-  description: string;
-  path: string;
-  variables?: string[];
-  previewContent?: string;
 }
