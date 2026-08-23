@@ -8,7 +8,7 @@ export const OFFICIAL_LAWS_URL = 'https://www.diputados.gob.mx/LeyesBiblio/index
 export const OFFICIAL_REGULATIONS_URL = 'https://www.diputados.gob.mx/LeyesBiblio/regla.htm';
 
 export const AREA_LABELS: Record<CorpusSearchScope, string> = {
-  todos: 'Todos los ordenamientos incluidos',
+  todos: 'Todas las leyes y reglamentos',
   laboral: 'Laboral',
   mercantil: 'Mercantil',
   fiscal: 'Fiscal',

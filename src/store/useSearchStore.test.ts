@@ -35,7 +35,7 @@ describe('useSearchStore', () => {
   it('limita el historial a 50 consultas', () => {
     const { result } = renderHook(() => useSearchStore());
     for (let index = 0; index < 60; index += 1) {
-      act(() => result.current.addToHistory({ query: `consulta ${index}`, scope: 'todos', scopeLabel: 'Todos los ordenamientos incluidos', resultCount: 1 }));
+      act(() => result.current.addToHistory({ query: `consulta ${index}`, scope: 'todos', scopeLabel: 'Todas las leyes y reglamentos', resultCount: 1 }));
     }
     expect(result.current.history).toHaveLength(50);
   });

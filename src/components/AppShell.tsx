@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { AlertCircle, CheckCircle2, Download, Info, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Info, X } from 'lucide-react';
+import logoMark from '../assets/logo-mark.png';
 import { useSearchStore } from '../store/useSearchStore';
 import { useUiStore } from '../store/useUiStore';
 
@@ -54,8 +55,8 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {installPrompt && (
         <div className="fixed bottom-3 left-3 right-3 z-40 mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-slate-700 bg-slate-950 p-3 text-white shadow-2xl" style={{ marginBottom: 'env(safe-area-inset-bottom)' }}>
-          <Download size={19} className="shrink-0 text-legal-gold" />
-          <p className="flex-1 text-xs font-semibold">Instala el buscador para usarlo offline.</p>
+          <img src={logoMark} alt="" className="h-10 w-10 shrink-0 rounded-xl border border-legal-gold/20 object-cover" />
+          <p className="flex-1 text-xs font-semibold leading-5">Lleva Lex Corporativo contigo. Instálalo para consultar incluso sin conexión.</p>
           <button type="button" onClick={install} className="min-h-11 rounded-xl bg-legal-gold px-4 text-xs font-extrabold text-slate-950">Instalar</button>
           <button type="button" onClick={() => setInstallPrompt(null)} className="flex min-h-11 min-w-11 items-center justify-center text-slate-400" aria-label="Cerrar"><X size={17} /></button>
         </div>

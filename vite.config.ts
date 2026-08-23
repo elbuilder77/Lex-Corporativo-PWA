@@ -12,9 +12,10 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.png', 'assets/*.png', 'wasm/*.wasm', 'corpus/*.json'],
       manifest: {
-        name: 'Lex Corporativo — Buscador Jurídico Federal',
-        short_name: 'Lex Buscador',
-        description: 'Consulta gratuita, local y verificable del corpus federal mexicano.',
+        name: 'Lex Corporativo — Consulta Federal',
+        short_name: 'Lex Corporativo',
+        description: 'Consulta gratuita de legislación federal mexicana con acceso directo a fuentes oficiales.',
+        lang: 'es-MX',
         theme_color: '#070b13',
         background_color: '#070b13',
         display: 'standalone',

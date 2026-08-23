@@ -1,8 +1,9 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import {
-  BookMarked, BookOpenCheck, Check, ChevronDown, ChevronUp, Clock3, Copy, ExternalLink,
+  BookMarked, BookOpenCheck, Check, ChevronDown, ChevronUp, Copy, ExternalLink,
   FileSearch, Heart, Info, LoaderCircle, Search, Share2, ShieldCheck, WifiOff,
 } from 'lucide-react';
+import logoMark from '../assets/logo-mark.png';
 import { SearchInfoSheet } from './SearchInfoSheet';
 import { SearchLibrarySheet } from './SearchLibrarySheet';
 import { AREA_LABELS, CORPUS_STATS, getLawsForScope } from '../lib/corpus-catalog';
@@ -65,7 +66,7 @@ export function BuscadorLegal() {
       if (requestedLawCode) url.searchParams.set('law', requestedLawCode); else url.searchParams.delete('law');
       window.history.replaceState(null, '', url);
     } catch {
-      setError('No fue posible abrir el corpus local. Recarga la aplicación e inténtalo de nuevo.');
+      setError('No pudimos cargar la legislación. Recarga la aplicación e inténtalo de nuevo.');
     } finally {
       setIsSearching(false);
     }
@@ -113,7 +114,7 @@ export function BuscadorLegal() {
       notify('Artículo eliminado de favoritos.', 'info');
     } else {
       addToFavorites(article);
-      notify('Artículo guardado en este navegador.', 'success');
+      notify('Artículo guardado en este dispositivo.', 'success');
     }
   };
 
@@ -121,34 +122,39 @@ export function BuscadorLegal() {
     <div className="min-h-screen bg-slate-50 pb-8">
       <section className="border-b border-slate-800 bg-legal-shell text-white">
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-          <div className="mb-6 flex items-center justify-between gap-3">
-            <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex min-h-11 items-center gap-2 text-left">
-              <BookOpenCheck size={21} className="text-legal-gold" />
-              <span><strong className="block text-xs tracking-wider">LEX CORPORATIVO</strong><span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-slate-500">Buscador Federal</span></span>
+          <header className="mb-7 flex items-center justify-between gap-3 border-b border-white/10 pb-5">
+            <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex min-h-12 items-center gap-2.5 text-left" aria-label="Ir al inicio">
+              <span className="flex h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-legal-gold/30 bg-black shadow-lg shadow-black/20">
+                <img src={logoMark} alt="" className="h-full w-full object-cover" />
+              </span>
+              <span>
+                <strong className="block font-serif text-base font-semibold tracking-wide text-white">Lex Corporativo</strong>
+                <span className="block text-[9px] font-extrabold uppercase tracking-[0.2em] text-legal-gold">Consulta Federal</span>
+              </span>
             </button>
             <div className="flex items-center gap-1">
               <button type="button" onClick={() => setPanel('library')} className="inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-xs font-bold text-slate-300 hover:bg-slate-800" aria-label="Abrir guardados"><BookMarked size={17} /><span className="hidden sm:inline">Guardados</span>{history.length + favorites.length > 0 && <span className="rounded-full bg-legal-gold px-1.5 py-0.5 text-[9px] text-slate-950">{history.length + favorites.length}</span>}</button>
               <button type="button" onClick={() => setPanel('info')} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white" aria-label="Información"><Info size={18} /></button>
             </div>
-          </div>
+          </header>
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl space-y-2">
+            <div className="max-w-3xl space-y-2">
               <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-legal-gold">
-                <BookOpenCheck size={15} /> Corpus federal gratuito
+                <BookOpenCheck size={15} /> Legislación federal gratuita
               </div>
-              <h1 className="font-serif text-2xl font-bold sm:text-3xl">Consulta normativa local y verificable</h1>
-              <p className="text-sm leading-6 text-slate-300">
-                Busca en {CORPUS_STATS.provisions.toLocaleString('es-MX')} disposiciones de {CORPUS_STATS.instruments} leyes y reglamentos. La consulta se procesa en tu dispositivo.
+              <h1 className="font-serif text-2xl font-bold leading-tight sm:text-3xl">Consulta la legislación federal con respaldo oficial</h1>
+              <p className="max-w-2xl text-sm leading-6 text-slate-300">
+                Encuentra artículos y disposiciones entre {CORPUS_STATS.provisions.toLocaleString('es-MX')} registros de {CORPUS_STATS.instruments} leyes y reglamentos, con acceso directo a la fuente oficial.
               </p>
             </div>
             <div className={`inline-flex min-h-11 items-center gap-2 self-start rounded-full border px-4 text-xs font-bold ${isOnline ? 'border-emerald-700/60 bg-emerald-950/40 text-emerald-300' : 'border-amber-700/60 bg-amber-950/40 text-amber-200'}`}>
               {isOnline ? <ShieldCheck size={16} /> : <WifiOff size={16} />}
-              {isOnline ? 'Motor local listo' : 'Modo sin conexión'}
+              {isOnline ? 'Consulta privada' : 'Disponible sin conexión'}
             </div>
           </div>
 
-          <form onSubmit={runSearch} className="mt-6 rounded-2xl border border-slate-700 bg-slate-900/80 p-3 shadow-2xl sm:p-4">
-            <label htmlFor="legal-query" className="mb-2 block text-xs font-bold text-slate-200">Término, concepto o artículo</label>
+          <form onSubmit={runSearch} className="mt-6 rounded-2xl border border-slate-700 bg-slate-900/80 p-3 shadow-2xl shadow-black/20 sm:p-4">
+            <label htmlFor="legal-query" className="mb-2 block text-xs font-bold text-slate-200">¿Qué necesitas consultar?</label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <div className="relative flex-1">
                 <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
@@ -177,9 +183,9 @@ export function BuscadorLegal() {
                 </select>
               </label>
               <label className="text-xs font-bold text-slate-300">
-                Ordenamiento <span className="font-normal text-slate-500">(opcional)</span>
+                Ley o reglamento <span className="font-normal text-slate-500">(opcional)</span>
                 <select value={activeLawCode} onChange={(event) => setLawCode(event.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 text-base text-white focus:border-legal-gold focus:outline-none sm:text-sm">
-                  <option value="">Todos los ordenamientos del área</option>
+                  <option value="">Todas las leyes y reglamentos del área</option>
                   {availableLaws.map((law) => <option key={law.code} value={law.code}>{law.code} · {law.name}</option>)}
                 </select>
               </label>
@@ -193,8 +199,8 @@ export function BuscadorLegal() {
         {!result && !isSearching && (
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
             <Search className="mx-auto text-slate-300" size={30} />
-            <h2 className="mt-3 text-sm font-extrabold text-slate-900">Busca por concepto o artículo</h2>
-            <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-slate-500">Ejemplos: “rescisión laboral”, “prescripción fiscal” o “artículo 47”.</p>
+            <h2 className="mt-3 font-serif text-lg font-bold text-slate-900">¿Qué deseas consultar?</h2>
+            <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-slate-500">Puedes buscar una situación jurídica, un concepto o un artículo específico. Por ejemplo: “rescisión laboral”, “prescripción fiscal” o “artículo 47”.</p>
           </div>
         )}
 
@@ -203,16 +209,16 @@ export function BuscadorLegal() {
             <div className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-extrabold text-slate-900">{result.articles.length} {result.articles.length === 1 ? 'resultado' : 'resultados'} para “{result.query}”</p>
-                <p className="mt-1 text-xs text-slate-500">Alcance: {result.scopeLabel}</p>
+                <p className="mt-1 text-xs text-slate-500">Área consultada: {result.scopeLabel}</p>
               </div>
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500"><Clock3 size={14} /> {result.executionTimeMs} ms · SQLite local</span>
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500"><ShieldCheck size={14} /> Búsqueda realizada en este dispositivo</span>
             </div>
 
             {result.articles.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
                 <FileSearch className="mx-auto text-slate-400" size={32} />
-                <h2 className="mt-3 text-sm font-extrabold text-slate-900">Sin coincidencias en este alcance</h2>
-                <p className="mt-1 text-xs leading-5 text-slate-500">Prueba términos más breves, selecciona otra área o busca en todo el corpus.</p>
+                <h2 className="mt-3 text-sm font-extrabold text-slate-900">No encontramos coincidencias</h2>
+                <p className="mt-1 text-xs leading-5 text-slate-500">Prueba con menos palabras, elige otra área o consulta todas las leyes y reglamentos.</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -239,7 +245,7 @@ export function BuscadorLegal() {
                           </div>
                         </div>
 
-                        <p className={`mt-4 whitespace-pre-line text-sm leading-7 text-slate-700 ${isExpanded ? '' : 'line-clamp-5'}`}>{article.content}</p>
+                        <p className={`mt-4 max-w-[78ch] whitespace-pre-line text-sm leading-7 text-slate-700 ${isExpanded ? '' : 'line-clamp-5'}`}>{article.content}</p>
 
                         <div className="mt-4 flex flex-col gap-2 border-t border-slate-100 pt-3 sm:flex-row sm:items-center sm:justify-between">
                           <a href={article.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-xl text-xs font-bold text-blue-700 hover:text-blue-900"><ExternalLink size={15} /> {article.sourceName}</a>
@@ -254,7 +260,7 @@ export function BuscadorLegal() {
               </div>
             )}
 
-            <p className="rounded-xl bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900">El texto mostrado pertenece al corpus local. Antes de citar o actuar, coteja reformas, vigencia y publicación en la fuente oficial enlazada.</p>
+            <p className="rounded-xl border border-amber-200/70 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-950">Antes de citar o tomar una decisión, confirma la reforma, vigencia y publicación en la fuente oficial.</p>
           </div>
         )}
       </main>

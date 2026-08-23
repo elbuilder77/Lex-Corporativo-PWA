@@ -19,7 +19,7 @@ export function SearchLibrarySheet({ open, onClose, onRepeat }: SearchLibraryShe
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/60 sm:items-center sm:p-4" onClick={onClose}>
       <section aria-modal="true" role="dialog" aria-label="Guardados" className="flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-white shadow-2xl sm:rounded-3xl" onClick={(event) => event.stopPropagation()}>
         <header className="flex items-center justify-between border-b border-slate-200 p-4">
-          <div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-700"><BookMarked size={20} /></span><div><h2 className="text-sm font-extrabold text-slate-950">Guardados</h2><p className="text-[11px] text-slate-500">Sólo en este navegador</p></div></div>
+          <div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-700"><BookMarked size={20} /></span><div><h2 className="text-sm font-extrabold text-slate-950">Guardados</h2><p className="text-[11px] text-slate-500">Guardado en este dispositivo</p></div></div>
           <button type="button" onClick={onClose} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100" aria-label="Cerrar"><X size={19} /></button>
         </header>
 
@@ -29,7 +29,7 @@ export function SearchLibrarySheet({ open, onClose, onRepeat }: SearchLibraryShe
         </div>
 
         <div className="flex-1 space-y-3 overflow-y-auto p-4">
-          {!empty && <div className="flex justify-end"><button type="button" onClick={tab === 'history' ? clearHistory : clearFavorites} className="inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-xs font-bold text-red-600 hover:bg-red-50"><Trash2 size={15} /> Limpiar</button></div>}
+          {!empty && <div className="flex justify-end"><button type="button" onClick={tab === 'history' ? clearHistory : clearFavorites} className="inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-xs font-bold text-red-600 hover:bg-red-50"><Trash2 size={15} /> Borrar</button></div>}
 
           {empty && <div className="py-12 text-center"><Heart className="mx-auto text-slate-300" size={32} /><p className="mt-3 text-sm font-bold text-slate-800">Nada guardado todavía</p><p className="mt-1 text-xs text-slate-500">Tus consultas y artículos favoritos aparecerán aquí.</p></div>}
 
@@ -37,7 +37,7 @@ export function SearchLibrarySheet({ open, onClose, onRepeat }: SearchLibraryShe
             <article key={item.id} className="rounded-2xl border border-slate-200 p-4">
               <p className="text-sm font-extrabold text-slate-950">“{item.query}”</p>
               <p className="mt-1 text-[11px] text-slate-500">{item.scopeLabel} · {item.resultCount} resultados</p>
-              <div className="mt-3 flex items-center justify-between gap-2"><span className="inline-flex items-center gap-1 text-[10px] text-slate-400"><Clock3 size={12} /> {new Date(item.timestamp).toLocaleDateString('es-MX')}</span><div className="flex gap-1"><button type="button" onClick={() => onRepeat(item)} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-slate-900 px-4 text-xs font-bold text-white"><RotateCcw size={14} /> Repetir</button><button type="button" onClick={() => removeFromHistory(item.id)} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl text-slate-400 hover:bg-red-50 hover:text-red-600" aria-label="Eliminar"><Trash2 size={16} /></button></div></div>
+              <div className="mt-3 flex items-center justify-between gap-2"><span className="inline-flex items-center gap-1 text-[10px] text-slate-400"><Clock3 size={12} /> {new Date(item.timestamp).toLocaleDateString('es-MX')}</span><div className="flex gap-1"><button type="button" onClick={() => onRepeat(item)} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-slate-900 px-4 text-xs font-bold text-white"><RotateCcw size={14} /> Consultar de nuevo</button><button type="button" onClick={() => removeFromHistory(item.id)} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl text-slate-400 hover:bg-red-50 hover:text-red-600" aria-label="Eliminar"><Trash2 size={16} /></button></div></div>
             </article>
           ))}
 

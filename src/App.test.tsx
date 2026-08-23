@@ -10,7 +10,7 @@ describe('App de un solo módulo', () => {
 
   it('abre directamente el buscador sin navegación por módulos', () => {
     render(<App />);
-    expect(screen.getByRole('heading', { name: 'Consulta normativa local y verificable' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Consulta la legislación federal con respaldo oficial' })).toBeInTheDocument();
     expect(screen.getByRole('searchbox')).toBeInTheDocument();
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
