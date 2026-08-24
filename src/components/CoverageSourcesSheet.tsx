@@ -67,6 +67,9 @@ export function CoverageSourcesSheet({ open, onClose }: CoverageSourcesSheetProp
               <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-emerald-800">
                 <CheckCircle2 size={13} /> {COVERAGE_SUMMARY.available} fuente consultable
               </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-blue-800">
+                <Landmark size={13} /> {COVERAGE_SUMMARY.partial} cobertura parcial
+              </span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-blue-800 ring-1 ring-blue-200">
                 <RadioTower size={13} /> {COVERAGE_SUMMARY.prioritized} conectores priorizados
               </span>
@@ -79,6 +82,7 @@ export function CoverageSourcesSheet({ open, onClose }: CoverageSourcesSheetProp
           <div className="space-y-2.5">
             {PROCUREMENT_SOURCES.map((source) => {
               const available = source.status === 'available';
+              const partial = source.status === 'partial';
               return (
                 <article key={source.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -94,14 +98,25 @@ export function CoverageSourcesSheet({ open, onClose }: CoverageSourcesSheetProp
                           className={`rounded-full px-2.5 py-0.5 text-[10px] font-extrabold ${
                             available
                               ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+                              : partial
+                                ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-200'
                               : 'bg-amber-50 text-amber-800 ring-1 ring-amber-200'
                           }`}
                         >
-                          {available ? 'Disponible en Lex' : 'Integración priorizada'}
+                          {available
+                            ? 'Disponible en Lex'
+                            : partial
+                              ? 'Cobertura parcial'
+                              : 'Integración priorizada'}
                         </span>
                       </div>
                       <p className="mt-1.5 text-xs font-bold text-slate-700">{source.sourceName}</p>
                       <p className="mt-1 text-xs leading-5 text-slate-500">{source.description}</p>
+                      {source.lastVerifiedAt && (
+                        <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-blue-700">
+                          Verificada el {new Date(`${source.lastVerifiedAt}T12:00:00`).toLocaleDateString('es-MX')}
+                        </p>
+                      )}
                     </div>
                     <a
                       href={source.sourceUrl}

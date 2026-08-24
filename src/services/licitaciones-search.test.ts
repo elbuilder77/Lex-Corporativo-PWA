@@ -39,6 +39,17 @@ describe('licitaciones-search', () => {
     expect(result.licitaciones.some((l) => l.entidadFederativa === 'Jalisco')).toBe(true);
   });
 
+  it('encuentra la publicación estatal verificada de Yucatán', async () => {
+    const result = await executeLicitacionesSearch({
+      query: 'PODJUDTSJ-CA 07/2026',
+      entidadFederativa: 'Yucatán',
+      sortBy: 'relevancia',
+    });
+
+    expect(result.licitaciones[0].id).toBe('yuc-pj-tsj-2026-07');
+    expect(result.licitaciones[0].fuenteOficial?.ambito).toBe('estatal');
+  });
+
   it('filtra por término de búsqueda y ordena por relevancia', async () => {
     const result = await executeLicitacionesSearch({
       query: 'ciberseguridad',

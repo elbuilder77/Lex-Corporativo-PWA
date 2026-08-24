@@ -1,4 +1,4 @@
-export type ProcurementSourceStatus = 'available' | 'prioritized';
+export type ProcurementSourceStatus = 'available' | 'partial' | 'prioritized';
 
 export interface ProcurementSource {
   id: string;
@@ -8,6 +8,7 @@ export interface ProcurementSource {
   sourceUrl: string;
   status: ProcurementSourceStatus;
   description: string;
+  lastVerifiedAt?: string;
 }
 
 export const PROCUREMENT_SOURCES: ProcurementSource[] = [
@@ -30,13 +31,23 @@ export const PROCUREMENT_SOURCES: ProcurementSource[] = [
     description: 'Convocatorias y subastas de las dependencias centrales. Conector estatal priorizado.',
   },
   {
-    id: 'yucatan',
+    id: 'yucatan-poder-judicial',
     territory: 'Yucatán',
+    scope: 'Estatal',
+    sourceName: 'Poder Judicial de Yucatán · Actas y licitaciones',
+    sourceUrl: 'https://www.pjyucatan.gob.mx/transparencia/informacion_publica/tsj/licitaciones',
+    status: 'partial',
+    lastVerifiedAt: '2026-08-24',
+    description: 'Primera publicación estatal integrada. La cobertura se limita al Tribunal Superior de Justicia y conserva como pendientes los campos que la fuente no expone.',
+  },
+  {
+    id: 'yucatan-central',
+    territory: 'Yucatán · Gobierno central',
     scope: 'Estatal',
     sourceName: 'Plataforma de Adquisiciones · Gobierno de Yucatán',
     sourceUrl: 'https://adquisiciones.yucatan.gob.mx/',
     status: 'prioritized',
-    description: 'Concursos, convocatorias y licitaciones en proceso. Conector estatal priorizado.',
+    description: 'Concursos, convocatorias y licitaciones en proceso. Siguiente ampliación del conector estatal.',
   },
   {
     id: 'jalisco',
@@ -60,6 +71,7 @@ export const PROCUREMENT_SOURCES: ProcurementSource[] = [
 
 export const COVERAGE_SUMMARY = {
   available: PROCUREMENT_SOURCES.filter((source) => source.status === 'available').length,
+  partial: PROCUREMENT_SOURCES.filter((source) => source.status === 'partial').length,
   prioritized: PROCUREMENT_SOURCES.filter((source) => source.status === 'prioritized').length,
 };
 

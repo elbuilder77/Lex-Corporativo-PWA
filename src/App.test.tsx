@@ -52,7 +52,7 @@ describe('App Lex Corporativo PWA', () => {
     });
 
     expect(
-      screen.getByRole('heading', { name: 'Licitaciones Públicas Abiertas en México' }),
+      screen.getByRole('heading', { name: 'Radar de Licitaciones Públicas en México' }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('searchbox', { name: '¿Qué licitación, insumo o servicio buscas?' }),
@@ -75,6 +75,7 @@ describe('App Lex Corporativo PWA', () => {
     expect(within(dialog).getByText('Yucatán')).toBeInTheDocument();
     expect(within(dialog).getByText('Jalisco')).toBeInTheDocument();
     expect(within(dialog).getByText('Ciudad de México')).toBeInTheDocument();
+    expect(within(dialog).getByText('Cobertura parcial')).toBeInTheDocument();
     expect(within(dialog).getAllByText('Integración priorizada')).toHaveLength(4);
     expect(screen.queryByText('Guardados')).not.toBeInTheDocument();
   });

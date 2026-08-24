@@ -2,14 +2,31 @@ import type {
   LicitacionCaracter,
   LicitacionEstatus,
   LicitacionMateria,
+  LicitacionOfficialSource,
   LicitacionPublica,
   LicitacionTipoProcedimiento,
 } from '../types';
+import { YUCATAN_PODER_JUDICIAL_LICITACIONES } from './connectors/yucatan-poder-judicial';
 
 export const COMPRANET_PORTAL_URL = 'https://comprasmx.buengobierno.gob.mx';
 export const COMPRANET_GOB_URL = 'https://www.gob.mx/compranet';
 export const DATOS_ABIERTOS_URL = 'https://datos.gob.mx/busca/dataset/concentrado-de-contrataciones-abiertas-de-la-apf';
 export const PDN_CONTRATACIONES_URL = 'https://www.plataformadigitalnacional.org/contrataciones';
+
+const COMPRANET_SOURCE: LicitacionOfficialSource = {
+  id: 'compranet',
+  nombre: 'ComprasMX · CompraNet',
+  url: COMPRANET_PORTAL_URL,
+  ambito: 'federal',
+  verificadaEl: '2026-08-24',
+  integridad: 'complete',
+};
+
+export function getLicitacionOfficialSource(
+  licitacion: LicitacionPublica,
+): LicitacionOfficialSource {
+  return licitacion.fuenteOficial ?? COMPRANET_SOURCE;
+}
 
 export const MATERIA_LABELS: Record<'todas' | LicitacionMateria, string> = {
   todas: 'Todas las materias',
@@ -25,6 +42,7 @@ export const CARACTER_LABELS: Record<'todos' | LicitacionCaracter, string> = {
   nacional: 'Nacional',
   internacional_tlc: 'Internacional bajo TLC',
   internacional_abierta: 'Internacional abierta',
+  no_especificado: 'Por confirmar',
 };
 
 export const TIPO_PROCEDIMIENTO_LABELS: Record<LicitacionTipoProcedimiento, string> = {
@@ -82,7 +100,7 @@ export const ENTIDADES_FEDERATIVAS_MEXICO: string[] = [
   'Zacatecas',
 ];
 
-export const LICITACIONES_DATA: LicitacionPublica[] = [
+const FEDERAL_LICITACIONES_DATA: LicitacionPublica[] = [
   {
     id: 'lic-imss-2026-001',
     numeroProcedimiento: 'LA-50-GYR-050GYR001-N-12-2026',
@@ -687,6 +705,11 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
   },
 ];
 
+export const LICITACIONES_DATA: LicitacionPublica[] = [
+  ...YUCATAN_PODER_JUDICIAL_LICITACIONES,
+  ...FEDERAL_LICITACIONES_DATA,
+];
+
 export const LICITACIONES_STATS = {
   total: LICITACIONES_DATA.length,
   convocantes: new Set(LICITACIONES_DATA.map((l) => l.convocante)).size,
@@ -765,7 +788,15 @@ export interface DaysRemainingInfo {
   badgeStyle: 'urgent' | 'warning' | 'open';
 }
 
-export function getDaysRemaining(isoString: string): DaysRemainingInfo {
+export function getDaysRemaining(isoString?: string): DaysRemainingInfo {
+  if (!isoString) {
+    return {
+      days: 0,
+      isExpired: false,
+      label: 'Plazo por verificar',
+      badgeStyle: 'open',
+    };
+  }
   try {
     const target = new Date(isoString).getTime();
     const now = Date.now();

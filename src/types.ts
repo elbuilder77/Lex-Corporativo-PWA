@@ -34,7 +34,20 @@ export type LicitacionMateria =
 export type LicitacionCaracter =
   | 'nacional'
   | 'internacional_tlc'
-  | 'internacional_abierta';
+  | 'internacional_abierta'
+  | 'no_especificado';
+
+export type LicitacionAmbito = 'federal' | 'estatal' | 'municipal';
+export type LicitacionDataCompleteness = 'complete' | 'publication_only';
+
+export interface LicitacionOfficialSource {
+  id: string;
+  nombre: string;
+  url: string;
+  ambito: LicitacionAmbito;
+  verificadaEl: string;
+  integridad: LicitacionDataCompleteness;
+}
 
 export type LicitacionTipoProcedimiento =
   | 'licitacion_publica'
@@ -66,12 +79,13 @@ export interface LicitacionPublica {
   fechaPublicacion: string;
   fechaVisitaSitio?: string;
   fechaJuntaAclaraciones?: string;
-  fechaLimitePropuestas: string;
+  fechaLimitePropuestas?: string;
   fechaFallo?: string;
   montoEstimado?: number;
   moneda: 'MXN' | 'USD';
   marcoLegal: string;
   enlaceCompraNet: string;
+  fuenteOficial?: LicitacionOfficialSource;
   requisitosClave: string[];
   anexosDisponibles: string[];
   score?: number;

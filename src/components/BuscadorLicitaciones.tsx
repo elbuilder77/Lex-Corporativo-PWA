@@ -34,6 +34,7 @@ import {
   getAvailableConvocantes,
   getAvailableEntidades,
   getDaysRemaining,
+  getLicitacionOfficialSource,
   LICITACIONES_STATS,
   MATERIA_LABELS,
   TIPO_PROCEDIMIENTO_LABELS,
@@ -65,7 +66,11 @@ function getInitialSort(value: string | null): LicitacionSort {
 
 function licitacionPlainText(licitacion: LicitacionPublica): string {
   const daysInfo = getDaysRemaining(licitacion.fechaLimitePropuestas);
-  return `FICHA DE LICITACIÓN PÚBLICA — MÉXICO (COMPRANET)
+  const source = getLicitacionOfficialSource(licitacion);
+  const deadline = licitacion.fechaLimitePropuestas
+    ? `${formatDateTime(licitacion.fechaLimitePropuestas)} (${daysInfo.label})`
+    : 'Por verificar en la fuente oficial';
+  return `FICHA DE LICITACIÓN PÚBLICA — MÉXICO
 ==================================================
 Procedimiento: ${licitacion.numeroProcedimiento}
 Expediente: ${licitacion.expediente}
@@ -78,10 +83,11 @@ Carácter: ${CARACTER_LABELS[licitacion.caracter]}
 Tipo: ${TIPO_PROCEDIMIENTO_LABELS[licitacion.tipoProcedimiento]}
 Estatus: ${ESTATUS_LABELS[licitacion.estatus]}
 Entidad: ${licitacion.entidadFederativa}
+Ámbito: ${source.ambito}
 
 FECHAS CRÍTICAS:
 - Publicación: ${formatDate(licitacion.fechaPublicacion)}
-${licitacion.fechaVisitaSitio ? `- Visita al sitio: ${formatDate(licitacion.fechaVisitaSitio)}\n` : ''}${licitacion.fechaJuntaAclaraciones ? `- Junta de aclaraciones: ${formatDate(licitacion.fechaJuntaAclaraciones)}\n` : ''}- Límite presentación de propuestas: ${formatDateTime(licitacion.fechaLimitePropuestas)} (${daysInfo.label})
+${licitacion.fechaVisitaSitio ? `- Visita al sitio: ${formatDate(licitacion.fechaVisitaSitio)}\n` : ''}${licitacion.fechaJuntaAclaraciones ? `- Junta de aclaraciones: ${formatDate(licitacion.fechaJuntaAclaraciones)}\n` : ''}- Límite presentación de propuestas: ${deadline}
 ${licitacion.fechaFallo ? `- Fallo estimado: ${formatDate(licitacion.fechaFallo)}\n` : ''}
 PRESUPUESTO:
 ${licitacion.montoEstimado ? formatCurrency(licitacion.montoEstimado, licitacion.moneda) : 'No especificado'}
@@ -92,8 +98,9 @@ ${licitacion.marcoLegal}
 REQUISITOS CLAVE:
 ${licitacion.requisitosClave.map((r) => `• ${r}`).join('\n')}
 
-Enlace oficial en CompraNet:
-${licitacion.enlaceCompraNet}`;
+Fuente oficial: ${source.nombre}
+Verificada por Lex: ${formatDate(source.verificadaEl)}
+${source.url}`;
 }
 
 export function BuscadorLicitaciones() {
@@ -275,9 +282,14 @@ export function BuscadorLicitaciones() {
   const shareLicitacion = async (licitacion: LicitacionPublica) => {
     try {
       if (navigator.share) {
+        const source = getLicitacionOfficialSource(licitacion);
         await navigator.share({
           title: `${licitacion.siglasConvocante} · ${licitacion.numeroProcedimiento}`,
-          text: `${licitacion.titulo}\nLímite: ${formatDateTime(licitacion.fechaLimitePropuestas)}\n${licitacion.enlaceCompraNet}`,
+          text: `${licitacion.titulo}\nLímite: ${
+            licitacion.fechaLimitePropuestas
+              ? formatDateTime(licitacion.fechaLimitePropuestas)
+              : 'Por verificar'
+          }\n${source.url}`,
         });
       } else {
         await copyLicitacion(licitacion);
@@ -298,7 +310,7 @@ export function BuscadorLicitaciones() {
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 rounded-full border border-blue-400/40 bg-blue-950/60 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-blue-300">
               <Landmark size={13} />
-              <span>CompraNet · {LICITACIONES_STATS.total.toLocaleString('es-MX')} Convocatorias</span>
+              <span>Fuentes oficiales · {LICITACIONES_STATS.total.toLocaleString('es-MX')} publicaciones</span>
             </div>
 
             <div
@@ -315,10 +327,10 @@ export function BuscadorLicitaciones() {
           </div>
 
           <h1 className="mt-3 font-serif text-xl font-bold leading-tight sm:text-2xl text-white">
-            Licitaciones Públicas Abiertas en México
+            Radar de Licitaciones Públicas en México
           </h1>
           <p className="mt-1 text-xs text-slate-400 sm:text-sm">
-            Consulta de convocatorias federales con filtro territorial, fechas de cierre, presupuestos y enlace oficial a CompraNet.
+            Consulta publicaciones federales y la primera cobertura estatal de Yucatán, siempre con procedencia y campos pendientes visibles.
           </p>
 
           {/* Integrated Search Box */}
@@ -633,7 +645,7 @@ export function BuscadorLicitaciones() {
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
             <Landmark className="mx-auto text-slate-400" size={36} />
             <h2 className="mt-3 text-sm font-extrabold text-slate-900">
-              Consulta convocatorias y licitaciones vigentes
+              Consulta convocatorias y publicaciones verificables
             </h2>
             <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-slate-500">
               Ingresa una palabra clave, dependencia convocante, materia o número de procedimiento para explorar los procedimientos de contratación pública.
@@ -646,7 +658,7 @@ export function BuscadorLicitaciones() {
           <div className="mb-4 flex flex-col gap-2.5 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-xs sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-sm font-extrabold text-slate-950">
-                {result.total} {result.total === 1 ? 'licitación encontrada' : 'licitaciones abiertas encontradas'}
+                {result.total} {result.total === 1 ? 'publicación encontrada' : 'publicaciones encontradas'}
                 {query.trim() && <span className="font-semibold text-slate-700"> para "{result.query}"</span>}
               </p>
               <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
@@ -670,7 +682,7 @@ export function BuscadorLicitaciones() {
                 rel="noreferrer"
                 className="inline-flex min-h-8 items-center gap-1.5 rounded-lg bg-slate-900 px-3 text-xs font-bold text-white hover:bg-slate-800"
               >
-                Portal CompraNet <ExternalLink size={12} />
+                Portal federal <ExternalLink size={12} />
               </a>
             </div>
           </div>
@@ -703,6 +715,7 @@ export function BuscadorLicitaciones() {
             {result.licitaciones.map((licitacion) => {
               const isExpanded = expanded.has(licitacion.id);
               const daysInfo = getDaysRemaining(licitacion.fechaLimitePropuestas);
+              const source = getLicitacionOfficialSource(licitacion);
 
               return (
                 <article
@@ -725,6 +738,14 @@ export function BuscadorLicitaciones() {
                         <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">
                           {CARACTER_LABELS[licitacion.caracter]}
                         </span>
+                        <span className="rounded-md bg-violet-50 px-2 py-0.5 text-[10px] font-bold capitalize text-violet-700">
+                          {source.ambito}
+                        </span>
+                        {source.integridad === 'publication_only' && (
+                          <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 ring-1 ring-blue-200">
+                            Datos parciales
+                          </span>
+                        )}
                       </div>
 
                       {/* Deadline Countdown Badge (Right Aligned) */}
@@ -757,6 +778,10 @@ export function BuscadorLicitaciones() {
                           <span>{licitacion.convocante}</span>
                           <span className="text-slate-300">·</span>
                           <span className="text-slate-500">{licitacion.unidadCompradora}</span>
+                        </p>
+                        <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-blue-700">
+                          <ShieldCheck size={12} className="shrink-0" />
+                          Fuente: {source.nombre} · verificada {formatDate(source.verificadaEl)}
                         </p>
                       </div>
 
@@ -814,7 +839,9 @@ export function BuscadorLicitaciones() {
                           <Calendar size={11} className="text-slate-400" /> Límite
                         </span>
                         <p className="mt-0.5 text-xs font-extrabold text-slate-900">
-                          {formatDate(licitacion.fechaLimitePropuestas)}
+                          {licitacion.fechaLimitePropuestas
+                            ? formatDate(licitacion.fechaLimitePropuestas)
+                            : 'Por verificar'}
                         </p>
                       </div>
 
@@ -874,7 +901,9 @@ export function BuscadorLicitaciones() {
                             <div className="rounded-lg bg-white p-2 border border-slate-200/80">
                               <span className="text-[10px] font-semibold text-slate-500">Límite de Propuestas</span>
                               <p className="text-xs font-bold text-slate-900">
-                                {formatDateTime(licitacion.fechaLimitePropuestas)}
+                                {licitacion.fechaLimitePropuestas
+                                  ? formatDateTime(licitacion.fechaLimitePropuestas)
+                                  : 'Por verificar en la fuente oficial'}
                               </p>
                             </div>
                             {licitacion.fechaFallo && (
@@ -903,14 +932,20 @@ export function BuscadorLicitaciones() {
                             <span className="flex items-center gap-1.5 text-xs font-extrabold text-slate-900">
                               <FileCheck2 size={13} className="text-emerald-700" /> Requisitos Clave
                             </span>
-                            <ul className="mt-1 space-y-1 text-xs text-slate-600">
-                              {licitacion.requisitosClave.map((req, i) => (
-                                <li key={i} className="flex items-start gap-1.5">
-                                  <span className="text-emerald-600 font-bold">•</span>
-                                  <span>{req}</span>
-                                </li>
-                              ))}
-                            </ul>
+                            {licitacion.requisitosClave.length > 0 ? (
+                              <ul className="mt-1 space-y-1 text-xs text-slate-600">
+                                {licitacion.requisitosClave.map((req, i) => (
+                                  <li key={i} className="flex items-start gap-1.5">
+                                    <span className="text-emerald-600 font-bold">•</span>
+                                    <span>{req}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="mt-1 text-xs leading-5 text-blue-700">
+                                Pendientes de verificación en las bases oficiales.
+                              </p>
+                            )}
                           </div>
                         </div>
 
@@ -918,7 +953,7 @@ export function BuscadorLicitaciones() {
                         {licitacion.anexosDisponibles.length > 0 && (
                           <div className="pt-1">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                              Documentos y anexos en CompraNet:
+                              Documentos y anexos en {source.nombre}:
                             </span>
                             <div className="mt-1 flex flex-wrap gap-1.5">
                               {licitacion.anexosDisponibles.map((anexo, i) => (
@@ -958,12 +993,12 @@ export function BuscadorLicitaciones() {
 
                       {/* Secondary Button: ComprasMX sin relleno amarillo */}
                       <a
-                        href={licitacion.enlaceCompraNet}
+                        href={source.url}
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 px-4 text-xs font-bold text-slate-800 transition active:scale-95"
                       >
-                        <ExternalLink size={14} /> Ver en ComprasMX (CompraNet)
+                        <ExternalLink size={14} /> Ver fuente oficial
                       </a>
                     </div>
                   </div>
@@ -972,9 +1007,9 @@ export function BuscadorLicitaciones() {
             })}
 
             <div className="rounded-xl border border-blue-200/70 bg-blue-50 px-4 py-3 text-xs leading-5 text-blue-950">
-              <strong>Nota de consulta:</strong> La información de procedimientos y plazos corresponde a
-              las convocatorias públicas federales. Antes de presentar propuestas, valida las aclaraciones
-              y modificaciones vigentes en la plataforma oficial de CompraNet.
+              <strong>Nota de consulta:</strong> Lex identifica la procedencia y señala expresamente los
+              campos pendientes. Antes de presentar propuestas, valida vigencia, bases, aclaraciones y
+              modificaciones directamente en la fuente oficial de cada procedimiento.
             </div>
           </div>
         )}

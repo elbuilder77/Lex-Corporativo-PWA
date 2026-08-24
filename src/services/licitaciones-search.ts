@@ -136,8 +136,12 @@ export async function executeLicitacionesSearch(
       return (b.montoEstimado ?? 0) - (a.montoEstimado ?? 0);
     }
     // Default: 'cierre_proximo' (closest deadline first)
-    const timeA = new Date(a.fechaLimitePropuestas).getTime();
-    const timeB = new Date(b.fechaLimitePropuestas).getTime();
+    const timeA = a.fechaLimitePropuestas
+      ? new Date(a.fechaLimitePropuestas).getTime()
+      : Number.POSITIVE_INFINITY;
+    const timeB = b.fechaLimitePropuestas
+      ? new Date(b.fechaLimitePropuestas).getTime()
+      : Number.POSITIVE_INFINITY;
     return timeA - timeB;
   });
 

@@ -5,6 +5,7 @@ import {
   getAvailableConvocantes,
   getAvailableEntidades,
   getDaysRemaining,
+  getLicitacionOfficialSource,
   LICITACIONES_DATA,
   LICITACIONES_STATS,
 } from './licitaciones-catalog';
@@ -55,5 +56,19 @@ describe('licitaciones-catalog', () => {
     const expiredInfo = getDaysRemaining(pastDate);
     expect(expiredInfo.isExpired).toBe(true);
     expect(expiredInfo.label).toContain('vencido');
+
+    const unknownInfo = getDaysRemaining();
+    expect(unknownInfo.isExpired).toBe(false);
+    expect(unknownInfo.label).toBe('Plazo por verificar');
+  });
+
+  it('integra la primera publicación oficial de Yucatán sin completar campos ausentes', () => {
+    const yucatan = LICITACIONES_DATA.find((item) => item.id === 'yuc-pj-tsj-2026-07');
+
+    expect(yucatan).toBeDefined();
+    expect(yucatan?.fechaLimitePropuestas).toBeUndefined();
+    expect(yucatan?.montoEstimado).toBeUndefined();
+    expect(getLicitacionOfficialSource(yucatan!).nombre).toContain('Poder Judicial de Yucatán');
+    expect(getLicitacionOfficialSource(yucatan!).integridad).toBe('publication_only');
   });
 });
