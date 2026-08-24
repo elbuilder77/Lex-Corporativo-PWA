@@ -8,7 +8,7 @@ import {
   WifiOff,
   X,
 } from 'lucide-react';
-import { CORPUS_STATS, OFFICIAL_LAWS_URL, OFFICIAL_REGULATIONS_URL } from '../lib/corpus-catalog';
+import { CORPUS_STATS, OFFICIAL_LAWS_URL } from '../lib/corpus-catalog';
 import { COMPRANET_GOB_URL, COMPRANET_PORTAL_URL, DATOS_ABIERTOS_URL, LICITACIONES_STATS } from '../lib/licitaciones-catalog';
 import { useSearchStore } from '../store/useSearchStore';
 import { useUiStore } from '../store/useUiStore';
