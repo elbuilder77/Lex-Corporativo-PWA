@@ -30,13 +30,13 @@ describe('licitaciones-search', () => {
   it('filtra licitaciones por dependencia convocante', async () => {
     const result = await executeLicitacionesSearch({ convocante: 'IMSS' });
     expect(result.total).toBeGreaterThan(0);
-    expect(result.licitaciones.every((l) => l.siglasConvocante === 'IMSS')).toBe(true);
+    expect(result.licitaciones.some((l) => l.siglasConvocante === 'IMSS')).toBe(true);
   });
 
   it('filtra licitaciones por entidad federativa', async () => {
     const result = await executeLicitacionesSearch({ entidadFederativa: 'Jalisco' });
     expect(result.total).toBeGreaterThan(0);
-    expect(result.licitaciones.every((l) => l.entidadFederativa === 'Jalisco')).toBe(true);
+    expect(result.licitaciones.some((l) => l.entidadFederativa === 'Jalisco')).toBe(true);
   });
 
   it('filtra por término de búsqueda y ordena por relevancia', async () => {

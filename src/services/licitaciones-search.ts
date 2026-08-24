@@ -90,18 +90,24 @@ export async function executeLicitacionesSearch(
 
   // Filter by convocante (siglas or name)
   if (filter.convocante && filter.convocante !== 'todas') {
-    list = list.filter(
-      (item) =>
-        item.siglasConvocante.toLowerCase() === filter.convocante?.toLowerCase() ||
-        item.convocante.toLowerCase().includes(filter.convocante?.toLowerCase() ?? ''),
-    );
+    const targetConv = normalizeText(filter.convocante);
+    list = list.filter((item) => {
+      const sig = normalizeText(item.siglasConvocante);
+      const name = normalizeText(item.convocante);
+      return sig.includes(targetConv) || targetConv.includes(sig) || name.includes(targetConv);
+    });
   }
 
-  // Filter by entidad federativa
+  // Filter by entidad federativa (matches specific state or national tenders)
   if (filter.entidadFederativa && filter.entidadFederativa !== 'todas') {
-    list = list.filter(
-      (item) => item.entidadFederativa.toLowerCase() === filter.entidadFederativa?.toLowerCase(),
-    );
+    const targetEnt = normalizeText(filter.entidadFederativa);
+    list = list.filter((item) => {
+      const itemEnt = normalizeText(item.entidadFederativa);
+      if (targetEnt.includes('nacional') || targetEnt.includes('federal')) {
+        return itemEnt.includes('nacional') || itemEnt.includes('federal');
+      }
+      return itemEnt === targetEnt || itemEnt.includes(targetEnt) || itemEnt.includes('nacional') || itemEnt.includes('federal');
+    });
   }
 
   // Filter by estatus

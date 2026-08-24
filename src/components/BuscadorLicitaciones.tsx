@@ -24,6 +24,7 @@ import {
   ShieldCheck,
   Sparkles,
   WifiOff,
+  X,
   Zap,
 } from 'lucide-react';
 import logoMark from '../assets/logo-mark.png';
@@ -58,10 +59,14 @@ const SUGGESTED_LICITACIONES = [
   { label: 'Subestaciones CFE', query: 'subestaciones', convocante: 'CFE' },
   { label: 'Puentes y Carreteras SICT', query: 'carretero puente', convocante: 'SICT' },
   { label: 'Ciberseguridad SAT', query: 'ciberseguridad', convocante: 'SAT' },
-  { label: 'Arrendamiento PEMEX', query: 'perforación', convocante: 'PEMEX' },
+  { label: 'Perforación PEMEX', query: 'perforación', convocante: 'PEMEX' },
   { label: 'Flotilla Vehicular', query: 'vehículos', materia: 'arrendamientos' as const },
   { label: 'Hospitales ISSSTE', query: 'laboratorio clínico', convocante: 'ISSSTE' },
   { label: 'Agua Cutzamala', query: 'bombeo cutzamala', convocante: 'CONAGUA' },
+  { label: 'Corredor Sonora', query: 'corredor sidur', entidad: 'Sonora' },
+  { label: 'Desalinizadora BC', query: 'desalinizadora', entidad: 'Baja California' },
+  { label: 'Arcos C5i Guanajuato', query: 'videovigilancia arcos', entidad: 'Guanajuato' },
+  { label: 'Muelle Dos Bocas', query: 'muelle atraque', entidad: 'Tabasco' },
 ];
 
 function licitacionPlainText(licitacion: LicitacionPublica): string {
@@ -82,7 +87,7 @@ Entidad: ${licitacion.entidadFederativa}
 
 FECHAS CRÍTICAS:
 - Publicación: ${formatDate(licitacion.fechaPublicacion)}
-${licitacion.fechaJuntaAclaraciones ? `- Junta de aclaraciones: ${formatDate(licitacion.fechaJuntaAclaraciones)}\n` : ''}- Límite presentación de propuestas: ${formatDateTime(licitacion.fechaLimitePropuestas)} (${daysInfo.label})
+${licitacion.fechaVisitaSitio ? `- Visita al sitio: ${formatDate(licitacion.fechaVisitaSitio)}\n` : ''}${licitacion.fechaJuntaAclaraciones ? `- Junta de aclaraciones: ${formatDate(licitacion.fechaJuntaAclaraciones)}\n` : ''}- Límite presentación de propuestas: ${formatDateTime(licitacion.fechaLimitePropuestas)} (${daysInfo.label})
 ${licitacion.fechaFallo ? `- Fallo estimado: ${formatDate(licitacion.fechaFallo)}\n` : ''}
 PRESUPUESTO:
 ${licitacion.montoEstimado ? formatCurrency(licitacion.montoEstimado, licitacion.moneda) : 'No especificado'}
@@ -130,6 +135,17 @@ export function BuscadorLicitaciones() {
 
   const availableConvocantes = useMemo(() => getAvailableConvocantes(), []);
   const availableEntidades = useMemo(() => getAvailableEntidades(), []);
+
+  // Count active filters (excluding default values)
+  const activeFiltersCount =
+    (materia !== 'todas' ? 1 : 0) +
+    (caracter !== 'todos' ? 1 : 0) +
+    (convocante !== 'todas' ? 1 : 0) +
+    (entidad !== 'todas' ? 1 : 0) +
+    (estatus !== 'todos' ? 1 : 0) +
+    (sortBy !== 'cierre_proximo' ? 1 : 0);
+
+  const hasActiveFilters = query.trim() !== '' || activeFiltersCount > 0;
 
   const performSearch = async (
     q: string,
@@ -210,13 +226,20 @@ export function BuscadorLicitaciones() {
     );
   };
 
-  const handleSuggestionClick = (sugQuery: string, sugConvocante?: string, sugMateria?: LicitacionMateria) => {
+  const handleSuggestionClick = (
+    sugQuery: string,
+    sugConvocante?: string,
+    sugMateria?: LicitacionMateria,
+    sugEntidad?: string,
+  ) => {
     setQuery(sugQuery);
     const nextMat = sugMateria ?? 'todas';
     const nextConv = sugConvocante ?? 'todas';
+    const nextEnt = sugEntidad ?? 'todas';
     setMateria(nextMat);
     setConvocante(nextConv);
-    void performSearch(sugQuery, nextMat, caracter, nextConv, entidad, estatus, sortBy);
+    setEntidad(nextEnt);
+    void performSearch(sugQuery, nextMat, caracter, nextConv, nextEnt, estatus, sortBy);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -230,15 +253,6 @@ export function BuscadorLicitaciones() {
     setSortBy('cierre_proximo');
     void performSearch('', 'todas', 'todos', 'todas', 'todas', 'todos', 'cierre_proximo');
   };
-
-  const hasActiveFilters =
-    query.trim() !== '' ||
-    materia !== 'todas' ||
-    caracter !== 'todos' ||
-    convocante !== 'todas' ||
-    entidad !== 'todas' ||
-    estatus !== 'todos' ||
-    sortBy !== 'cierre_proximo';
 
   const copyLicitacion = async (licitacion: LicitacionPublica) => {
     try {
@@ -280,62 +294,59 @@ export function BuscadorLicitaciones() {
 
   return (
     <div className="min-h-screen bg-slate-50 pb-12">
-      {/* Hero Banner Section */}
+      {/* Compact Hero & Search Area */}
       <section className="border-b border-slate-800 bg-legal-shell text-white">
-        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-3xl space-y-3">
-              {/* Brand Logo & CompraNet Badge */}
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="inline-flex items-center gap-2.5 rounded-xl border border-legal-gold/30 bg-black/60 px-3 py-1.5 backdrop-blur-xs">
-                  <img
-                    src={logoMark}
-                    alt="Lex Corporativo"
-                    className="h-7 w-7 rounded-md object-cover border border-legal-gold/20"
-                  />
-                  <span className="font-serif text-sm font-bold tracking-wide text-white">
-                    Lex Corporativo
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 rounded-full border border-blue-400/40 bg-blue-950/60 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-blue-300">
-                  <Landmark size={14} /> Contrataciones Públicas · CompraNet
-                </div>
+        <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-6">
+          {/* Header Bar: Brand + Service Title + Live Status */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <div className="inline-flex items-center gap-2 rounded-xl border border-legal-gold/30 bg-black/60 px-2.5 py-1 backdrop-blur-xs">
+                <img
+                  src={logoMark}
+                  alt="Lex Corporativo"
+                  className="h-6 w-6 rounded-md object-cover border border-legal-gold/20"
+                />
+                <span className="font-serif text-xs font-bold tracking-wide text-white">
+                  Lex Corporativo
+                </span>
               </div>
-
-              <h1 className="font-serif text-2xl font-bold leading-tight sm:text-3xl text-white">
-                Buscador de Licitaciones Abiertas en México
-              </h1>
-              <p className="max-w-2xl text-sm leading-6 text-slate-300">
-                Consulta convocatorias activas, pliegos de requisitos y expedientes de contratación del
-                Gobierno Federal, IMSS, CFE, PEMEX, SICT y dependencias estatales con enlace directo a
-                CompraNet.
-              </p>
+              <div className="flex items-center gap-1.5 rounded-full border border-blue-400/40 bg-blue-950/60 px-3 py-0.5 text-[11px] font-extrabold uppercase tracking-wider text-blue-300">
+                <Landmark size={13} /> CompraNet · Contrataciones Abiertas
+              </div>
             </div>
+
             <div
-              className={`inline-flex min-h-11 items-center gap-2 self-start lg:self-center rounded-full border px-4 text-xs font-bold ${
+              className={`inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full border px-3 py-1 text-[11px] font-bold ${
                 isOnline
                   ? 'border-emerald-700/60 bg-emerald-950/40 text-emerald-300'
                   : 'border-amber-700/60 bg-amber-950/40 text-amber-200'
               }`}
             >
-              {isOnline ? <ShieldCheck size={16} /> : <WifiOff size={16} />}
-              {isOnline ? 'Conexión CompraNet activa' : 'Consulta local disponible'}
+              {isOnline ? <ShieldCheck size={14} /> : <WifiOff size={14} />}
+              {isOnline ? 'CompraNet en línea' : 'Consulta local'}
             </div>
           </div>
 
-          {/* Search Box */}
+          <h1 className="mt-3 font-serif text-xl font-bold leading-tight sm:text-2xl text-white">
+            Buscador de Licitaciones Abiertas en México
+          </h1>
+          <p className="mt-1 text-xs text-slate-300 sm:text-sm">
+            Monitoreo en tiempo real de convocatorias públicas, bases de licitación, fechas de cierre y presupuestos del Gobierno Federal y Estados.
+          </p>
+
+          {/* Integrated Search Box */}
           <form
             onSubmit={handleSearchSubmit}
-            className="mt-6 rounded-2xl border border-slate-700 bg-slate-900/80 p-3 shadow-2xl shadow-black/20 sm:p-4"
+            className="mt-4 rounded-2xl border border-slate-700 bg-slate-900/90 p-3 shadow-xl shadow-black/30"
           >
-            <label htmlFor="licitacion-query" className="mb-2 block text-xs font-bold text-slate-200">
+            <label htmlFor="licitacion-query" className="sr-only">
               ¿Qué licitación, insumo o servicio buscas?
             </label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <div className="relative flex-1">
                 <Search
                   className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-                  size={20}
+                  size={18}
                 />
                 <input
                   id="licitacion-query"
@@ -344,57 +355,109 @@ export function BuscadorLicitaciones() {
                   enterKeyHint="search"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Ej. medicamentos, software, mantenimiento, obra civil o número de procedimiento"
+                  placeholder="Buscar por objeto, insumo, servicio o número de procedimiento (ej. medicamentos, obra, software)"
                   autoComplete="off"
-                  className="min-h-12 w-full rounded-xl border border-slate-600 bg-slate-950 py-3 pl-11 pr-4 text-base text-white placeholder:text-slate-500 focus:border-legal-gold focus:outline-none"
+                  className="min-h-11 w-full rounded-xl border border-slate-600 bg-slate-950 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-500 focus:border-legal-gold focus:outline-none"
                 />
               </div>
-              <button
-                type="submit"
-                disabled={isSearching}
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-legal-gold px-6 text-sm font-extrabold text-slate-950 transition hover:bg-legal-goldhover disabled:cursor-wait disabled:opacity-60"
-              >
-                {isSearching ? <LoaderCircle size={18} className="animate-spin" /> : <FileSearch size={18} />} Buscar
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowFilters(!showFilters)}
-                className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border px-4 text-xs font-bold transition sm:min-w-fit ${
-                  showFilters
-                    ? 'border-legal-gold bg-legal-gold/20 text-legal-gold'
-                    : 'border-slate-600 bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }`}
-              >
-                <Filter size={16} /> Filtros {hasActiveFilters && <span className="h-2 w-2 rounded-full bg-legal-gold" />}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="submit"
+                  disabled={isSearching}
+                  className="inline-flex min-h-11 flex-1 sm:flex-initial items-center justify-center gap-2 rounded-xl bg-legal-gold px-5 text-xs font-extrabold text-slate-950 transition hover:bg-legal-goldhover disabled:cursor-wait disabled:opacity-60"
+                >
+                  {isSearching ? <LoaderCircle size={16} className="animate-spin" /> : <FileSearch size={16} />} Buscar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border px-3.5 text-xs font-bold transition ${
+                    showFilters || activeFiltersCount > 0
+                      ? 'border-legal-gold bg-legal-gold/20 text-legal-gold font-extrabold'
+                      : 'border-slate-600 bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  }`}
+                  aria-expanded={showFilters}
+                >
+                  <Filter size={15} />
+                  <span>Filtros</span>
+                  {activeFiltersCount > 0 && (
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-legal-gold text-[10px] font-extrabold text-slate-950">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
 
-            {/* Quick Category Filter Pills */}
-            <div className="mt-3 flex flex-wrap items-center gap-1.5 pt-2">
-              <span className="mr-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                Materia:
-              </span>
-              {(Object.entries(MATERIA_LABELS) as Array<['todas' | LicitacionMateria, string]>).map(
-                ([key, label]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => handleFilterChange(key)}
-                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
-                      materia === key
-                        ? 'bg-legal-gold text-slate-950 font-bold'
-                        : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ),
-              )}
-            </div>
-
-            {/* Collapsible Extended Filters */}
+            {/* Collapsible Structured Filters Bar */}
             {showFilters && (
-              <div className="mt-4 grid gap-3 border-t border-slate-700/80 pt-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="mt-3 grid gap-2.5 border-t border-slate-700/80 pt-3 sm:grid-cols-2 lg:grid-cols-5">
+                {/* 1. Materia */}
+                <label className="text-xs font-bold text-slate-300">
+                  Materia
+                  <select
+                    value={materia}
+                    onChange={(e) =>
+                      handleFilterChange(
+                        e.target.value as 'todas' | LicitacionMateria,
+                        caracter,
+                        convocante,
+                        entidad,
+                        estatus,
+                        sortBy,
+                      )
+                    }
+                    className="mt-1 min-h-10 w-full rounded-xl border border-slate-600 bg-slate-950 px-2.5 text-xs text-white focus:border-legal-gold focus:outline-none"
+                  >
+                    {(Object.entries(MATERIA_LABELS) as Array<['todas' | LicitacionMateria, string]>).map(
+                      ([key, label]) => (
+                        <option key={key} value={key}>
+                          {label}
+                        </option>
+                      ),
+                    )}
+                  </select>
+                </label>
+
+                {/* 2. Entidad Federativa (All 32 states + Nacional) */}
+                <label className="text-xs font-bold text-slate-300">
+                  Entidad Federativa ({availableEntidades.length})
+                  <select
+                    value={entidad}
+                    onChange={(e) =>
+                      handleFilterChange(materia, caracter, convocante, e.target.value, estatus, sortBy)
+                    }
+                    className="mt-1 min-h-10 w-full rounded-xl border border-slate-600 bg-slate-950 px-2.5 text-xs text-white focus:border-legal-gold focus:outline-none"
+                  >
+                    <option value="todas">Todas las 32 entidades</option>
+                    {availableEntidades.map((ent) => (
+                      <option key={ent} value={ent}>
+                        {ent}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                {/* 3. Convocante / Dependencia */}
+                <label className="text-xs font-bold text-slate-300">
+                  Dependencia Convocante
+                  <select
+                    value={convocante}
+                    onChange={(e) =>
+                      handleFilterChange(materia, caracter, e.target.value, entidad, estatus, sortBy)
+                    }
+                    className="mt-1 min-h-10 w-full rounded-xl border border-slate-600 bg-slate-950 px-2.5 text-xs text-white focus:border-legal-gold focus:outline-none"
+                  >
+                    <option value="todas">Todas las dependencias</option>
+                    {availableConvocantes.map((c) => (
+                      <option key={c.siglas} value={c.siglas}>
+                        {c.siglas} · {c.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                {/* 4. Carácter */}
                 <label className="text-xs font-bold text-slate-300">
                   Carácter
                   <select
@@ -409,7 +472,7 @@ export function BuscadorLicitaciones() {
                         sortBy,
                       )
                     }
-                    className="mt-1 min-h-11 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 text-sm text-white focus:border-legal-gold focus:outline-none"
+                    className="mt-1 min-h-10 w-full rounded-xl border border-slate-600 bg-slate-950 px-2.5 text-xs text-white focus:border-legal-gold focus:outline-none"
                   >
                     {(Object.entries(CARACTER_LABELS) as Array<['todos' | LicitacionCaracter, string]>).map(
                       ([key, label]) => (
@@ -421,42 +484,7 @@ export function BuscadorLicitaciones() {
                   </select>
                 </label>
 
-                <label className="text-xs font-bold text-slate-300">
-                  Dependencia / Convocante
-                  <select
-                    value={convocante}
-                    onChange={(e) =>
-                      handleFilterChange(materia, caracter, e.target.value, entidad, estatus, sortBy)
-                    }
-                    className="mt-1 min-h-11 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 text-sm text-white focus:border-legal-gold focus:outline-none"
-                  >
-                    <option value="todas">Todas las dependencias</option>
-                    {availableConvocantes.map((c) => (
-                      <option key={c.siglas} value={c.siglas}>
-                        {c.siglas} · {c.nombre}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label className="text-xs font-bold text-slate-300">
-                  Entidad Federativa
-                  <select
-                    value={entidad}
-                    onChange={(e) =>
-                      handleFilterChange(materia, caracter, convocante, e.target.value, estatus, sortBy)
-                    }
-                    className="mt-1 min-h-11 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 text-sm text-white focus:border-legal-gold focus:outline-none"
-                  >
-                    <option value="todas">Todas las entidades</option>
-                    {availableEntidades.map((ent) => (
-                      <option key={ent} value={ent}>
-                        {ent}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
+                {/* 5. Ordenamiento */}
                 <label className="text-xs font-bold text-slate-300">
                   Ordenar por
                   <select
@@ -471,14 +499,93 @@ export function BuscadorLicitaciones() {
                         e.target.value as 'cierre_proximo' | 'reciente' | 'monto_mayor' | 'relevancia',
                       )
                     }
-                    className="mt-1 min-h-11 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 text-sm text-white focus:border-legal-gold focus:outline-none"
+                    className="mt-1 min-h-10 w-full rounded-xl border border-slate-600 bg-slate-950 px-2.5 text-xs text-white focus:border-legal-gold focus:outline-none"
                   >
-                    <option value="cierre_proximo">🔥 Fecha límite más próxima (urgente)</option>
-                    <option value="reciente">📅 Publicación más reciente</option>
-                    <option value="monto_mayor">💰 Mayor monto estimado</option>
-                    <option value="relevancia">🎯 Relevancia de búsqueda</option>
+                    <option value="cierre_proximo">🔥 Cierre más próximo</option>
+                    <option value="reciente">📅 Más reciente</option>
+                    <option value="monto_mayor">💰 Mayor presupuesto</option>
+                    <option value="relevancia">🎯 Relevancia</option>
                   </select>
                 </label>
+              </div>
+            )}
+
+            {/* Active Filter Badges Bar */}
+            {activeFiltersCount > 0 && (
+              <div className="mt-2.5 flex flex-wrap items-center gap-1.5 border-t border-slate-800 pt-2">
+                <span className="text-[11px] font-bold text-slate-400">Filtros activos:</span>
+                {materia !== 'todas' && (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-slate-800 px-2 py-0.5 text-[11px] font-semibold text-legal-gold">
+                    Materia: {MATERIA_LABELS[materia]}
+                    <button
+                      type="button"
+                      onClick={() => handleFilterChange('todas')}
+                      className="hover:text-white"
+                      title="Quitar filtro de materia"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+                {entidad !== 'todas' && (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-slate-800 px-2 py-0.5 text-[11px] font-semibold text-legal-gold">
+                    Entidad: {entidad}
+                    <button
+                      type="button"
+                      onClick={() => handleFilterChange(materia, caracter, convocante, 'todas')}
+                      className="hover:text-white"
+                      title="Quitar filtro de entidad"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+                {convocante !== 'todas' && (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-slate-800 px-2 py-0.5 text-[11px] font-semibold text-legal-gold">
+                    Convocante: {convocante}
+                    <button
+                      type="button"
+                      onClick={() => handleFilterChange(materia, caracter, 'todas')}
+                      className="hover:text-white"
+                      title="Quitar filtro de convocante"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+                {caracter !== 'todos' && (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-slate-800 px-2 py-0.5 text-[11px] font-semibold text-legal-gold">
+                    Carácter: {CARACTER_LABELS[caracter]}
+                    <button
+                      type="button"
+                      onClick={() => handleFilterChange(materia, 'todos')}
+                      className="hover:text-white"
+                      title="Quitar filtro de carácter"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+                {sortBy !== 'cierre_proximo' && (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-slate-800 px-2 py-0.5 text-[11px] font-semibold text-legal-gold">
+                    Orden: {sortBy}
+                    <button
+                      type="button"
+                      onClick={() => handleFilterChange(materia, caracter, convocante, entidad, estatus, 'cierre_proximo')}
+                      className="hover:text-white"
+                      title="Restablecer orden"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="text-[11px] font-bold text-red-400 hover:text-red-300 ml-1 underline"
+                >
+                  Limpiar todos
+                </button>
               </div>
             )}
           </form>
@@ -486,16 +593,16 @@ export function BuscadorLicitaciones() {
       </section>
 
       {/* Main Content Area */}
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
-        {/* Results Header */}
+      <main className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
+        {/* Results Count & Actions Header */}
         {result && (
-          <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-4 flex flex-col gap-2.5 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-xs sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-sm font-extrabold text-slate-950">
                 {result.total} {result.total === 1 ? 'licitación encontrada' : 'licitaciones abiertas encontradas'}
-                {query.trim() && <span> para “{result.query}”</span>}
+                {query.trim() && <span className="font-semibold text-slate-700"> para “{result.query}”</span>}
               </p>
-              <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600">
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
                 {result.executionTimeMs} ms
               </span>
             </div>
@@ -505,28 +612,87 @@ export function BuscadorLicitaciones() {
                 <button
                   type="button"
                   onClick={resetFilters}
-                  className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                  className="inline-flex min-h-8 items-center gap-1 rounded-lg border border-slate-200 px-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
                 >
-                  <RotateCcw size={13} /> Limpiar filtros
+                  <RotateCcw size={12} /> Limpiar búsqueda
                 </button>
               )}
               <a
                 href={COMPRANET_PORTAL_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-slate-900 px-3 text-xs font-bold text-white hover:bg-slate-800"
+                className="inline-flex min-h-8 items-center gap-1.5 rounded-lg bg-slate-900 px-3 text-xs font-bold text-white hover:bg-slate-800"
               >
-                Portal CompraNet <ExternalLink size={13} />
+                Portal CompraNet <ExternalLink size={12} />
               </a>
+            </div>
+          </div>
+        )}
+
+        {/* Initial Showcase Card when no query and no active filters */}
+        {result && !query.trim() && activeFiltersCount === 0 && (
+          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xs sm:p-6 mb-5">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-2xl border border-legal-gold/40 bg-slate-950 p-1 shadow-md shadow-legal-gold/10">
+                <img src={logoMark} alt="Lex Corporativo" className="h-full w-full rounded-xl object-cover" />
+              </div>
+              <div className="flex-1 text-center sm:text-left">
+                <img
+                  src={logoLockup}
+                  alt="Lex Corporativo"
+                  className="h-6 object-contain mb-1 mx-auto sm:mx-0"
+                />
+                <h2 className="font-serif text-sm sm:text-base font-bold text-slate-950">
+                  Catálogo Federal y Estatal de Contrataciones Abiertas
+                </h2>
+                <p className="mt-0.5 text-xs text-slate-600 leading-5">
+                  Consulta {LICITACIONES_STATS.total} convocatorias públicas activas con especificaciones técnicas, pliegos de bases, requisitos del SAT/IMSS y enlace oficial a CompraNet.
+                </p>
+
+                <div className="mt-2.5 flex flex-wrap justify-center sm:justify-start gap-1.5">
+                  <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700">
+                    <Zap size={12} className="text-amber-600" /> Monitoreo CompraNet
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700">
+                    <Scale size={12} className="text-legal-golddark" /> LAASSP & LOPSRM
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700">
+                    <MapPin size={12} className="text-blue-600" /> 32 Estados + Nacional
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Suggestions Chips */}
+            <div className="mt-4 border-t border-slate-100 pt-3">
+              <div className="flex items-center gap-1.5 mb-2">
+                <Sparkles size={14} className="text-legal-golddark" />
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700">
+                  Sugerencias de búsqueda rápida:
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {SUGGESTED_LICITACIONES.map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSuggestionClick(item.query, item.convocante, item.materia, item.entidad)}
+                    className="group inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:border-legal-gold hover:bg-amber-50/60 hover:text-slate-950 transition"
+                  >
+                    <Search size={11} className="text-slate-400 group-hover:text-legal-golddark" />
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
 
         {/* Empty State */}
         {result && result.licitaciones.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
-            <FileSearch className="mx-auto text-slate-400" size={36} />
-            <h2 className="mt-3 text-base font-extrabold text-slate-900">
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
+            <FileSearch className="mx-auto text-slate-400" size={32} />
+            <h2 className="mt-2.5 text-sm font-extrabold text-slate-900">
               No se encontraron licitaciones con estos criterios
             </h2>
             <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-slate-500">
@@ -536,75 +702,16 @@ export function BuscadorLicitaciones() {
             <button
               type="button"
               onClick={resetFilters}
-              className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl bg-slate-900 px-5 text-xs font-bold text-white hover:bg-slate-800"
+              className="mt-3.5 inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-slate-900 px-4 text-xs font-bold text-white hover:bg-slate-800"
             >
-              <RotateCcw size={15} /> Restablecer búsqueda
+              <RotateCcw size={14} /> Restablecer filtros
             </button>
           </div>
         )}
 
-        {/* Tender Cards List */}
+        {/* Reordered Tender Cards List */}
         {result && result.licitaciones.length > 0 && (
-          <div className="space-y-4" aria-live="polite">
-            {/* When not filtering with query, show the Branded Quick Showcase on top */}
-            {!query.trim() && !hasActiveFilters && (
-              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs sm:p-7 mb-6">
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl border-2 border-legal-gold/40 bg-slate-950 p-1 shadow-lg shadow-legal-gold/10">
-                    <img src={logoMark} alt="Lex Corporativo" className="h-full w-full rounded-xl object-cover" />
-                  </div>
-                  <div className="flex-1 text-center sm:text-left">
-                    <img
-                      src={logoLockup}
-                      alt="Lex Corporativo"
-                      className="h-7 object-contain mb-1.5 mx-auto sm:mx-0"
-                    />
-                    <h3 className="font-serif text-base font-bold text-slate-950 sm:text-lg">
-                      Licitaciones y Contrataciones Públicas de México
-                    </h3>
-                    <p className="mt-1 text-xs leading-5 text-slate-600">
-                      Explora {LICITACIONES_STATS.total} convocatorias y expedientes abiertos de {LICITACIONES_STATS.convocantes} dependencias federales y estatales (IMSS, CFE, PEMEX, SICT, SAT, etc.).
-                    </p>
-
-                    <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-1.5">
-                      <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700">
-                        <Zap size={13} className="text-amber-600" /> Monitoreo CompraNet
-                      </span>
-                      <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700">
-                        <Scale size={13} className="text-legal-golddark" /> LAASSP & LOPSRM
-                      </span>
-                      <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700">
-                        <ShieldCheck size={13} className="text-emerald-600" /> Datos 100% en dispositivo
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Suggestions Pills */}
-                <div className="mt-5 border-t border-slate-100 pt-4">
-                  <div className="flex items-center gap-1.5 mb-2.5">
-                    <Sparkles size={15} className="text-legal-golddark" />
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                      Sugerencias de búsqueda en licitaciones:
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {SUGGESTED_LICITACIONES.map((item, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => handleSuggestionClick(item.query, item.convocante, item.materia)}
-                        className="group inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-legal-gold hover:bg-amber-50/60 hover:text-slate-950 transition"
-                      >
-                        <Search size={12} className="text-slate-400 group-hover:text-legal-golddark" />
-                        <span>{item.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
+          <div className="space-y-3.5" aria-live="polite">
             {result.licitaciones.map((licitacion) => {
               const isExpanded = expanded.has(licitacion.id);
               const favorite = isFavoriteLicitacion(licitacion.id);
@@ -613,29 +720,29 @@ export function BuscadorLicitaciones() {
               return (
                 <article
                   key={licitacion.id}
-                  className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300"
+                  className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition hover:border-slate-300"
                 >
-                  <div className="p-4 sm:p-6">
-                    {/* Header line: Tags & Countdown */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3.5">
+                  <div className="p-4 sm:p-5">
+                    {/* Top Row: Convocante Badge + Procedure ID + Entity + Urgency Countdown */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
                       <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="rounded-md bg-slate-950 px-2 py-1 text-[11px] font-extrabold tracking-wide text-white">
+                        <span className="rounded-md bg-slate-950 px-2 py-0.5 text-[11px] font-extrabold tracking-wide text-white">
                           {licitacion.siglasConvocante}
                         </span>
-                        <span className="rounded-md bg-amber-50 px-2 py-1 font-mono text-[11px] font-bold text-amber-900 border border-amber-200/60">
+                        <span className="rounded-md bg-amber-50 px-2 py-0.5 font-mono text-[11px] font-bold text-amber-900 border border-amber-200/60">
                           {licitacion.numeroProcedimiento}
                         </span>
-                        <span className="rounded-md bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-700 uppercase">
-                          {MATERIA_LABELS[licitacion.materia]}
+                        <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700">
+                          <MapPin size={11} className="text-slate-500" /> {licitacion.entidadFederativa}
                         </span>
-                        <span className="rounded-md bg-blue-50 px-2 py-1 text-[10px] font-bold text-blue-700">
+                        <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">
                           {CARACTER_LABELS[licitacion.caracter]}
                         </span>
                       </div>
 
-                      {/* Deadline Countdown Badge */}
+                      {/* Deadline Countdown Badge (Right Aligned) */}
                       <div
-                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-extrabold ${
+                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-extrabold ${
                           daysInfo.badgeStyle === 'urgent'
                             ? 'bg-red-50 text-red-700 border border-red-200'
                             : daysInfo.badgeStyle === 'warning'
@@ -644,124 +751,124 @@ export function BuscadorLicitaciones() {
                         }`}
                       >
                         {daysInfo.badgeStyle === 'urgent' ? (
-                          <Flame size={14} className="text-red-600 animate-pulse" />
+                          <Flame size={13} className="text-red-600 animate-pulse" />
                         ) : (
-                          <Clock3 size={14} />
+                          <Clock3 size={13} />
                         )}
                         <span>{daysInfo.label}</span>
                       </div>
                     </div>
 
-                    {/* Title and Top Convocante */}
-                    <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    {/* Middle Row: Title & Convocante Subtitle */}
+                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <h2 className="text-base font-extrabold leading-snug text-slate-950 sm:text-lg">
                           {licitacion.titulo}
                         </h2>
-                        <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-slate-600">
-                          <Building2 size={14} className="text-slate-400 shrink-0" />
+                        <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs font-semibold text-slate-600">
+                          <Building2 size={13} className="text-slate-400 shrink-0" />
                           <span>{licitacion.convocante}</span>
                           <span className="text-slate-300">·</span>
                           <span className="text-slate-500">{licitacion.unidadCompradora}</span>
                         </p>
                       </div>
 
-                      {/* Card Action Buttons */}
+                      {/* Action buttons on desktop/card */}
                       <div className="flex shrink-0 items-center gap-1 self-start">
                         <button
                           type="button"
                           onClick={() => copyLicitacion(licitacion)}
-                          className="flex min-h-10 min-w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                          className="flex min-h-9 min-w-9 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                           title="Copiar ficha técnica"
                           aria-label="Copiar ficha técnica de licitación"
                         >
                           {copiedId === licitacion.id ? (
-                            <Check size={18} className="text-emerald-600" />
+                            <Check size={16} className="text-emerald-600" />
                           ) : (
-                            <Copy size={18} />
+                            <Copy size={16} />
                           )}
                         </button>
                         <button
                           type="button"
                           onClick={() => shareLicitacion(licitacion)}
-                          className="flex min-h-10 min-w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                          className="flex min-h-9 min-w-9 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                           title="Compartir licitación"
                           aria-label="Compartir licitación"
                         >
-                          <Share2 size={18} />
+                          <Share2 size={16} />
                         </button>
                         <button
                           type="button"
                           onClick={() => toggleFavorite(licitacion)}
-                          className={`flex min-h-10 min-w-10 items-center justify-center rounded-xl hover:bg-rose-50 ${
+                          className={`flex min-h-9 min-w-9 items-center justify-center rounded-xl hover:bg-rose-50 ${
                             favorite ? 'text-rose-600' : 'text-slate-500 hover:text-rose-600'
                           }`}
                           title={favorite ? 'Quitar de seguimiento' : 'Guardar en seguimiento'}
                           aria-label={favorite ? 'Quitar de seguimiento' : 'Guardar en seguimiento'}
                         >
-                          <Heart size={18} fill={favorite ? 'currentColor' : 'none'} />
+                          <Heart size={16} fill={favorite ? 'currentColor' : 'none'} />
                         </button>
                       </div>
                     </div>
 
-                    {/* Key Info Metrics Grid */}
-                    <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                      <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2.5">
+                    {/* Key Metrics Grid (4 items) */}
+                    <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2">
                         <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                          <DollarSign size={12} className="text-slate-400" /> Presupuesto Estimado
+                          <DollarSign size={11} className="text-slate-400" /> Presupuesto Estimado
                         </span>
-                        <p className="mt-1 font-mono text-xs font-extrabold text-slate-900 sm:text-sm">
+                        <p className="mt-0.5 font-mono text-xs font-extrabold text-slate-900 sm:text-sm">
                           {licitacion.montoEstimado
                             ? formatCurrency(licitacion.montoEstimado, licitacion.moneda)
                             : 'No especificado'}
                         </p>
                       </div>
 
-                      <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2.5">
+                      <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2">
                         <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                          <MapPin size={12} className="text-slate-400" /> Entidad Federativa
+                          <Scale size={11} className="text-slate-400" /> Materia
                         </span>
-                        <p className="mt-1 text-xs font-extrabold text-slate-900 sm:text-sm">
-                          {licitacion.entidadFederativa}
+                        <p className="mt-0.5 text-xs font-extrabold text-slate-900 sm:text-sm truncate">
+                          {MATERIA_LABELS[licitacion.materia]}
                         </p>
                       </div>
 
-                      <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2.5">
+                      <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2">
                         <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                          <Calendar size={12} className="text-slate-400" /> Presentación y Apertura
+                          <Calendar size={11} className="text-slate-400" /> Límite de Propuestas
                         </span>
-                        <p className="mt-1 text-xs font-extrabold text-slate-900 sm:text-sm">
+                        <p className="mt-0.5 text-xs font-extrabold text-slate-900 sm:text-sm">
                           {formatDate(licitacion.fechaLimitePropuestas)}
                         </p>
                       </div>
 
-                      <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2.5">
+                      <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2">
                         <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                          <Scale size={12} className="text-slate-400" /> Estatus
+                          <Check size={11} className="text-slate-400" /> Estatus
                         </span>
-                        <p className="mt-1 text-xs font-extrabold text-slate-900 sm:text-sm">
+                        <p className="mt-0.5 text-xs font-extrabold text-slate-900 sm:text-sm truncate">
                           {ESTATUS_LABELS[licitacion.estatus]}
                         </p>
                       </div>
                     </div>
 
-                    {/* Description */}
+                    {/* Description Paragraph */}
                     <p
-                      className={`mt-3 text-xs leading-6 text-slate-700 sm:text-sm ${
+                      className={`mt-2.5 text-xs leading-5 text-slate-700 sm:text-sm ${
                         isExpanded ? '' : 'line-clamp-2'
                       }`}
                     >
                       {licitacion.descripcion}
                     </p>
 
-                    {/* Expanded details: Timeline, Legal basis, Requirements */}
+                    {/* Expanded Content Drawer */}
                     {isExpanded && (
-                      <div className="mt-4 space-y-3 rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
-                        {/* Critical Timeline */}
+                      <div className="mt-3.5 space-y-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5 sm:p-4">
+                        {/* Timeline */}
                         <div>
-                          <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900">
+                          <h3 className="text-[11px] font-extrabold uppercase tracking-wider text-slate-900">
                             Cronograma del Procedimiento
-                          </h4>
+                          </h3>
                           <div className="mt-2 grid gap-2 sm:grid-cols-2 md:grid-cols-4">
                             <div className="rounded-lg bg-white p-2 border border-slate-200/80">
                               <span className="text-[10px] font-semibold text-slate-500">Publicación</span>
@@ -769,20 +876,24 @@ export function BuscadorLicitaciones() {
                                 {formatDate(licitacion.fechaPublicacion)}
                               </p>
                             </div>
+                            {licitacion.fechaVisitaSitio && (
+                              <div className="rounded-lg bg-white p-2 border border-slate-200/80">
+                                <span className="text-[10px] font-semibold text-slate-500">Visita al Sitio</span>
+                                <p className="text-xs font-bold text-slate-900">
+                                  {formatDate(licitacion.fechaVisitaSitio)}
+                                </p>
+                              </div>
+                            )}
                             {licitacion.fechaJuntaAclaraciones && (
                               <div className="rounded-lg bg-white p-2 border border-slate-200/80">
-                                <span className="text-[10px] font-semibold text-slate-500">
-                                  Junta de Aclaraciones
-                                </span>
+                                <span className="text-[10px] font-semibold text-slate-500">Junta de Aclaraciones</span>
                                 <p className="text-xs font-bold text-slate-900">
                                   {formatDate(licitacion.fechaJuntaAclaraciones)}
                                 </p>
                               </div>
                             )}
                             <div className="rounded-lg bg-white p-2 border border-slate-200/80">
-                              <span className="text-[10px] font-semibold text-slate-500">
-                                Límite de Propuestas
-                              </span>
+                              <span className="text-[10px] font-semibold text-slate-500">Límite de Propuestas</span>
                               <p className="text-xs font-bold text-slate-900">
                                 {formatDateTime(licitacion.fechaLimitePropuestas)}
                               </p>
@@ -798,11 +909,11 @@ export function BuscadorLicitaciones() {
                           </div>
                         </div>
 
-                        {/* Legal Framework & Requirements */}
-                        <div className="grid gap-3 pt-2 sm:grid-cols-2">
+                        {/* Legal Basis & Requirements */}
+                        <div className="grid gap-2.5 sm:grid-cols-2">
                           <div className="rounded-xl bg-white p-3 border border-slate-200/80">
                             <span className="flex items-center gap-1.5 text-xs font-extrabold text-slate-900">
-                              <Scale size={14} className="text-legal-golddark" /> Fundamento Jurídico
+                              <Scale size={13} className="text-legal-golddark" /> Fundamento Jurídico
                             </span>
                             <p className="mt-1 text-xs text-slate-700 leading-5">
                               {licitacion.marcoLegal}
@@ -811,9 +922,9 @@ export function BuscadorLicitaciones() {
 
                           <div className="rounded-xl bg-white p-3 border border-slate-200/80">
                             <span className="flex items-center gap-1.5 text-xs font-extrabold text-slate-900">
-                              <FileCheck2 size={14} className="text-emerald-700" /> Requisitos Clave
+                              <FileCheck2 size={13} className="text-emerald-700" /> Requisitos Clave
                             </span>
-                            <ul className="mt-1.5 space-y-1 text-xs text-slate-600">
+                            <ul className="mt-1 space-y-1 text-xs text-slate-600">
                               {licitacion.requisitosClave.map((req, i) => (
                                 <li key={i} className="flex items-start gap-1.5">
                                   <span className="text-emerald-600 font-bold">•</span>
@@ -827,14 +938,14 @@ export function BuscadorLicitaciones() {
                         {/* Attachments */}
                         {licitacion.anexosDisponibles.length > 0 && (
                           <div className="pt-1">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                               Documentos y anexos en CompraNet:
                             </span>
                             <div className="mt-1 flex flex-wrap gap-1.5">
                               {licitacion.anexosDisponibles.map((anexo, i) => (
                                 <span
                                   key={i}
-                                  className="rounded-md bg-white px-2 py-1 text-[11px] font-semibold text-slate-700 border border-slate-200"
+                                  className="rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-700 border border-slate-200"
                                 >
                                   📄 {anexo}
                                 </span>
@@ -845,15 +956,15 @@ export function BuscadorLicitaciones() {
                       </div>
                     )}
 
-                    {/* Footer Actions */}
-                    <div className="mt-4 flex flex-col gap-2 border-t border-slate-100 pt-3 sm:flex-row sm:items-center sm:justify-between">
+                    {/* Bottom Actions Bar */}
+                    <div className="mt-3.5 flex flex-col gap-2 border-t border-slate-100 pt-3 sm:flex-row sm:items-center sm:justify-between">
                       <a
                         href={licitacion.enlaceCompraNet}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-slate-900 px-4 text-xs font-bold text-white hover:bg-slate-800 transition"
+                        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 text-xs font-bold text-white hover:bg-slate-800 transition"
                       >
-                        <ExternalLink size={15} /> Ver expediente en CompraNet
+                        <ExternalLink size={14} /> Ver expediente en CompraNet
                       </a>
 
                       <button
@@ -866,9 +977,9 @@ export function BuscadorLicitaciones() {
                             return next;
                           })
                         }
-                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+                        className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-slate-200 px-3.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
                       >
-                        {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
                         {isExpanded ? 'Contraer ficha' : 'Ver requisitos y cronograma completo'}
                       </button>
                     </div>
@@ -879,7 +990,7 @@ export function BuscadorLicitaciones() {
 
             <div className="rounded-xl border border-blue-200/70 bg-blue-50 px-4 py-3 text-xs leading-5 text-blue-950">
               <strong>Nota de consulta:</strong> La información de procedimientos y plazos corresponde a
-              las convocatorias públicas federales. Antes de presentar propuestas, valida las aclaraciones
+              las convocatorias públicas federales y estatales. Antes de presentar propuestas, valida las aclaraciones
               y modificaciones vigentes en la plataforma oficial de CompraNet.
             </div>
           </div>
