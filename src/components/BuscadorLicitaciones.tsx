@@ -22,7 +22,6 @@ import {
   Search,
   Share2,
   ShieldCheck,
-  Sparkles,
   WifiOff,
   X,
 } from 'lucide-react';
@@ -57,21 +56,6 @@ const SORT_LABELS: Record<'cierre_proximo' | 'reciente' | 'monto_mayor' | 'relev
   monto_mayor: 'Mayor presupuesto',
   relevancia: 'Relevancia',
 };
-
-const SUGGESTED_LICITACIONES = [
-  { label: 'Medicamentos IMSS', query: 'medicamentos', convocante: 'IMSS' },
-  { label: 'Subestaciones CFE', query: 'subestaciones', convocante: 'CFE' },
-  { label: 'Puentes y Carreteras SICT', query: 'carretero puente', convocante: 'SICT' },
-  { label: 'Ciberseguridad SAT', query: 'ciberseguridad', convocante: 'SAT' },
-  { label: 'Perforación PEMEX', query: 'perforación', convocante: 'PEMEX' },
-  { label: 'Flotilla Vehicular', query: 'vehículos', materia: 'arrendamientos' as const },
-  { label: 'Hospitales ISSSTE', query: 'laboratorio clínico', convocante: 'ISSSTE' },
-  { label: 'Agua Cutzamala', query: 'bombeo cutzamala', convocante: 'CONAGUA' },
-  { label: 'Corredor Sonora', query: 'corredor sidur', entidad: 'Sonora' },
-  { label: 'Desalinizadora BC', query: 'desalinizadora', entidad: 'Baja California' },
-  { label: 'Arcos C5i Guanajuato', query: 'videovigilancia arcos', entidad: 'Guanajuato' },
-  { label: 'Muelle Dos Bocas', query: 'muelle atraque', entidad: 'Tabasco' },
-];
 
 function licitacionPlainText(licitacion: LicitacionPublica): string {
   const daysInfo = getDaysRemaining(licitacion.fechaLimitePropuestas);
@@ -230,23 +214,6 @@ export function BuscadorLicitaciones() {
       nextEstatus,
       nextSort,
     );
-  };
-
-  const handleSuggestionClick = (
-    sugQuery: string,
-    sugConvocante?: string,
-    sugMateria?: LicitacionMateria,
-    sugEntidad?: string,
-  ) => {
-    setQuery(sugQuery);
-    const nextMat = sugMateria ?? 'todas';
-    const nextConv = sugConvocante ?? 'todas';
-    const nextEnt = sugEntidad ?? 'todas';
-    setMateria(nextMat);
-    setConvocante(nextConv);
-    setEntidad(nextEnt);
-    void performSearch(sugQuery, nextMat, caracter, nextConv, nextEnt, estatus, sortBy);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   /** Limpia solo filtros, conserva el query */
@@ -614,40 +581,16 @@ export function BuscadorLicitaciones() {
       {/* Main Content Area */}
       <main className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
 
-        {/* Quick Suggestions & Initial Prompt — visible when no search performed yet */}
+        {/* Initial Prompt — visible when no search performed yet */}
         {!result && !isSearching && (
-          <div className="space-y-4">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-              <div className="flex items-center gap-1.5 mb-3">
-                <Sparkles size={14} className="text-legal-golddark" />
-                <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
-                  Búsquedas frecuentes
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {SUGGESTED_LICITACIONES.map((item, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => handleSuggestionClick(item.query, item.convocante, item.materia, item.entidad)}
-                    className="group inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-legal-gold hover:bg-amber-50/60 hover:text-slate-950 transition active:scale-95 cursor-pointer"
-                  >
-                    <Search size={12} className="text-slate-400 group-hover:text-legal-golddark" />
-                    <span>{item.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
-              <Landmark className="mx-auto text-slate-400" size={32} />
-              <h2 className="mt-2.5 text-sm font-extrabold text-slate-900">
-                Consulta convocatorias y licitaciones vigentes
-              </h2>
-              <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-slate-500">
-                Ingresa una palabra clave, dependencia convocante, materia o selecciona una búsqueda frecuente para explorar los procedimientos oficiales de contratación pública.
-              </p>
-            </div>
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
+            <Landmark className="mx-auto text-slate-400" size={36} />
+            <h2 className="mt-3 text-sm font-extrabold text-slate-900">
+              Consulta convocatorias y licitaciones vigentes
+            </h2>
+            <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-slate-500">
+              Ingresa una palabra clave, dependencia convocante, materia o número de procedimiento para explorar los procedimientos de contratación pública.
+            </p>
           </div>
         )}
 
