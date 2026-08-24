@@ -50,12 +50,20 @@ import type {
   LicitacionSearchResult,
 } from '../types';
 
-const SORT_LABELS: Record<'cierre_proximo' | 'reciente' | 'monto_mayor' | 'relevancia', string> = {
+type LicitacionSort = 'cierre_proximo' | 'reciente' | 'monto_mayor' | 'relevancia';
+
+const SORT_LABELS: Record<LicitacionSort, string> = {
   cierre_proximo: 'Cierre más próximo',
   reciente: 'Más reciente',
   monto_mayor: 'Mayor presupuesto',
   relevancia: 'Relevancia',
 };
+
+function getInitialSort(value: string | null): LicitacionSort {
+  return value && Object.prototype.hasOwnProperty.call(SORT_LABELS, value)
+    ? (value as LicitacionSort)
+    : 'cierre_proximo';
+}
 
 function licitacionPlainText(licitacion: LicitacionPublica): string {
   const daysInfo = getDaysRemaining(licitacion.fechaLimitePropuestas);
@@ -104,9 +112,7 @@ export function BuscadorLicitaciones() {
   const [estatus, setEstatus] = useState<'todos' | LicitacionEstatus>(
     (searchParams.get('estatus') as LicitacionEstatus) || 'todos',
   );
-  const [sortBy, setSortBy] = useState<'cierre_proximo' | 'reciente' | 'monto_mayor' | 'relevancia'>(
-    'cierre_proximo',
-  );
+  const [sortBy, setSortBy] = useState<LicitacionSort>(() => getInitialSort(searchParams.get('orden')));
 
   const [showFilters, setShowFilters] = useState(false);
   const [result, setResult] = useState<LicitacionSearchResult | null>(null);
@@ -142,7 +148,7 @@ export function BuscadorLicitaciones() {
     conv: string,
     ent: string,
     est: 'todos' | LicitacionEstatus,
-    sort: 'cierre_proximo' | 'reciente' | 'monto_mayor' | 'relevancia',
+    sort: LicitacionSort,
   ) => {
     setIsSearching(true);
     try {
@@ -170,6 +176,8 @@ export function BuscadorLicitaciones() {
       else url.searchParams.delete('entidad');
       if (est !== 'todos') url.searchParams.set('estatus', est);
       else url.searchParams.delete('estatus');
+      if (sort !== 'cierre_proximo') url.searchParams.set('orden', sort);
+      else url.searchParams.delete('orden');
       window.history.replaceState(null, '', url);
     } catch {
       notify('No se pudieron cargar las licitaciones.', 'error');
@@ -197,7 +205,7 @@ export function BuscadorLicitaciones() {
     nextConvocante = convocante,
     nextEntidad = entidad,
     nextEstatus = estatus,
-    nextSort = sortBy,
+    nextSort: LicitacionSort = sortBy,
   ) => {
     setMateria(nextMateria);
     setCaracter(nextCaracter);
@@ -228,6 +236,14 @@ export function BuscadorLicitaciones() {
       void performSearch(query, 'todas', 'todos', 'todas', 'todas', 'todos', 'cierre_proximo');
     } else {
       setResult(null);
+      const url = new URL(window.location.href);
+      url.searchParams.delete('materia');
+      url.searchParams.delete('caracter');
+      url.searchParams.delete('convocante');
+      url.searchParams.delete('entidad');
+      url.searchParams.delete('estatus');
+      url.searchParams.delete('orden');
+      window.history.replaceState(null, '', url);
     }
   };
 
@@ -248,6 +264,7 @@ export function BuscadorLicitaciones() {
     url.searchParams.delete('convocante');
     url.searchParams.delete('entidad');
     url.searchParams.delete('estatus');
+    url.searchParams.delete('orden');
     window.history.replaceState(null, '', url);
   };
 
@@ -302,6 +319,7 @@ export function BuscadorLicitaciones() {
             </div>
 
             <div
+              role="status"
               className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-bold ${
                 isOnline
                   ? 'border-emerald-700/60 bg-emerald-950/40 text-emerald-300'
@@ -377,7 +395,7 @@ export function BuscadorLicitaciones() {
 
             {/* Collapsible Structured Filters Bar */}
             {showFilters && (
-              <div className="mt-3 grid gap-2.5 border-t border-slate-700/80 pt-3 sm:grid-cols-2 lg:grid-cols-5">
+              <div className="mt-3 grid gap-2.5 border-t border-slate-700/80 pt-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                 {/* 1. Materia */}
                 <label className="text-xs font-bold text-slate-300">
                   Materia
@@ -470,7 +488,34 @@ export function BuscadorLicitaciones() {
                   </select>
                 </label>
 
-                {/* 5. Ordenamiento */}
+                {/* 5. Etapa */}
+                <label className="text-xs font-bold text-slate-300">
+                  Etapa del procedimiento
+                  <select
+                    value={estatus}
+                    onChange={(e) =>
+                      handleFilterChange(
+                        materia,
+                        caracter,
+                        convocante,
+                        entidad,
+                        e.target.value as 'todos' | LicitacionEstatus,
+                        sortBy,
+                      )
+                    }
+                    className="mt-1 min-h-10 w-full rounded-xl border border-slate-600 bg-slate-950 px-2.5 text-xs text-white focus:border-legal-gold focus:outline-none"
+                  >
+                    {(Object.entries(ESTATUS_LABELS) as Array<['todos' | LicitacionEstatus, string]>).map(
+                      ([key, label]) => (
+                        <option key={key} value={key}>
+                          {label}
+                        </option>
+                      ),
+                    )}
+                  </select>
+                </label>
+
+                {/* 6. Ordenamiento */}
                 <label className="text-xs font-bold text-slate-300">
                   Ordenar por
                   <select
@@ -482,7 +527,7 @@ export function BuscadorLicitaciones() {
                         convocante,
                         entidad,
                         estatus,
-                        e.target.value as 'cierre_proximo' | 'reciente' | 'monto_mayor' | 'relevancia',
+                        e.target.value as LicitacionSort,
                       )
                     }
                     className="mt-1 min-h-10 w-full rounded-xl border border-slate-600 bg-slate-950 px-2.5 text-xs text-white focus:border-legal-gold focus:outline-none"
@@ -508,6 +553,7 @@ export function BuscadorLicitaciones() {
                       onClick={() => handleFilterChange('todas')}
                       className="hover:text-white"
                       title="Quitar filtro de materia"
+                      aria-label="Quitar filtro de materia"
                     >
                       <X size={12} />
                     </button>
@@ -521,6 +567,7 @@ export function BuscadorLicitaciones() {
                       onClick={() => handleFilterChange(materia, caracter, convocante, 'todas')}
                       className="hover:text-white"
                       title="Quitar filtro de entidad"
+                      aria-label="Quitar filtro de entidad"
                     >
                       <X size={12} />
                     </button>
@@ -534,6 +581,7 @@ export function BuscadorLicitaciones() {
                       onClick={() => handleFilterChange(materia, caracter, 'todas')}
                       className="hover:text-white"
                       title="Quitar filtro de convocante"
+                      aria-label="Quitar filtro de convocante"
                     >
                       <X size={12} />
                     </button>
@@ -547,6 +595,21 @@ export function BuscadorLicitaciones() {
                       onClick={() => handleFilterChange(materia, 'todos')}
                       className="hover:text-white"
                       title="Quitar filtro de carácter"
+                      aria-label="Quitar filtro de carácter"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+                {estatus !== 'todos' && (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-slate-800 px-2 py-0.5 text-[11px] font-semibold text-legal-gold">
+                    Etapa: {ESTATUS_LABELS[estatus]}
+                    <button
+                      type="button"
+                      onClick={() => handleFilterChange(materia, caracter, convocante, entidad, 'todos')}
+                      className="hover:text-white"
+                      title="Quitar filtro de etapa"
+                      aria-label="Quitar filtro de etapa"
                     >
                       <X size={12} />
                     </button>
@@ -560,6 +623,7 @@ export function BuscadorLicitaciones() {
                       onClick={() => handleFilterChange(materia, caracter, convocante, entidad, estatus, 'cierre_proximo')}
                       className="hover:text-white"
                       title="Restablecer orden"
+                      aria-label="Restablecer orden"
                     >
                       <X size={12} />
                     </button>
@@ -804,7 +868,10 @@ export function BuscadorLicitaciones() {
 
                     {/* Expanded Content Drawer */}
                     {isExpanded && (
-                      <div className="mt-3.5 space-y-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5 sm:p-4">
+                      <div
+                        id={`licitacion-detalle-${licitacion.id}`}
+                        className="mt-3.5 space-y-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5 sm:p-4"
+                      >
                         {/* Timeline */}
                         <div>
                           <h3 className="text-[11px] font-extrabold uppercase tracking-wider text-slate-900">
@@ -911,6 +978,8 @@ export function BuscadorLicitaciones() {
                           })
                         }
                         className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-legal-gold hover:bg-legal-goldhover px-4 text-xs font-bold text-slate-950 shadow-xs transition active:scale-95 cursor-pointer"
+                        aria-expanded={isExpanded}
+                        aria-controls={`licitacion-detalle-${licitacion.id}`}
                       >
                         {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
                         {isExpanded ? 'Contraer ficha' : 'Ver requisitos y cronograma completo'}

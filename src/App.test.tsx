@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import App from './App';
 import { useSearchStore } from './store/useSearchStore';
 
@@ -76,5 +76,26 @@ describe('App Lex Corporativo PWA', () => {
     expect(within(dialog).getByRole('button', { name: /Artículos \(0\)/i })).toBeInTheDocument();
     expect(within(dialog).getByRole('button', { name: /Licitaciones \(0\)/i })).toBeInTheDocument();
     expect(within(dialog).queryByText(/Historial/i)).not.toBeInTheDocument();
+  });
+
+  it('aplica y conserva el filtro de etapa de una licitación en la URL', async () => {
+    localStorage.setItem('lex_pwa_station_opened', '1');
+    await act(async () => {
+      render(<App />);
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getAllByRole('button', { name: /Licitaciones/i })[0]);
+      fireEvent.click(screen.getByRole('button', { name: /Filtros/i }));
+    });
+
+    fireEvent.change(screen.getByLabelText('Etapa del procedimiento'), {
+      target: { value: 'junta_aclaraciones' },
+    });
+
+    await waitFor(() => {
+      expect(window.location.search).toContain('estatus=junta_aclaraciones');
+    });
+    expect(screen.getByRole('button', { name: 'Quitar filtro de etapa' })).toBeInTheDocument();
   });
 });

@@ -15,7 +15,11 @@ export function App() {
       params.has('lq') ||
       params.has('tab') ||
       params.has('materia') ||
+      params.has('caracter') ||
       params.has('convocante') ||
+      params.has('entidad') ||
+      params.has('estatus') ||
+      params.has('orden') ||
       params.has('law') ||
       params.has('scope')
     ) {
@@ -30,7 +34,15 @@ export function App() {
     if (tabParam === 'licitaciones' || tabParam === 'normativa') {
       return tabParam;
     }
-    if (params.has('lq') || params.has('materia') || params.has('convocante')) {
+    if (
+      params.has('lq') ||
+      params.has('materia') ||
+      params.has('caracter') ||
+      params.has('convocante') ||
+      params.has('entidad') ||
+      params.has('estatus') ||
+      params.has('orden')
+    ) {
       return 'licitaciones';
     }
     return 'normativa';
