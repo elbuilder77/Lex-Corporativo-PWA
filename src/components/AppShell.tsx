@@ -1,9 +1,9 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { AlertCircle, BookMarked, CheckCircle2, Info, Landmark, Scale, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Info, Landmark, Map, Scale, X } from 'lucide-react';
 import logoMark from '../assets/logo-mark.png';
+import { clearRetiredSavedData } from '../lib/coverage-sources';
+import { CoverageSourcesSheet } from './CoverageSourcesSheet';
 import { SearchInfoSheet } from './SearchInfoSheet';
-import { SearchLibrarySheet } from './SearchLibrarySheet';
-import { useSearchStore } from '../store/useSearchStore';
 import { useUiStore } from '../store/useUiStore';
 import type { AppModuleTab } from '../types';
 
@@ -20,15 +20,12 @@ interface AppShellProps {
 
 export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
   const { notifications, dismissNotification, setIsOnline } = useUiStore();
-  const { favorites, favoriteLicitaciones, loadFromStorage } = useSearchStore();
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [panel, setPanel] = useState<'library' | 'info' | null>(null);
-
-  const totalSaved = favorites.length + favoriteLicitaciones.length;
+  const [panel, setPanel] = useState<'coverage' | 'info' | null>(null);
 
   useEffect(() => {
-    loadFromStorage();
-  }, [loadFromStorage]);
+    clearRetiredSavedData();
+  }, []);
 
   useEffect(() => {
     const online = () => setIsOnline(true);
@@ -118,21 +115,16 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
             </button>
           </nav>
 
-          {/* Action Buttons: Guardados & Info */}
+          {/* Action Buttons: Coverage & Info */}
           <div className="flex items-center gap-1">
             <button
               type="button"
-              onClick={() => setPanel('library')}
+              onClick={() => setPanel('coverage')}
               className="inline-flex min-h-10 items-center gap-1.5 rounded-xl px-3 text-xs font-bold text-slate-300 hover:bg-slate-800 hover:text-white transition"
-              aria-label="Abrir guardados"
+              aria-label="Abrir cobertura y fuentes"
             >
-              <BookMarked size={17} />
-              <span className="hidden md:inline">Guardados</span>
-              {totalSaved > 0 && (
-                <span className="rounded-full bg-legal-gold px-1.5 py-0.5 text-[9px] font-extrabold text-slate-950">
-                  {totalSaved}
-                </span>
-              )}
+              <Map size={17} />
+              <span className="hidden md:inline">Cobertura</span>
             </button>
             <button
               type="button"
@@ -151,8 +143,8 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
         {children}
       </div>
 
-      {/* Saved Library Sheet */}
-      <SearchLibrarySheet open={panel === 'library'} onClose={() => setPanel(null)} />
+      {/* Coverage & Sources Sheet */}
+      <CoverageSourcesSheet open={panel === 'coverage'} onClose={() => setPanel(null)} />
 
       {/* Info Sheet */}
       <SearchInfoSheet open={panel === 'info'} onClose={() => setPanel(null)} />
@@ -254,16 +246,11 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
         </button>
         <button
           type="button"
-          onClick={() => setPanel('library')}
+          onClick={() => setPanel('coverage')}
           className="relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 hover:text-slate-200 transition"
         >
-          <BookMarked size={20} />
-          <span>Guardados</span>
-          {totalSaved > 0 && (
-            <span className="absolute top-2 right-[calc(50%-18px)] flex h-4 w-4 items-center justify-center rounded-full bg-legal-gold text-[9px] font-extrabold text-slate-950">
-              {totalSaved > 9 ? '9+' : totalSaved}
-            </span>
-          )}
+          <Map size={20} />
+          <span>Cobertura</span>
         </button>
       </nav>
     </div>

@@ -4,13 +4,11 @@ import {
   Info,
   Landmark,
   ShieldCheck,
-  Trash2,
   WifiOff,
   X,
 } from 'lucide-react';
 import { CORPUS_STATS, OFFICIAL_LAWS_URL } from '../lib/corpus-catalog';
 import { COMPRANET_GOB_URL, COMPRANET_PORTAL_URL, DATOS_ABIERTOS_URL, LICITACIONES_STATS } from '../lib/licitaciones-catalog';
-import { useSearchStore } from '../store/useSearchStore';
 import { useUiStore } from '../store/useUiStore';
 
 interface SearchInfoSheetProps {
@@ -19,17 +17,8 @@ interface SearchInfoSheetProps {
 }
 
 export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
-  const { favorites, favoriteLicitaciones, clearAll } = useSearchStore();
-  const { isOnline, notify } = useUiStore();
+  const { isOnline } = useUiStore();
   if (!open) return null;
-
-  const totalSaved = favorites.length + favoriteLicitaciones.length;
-
-  const clearData = () => {
-    if (!window.confirm('¿Eliminar todos los artículos y licitaciones guardadas de este navegador?')) return;
-    clearAll();
-    notify('Artículos y licitaciones guardadas eliminados.', 'success');
-  };
 
   return (
     <div
@@ -70,7 +59,7 @@ export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
               <Landmark size={18} className="text-blue-700" /> Licitaciones CompraNet
             </div>
             <p className="mt-2 text-xs leading-5 text-slate-600">
-              Catálogo de contrataciones públicas federales y estatales vigentes en México ({LICITACIONES_STATS.total} procedimientos activos en {LICITACIONES_STATS.convocantes} instituciones convocantes como IMSS, CFE, PEMEX, SICT, SAT, etc.), con fechas críticas, montos estimados, fundamento en LAASSP/LOPSRM y enlace oficial al expediente de CompraNet.
+              Catálogo de contrataciones públicas federales con ejecución nacional y por entidad ({LICITACIONES_STATS.total} procedimientos activos en {LICITACIONES_STATS.convocantes} instituciones convocantes como IMSS, CFE, PEMEX, SICT, SAT, etc.), con fechas críticas, montos estimados, fundamento en LAASSP/LOPSRM y enlace oficial al expediente de CompraNet.
             </p>
           </div>
 
@@ -97,16 +86,8 @@ export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
               <span>Consulta privada sin rastreo</span>
             </div>
             <p className="mt-2 text-xs leading-5 text-slate-600">
-              Esta aplicación no recopila historial de navegación, consultas frecuentes ni datos personales. Las búsquedas y los elementos guardados se conservan exclusivamente en tu dispositivo.
+              Esta aplicación no recopila historial de navegación, consultas frecuentes ni datos personales. Las búsquedas se procesan localmente cuando corresponde y no se conserva un portafolio de actividad.
             </p>
-            <button
-              type="button"
-              onClick={clearData}
-              disabled={totalSaved === 0}
-              className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-xl border border-red-200 px-4 text-xs font-bold text-red-600 hover:bg-red-50 disabled:opacity-40 transition"
-            >
-              <Trash2 size={15} /> Borrar guardados ({totalSaved})
-            </button>
           </div>
 
           {/* Official External Links */}

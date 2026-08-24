@@ -13,7 +13,6 @@ import {
   FileSearch,
   Filter,
   Flame,
-  Heart,
   Landmark,
   LoaderCircle,
   MapPin,
@@ -40,7 +39,6 @@ import {
   TIPO_PROCEDIMIENTO_LABELS,
 } from '../lib/licitaciones-catalog';
 import { executeLicitacionesSearch } from '../services/licitaciones-search';
-import { useSearchStore } from '../store/useSearchStore';
 import { useUiStore } from '../store/useUiStore';
 import type {
   LicitacionCaracter,
@@ -121,11 +119,6 @@ export function BuscadorLicitaciones() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const { isOnline, notify } = useUiStore();
-  const {
-    addToFavoriteLicitaciones,
-    removeFromFavoriteLicitaciones,
-    isFavoriteLicitacion,
-  } = useSearchStore();
 
   const availableConvocantes = useMemo(() => getAvailableConvocantes(), []);
   const availableEntidades = useMemo(() => getAvailableEntidades(), []);
@@ -296,16 +289,6 @@ export function BuscadorLicitaciones() {
     }
   };
 
-  const toggleFavorite = (licitacion: LicitacionPublica) => {
-    if (isFavoriteLicitacion(licitacion.id)) {
-      removeFromFavoriteLicitaciones(licitacion.id);
-      notify('Licitación eliminada de seguimiento.', 'info');
-    } else {
-      addToFavoriteLicitaciones(licitacion);
-      notify('Licitación guardada en seguimiento local.', 'success');
-    }
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 pb-12">
       {/* Compact Hero & Search Area */}
@@ -335,7 +318,7 @@ export function BuscadorLicitaciones() {
             Licitaciones Públicas Abiertas en México
           </h1>
           <p className="mt-1 text-xs text-slate-400 sm:text-sm">
-            Monitoreo de convocatorias federales y estatales con fechas de cierre, presupuestos y enlace oficial a CompraNet.
+            Consulta de convocatorias federales con filtro territorial, fechas de cierre, presupuestos y enlace oficial a CompraNet.
           </p>
 
           {/* Integrated Search Box */}
@@ -719,7 +702,6 @@ export function BuscadorLicitaciones() {
           <div className="space-y-3.5" aria-live="polite">
             {result.licitaciones.map((licitacion) => {
               const isExpanded = expanded.has(licitacion.id);
-              const favorite = isFavoriteLicitacion(licitacion.id);
               const daysInfo = getDaysRemaining(licitacion.fechaLimitePropuestas);
 
               return (
@@ -801,17 +783,6 @@ export function BuscadorLicitaciones() {
                           aria-label="Compartir licitación"
                         >
                           <Share2 size={16} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => toggleFavorite(licitacion)}
-                          className={`flex min-h-9 min-w-9 items-center justify-center rounded-xl hover:bg-rose-50 ${
-                            favorite ? 'text-rose-600' : 'text-slate-500 hover:text-rose-600'
-                          }`}
-                          title={favorite ? 'Quitar de seguimiento' : 'Guardar en seguimiento'}
-                          aria-label={favorite ? 'Quitar de seguimiento' : 'Guardar en seguimiento'}
-                        >
-                          <Heart size={16} fill={favorite ? 'currentColor' : 'none'} />
                         </button>
                       </div>
                     </div>
@@ -1002,7 +973,7 @@ export function BuscadorLicitaciones() {
 
             <div className="rounded-xl border border-blue-200/70 bg-blue-50 px-4 py-3 text-xs leading-5 text-blue-950">
               <strong>Nota de consulta:</strong> La información de procedimientos y plazos corresponde a
-              las convocatorias públicas federales y estatales. Antes de presentar propuestas, valida las aclaraciones
+              las convocatorias públicas federales. Antes de presentar propuestas, valida las aclaraciones
               y modificaciones vigentes en la plataforma oficial de CompraNet.
             </div>
           </div>

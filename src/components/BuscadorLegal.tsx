@@ -8,7 +8,6 @@ import {
   ExternalLink,
   FileSearch,
   Filter,
-  Heart,
   LoaderCircle,
   RotateCcw,
   Search,
@@ -20,7 +19,6 @@ import {
 } from 'lucide-react';
 import { AREA_LABELS, CORPUS_STATS, getLawsForScope } from '../lib/corpus-catalog';
 import { executeCorpusSearch, type CorpusSearchResult } from '../services/corpus-search';
-import { useSearchStore } from '../store/useSearchStore';
 import { useUiStore } from '../store/useUiStore';
 import type { CorpusSearchScope, LegalArticle } from '../types';
 
@@ -56,7 +54,6 @@ export function BuscadorLegal() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const { isOnline, notify } = useUiStore();
-  const { addToFavorites, removeFromFavorites, isFavorite } = useSearchStore();
 
   const availableLaws = useMemo(() => getLawsForScope(scope), [scope]);
   const activeLawCode = availableLaws.some((law) => law.code === lawCode) ? lawCode : '';
@@ -164,16 +161,6 @@ export function BuscadorLegal() {
       if ((shareError as Error).name !== 'AbortError') {
         notify('No fue posible compartir el artículo.', 'error');
       }
-    }
-  };
-
-  const toggleFavorite = (article: LegalArticle) => {
-    if (isFavorite(article.id)) {
-      removeFromFavorites(article.id);
-      notify('Artículo eliminado de guardados.', 'info');
-    } else {
-      addToFavorites(article);
-      notify('Artículo guardado en este dispositivo.', 'success');
     }
   };
 
@@ -416,7 +403,6 @@ export function BuscadorLegal() {
               <div className="space-y-3">
                 {result.articles.map((article) => {
                   const isExpanded = expanded.has(article.id);
-                  const favorite = isFavorite(article.id);
                   return (
                     <article
                       key={article.id}
@@ -465,17 +451,6 @@ export function BuscadorLegal() {
                               title="Compartir artículo"
                             >
                               <Share2 size={16} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => toggleFavorite(article)}
-                              className={`flex min-h-9 min-w-9 items-center justify-center rounded-xl hover:bg-rose-50 ${
-                                favorite ? 'text-rose-600' : 'text-slate-500 hover:text-rose-600'
-                              }`}
-                              aria-label={favorite ? 'Quitar de guardados' : 'Guardar en este dispositivo'}
-                              title={favorite ? 'Quitar de guardados' : 'Guardar en este dispositivo'}
-                            >
-                              <Heart size={16} fill={favorite ? 'currentColor' : 'none'} />
                             </button>
                           </div>
                         </div>

@@ -1,11 +1,9 @@
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import App from './App';
-import { useSearchStore } from './store/useSearchStore';
 
 describe('App Lex Corporativo PWA', () => {
   beforeEach(() => {
     localStorage.clear();
-    useSearchStore.setState({ favorites: [], favoriteLicitaciones: [] });
     vi.clearAllMocks();
   });
 
@@ -61,21 +59,24 @@ describe('App Lex Corporativo PWA', () => {
     ).toBeInTheDocument();
   });
 
-  it('muestra el portafolio de guardados sin historial de búsqueda', async () => {
+  it('muestra cobertura verificable y distingue los conectores estatales priorizados', async () => {
     localStorage.setItem('lex_pwa_station_opened', '1');
     await act(async () => {
       render(<App />);
     });
 
-    const openSavedBtn = screen.getAllByRole('button', { name: /Abrir guardados|Guardados/i })[0];
+    const openCoverageButton = screen.getAllByRole('button', { name: /Abrir cobertura|Cobertura/i })[0];
     await act(async () => {
-      fireEvent.click(openSavedBtn);
+      fireEvent.click(openCoverageButton);
     });
-    const dialog = screen.getByRole('dialog', { name: 'Guardados' });
+    const dialog = screen.getByRole('dialog', { name: 'Cobertura y fuentes' });
     expect(dialog).toBeInTheDocument();
-    expect(within(dialog).getByRole('button', { name: /Artículos \(0\)/i })).toBeInTheDocument();
-    expect(within(dialog).getByRole('button', { name: /Licitaciones \(0\)/i })).toBeInTheDocument();
-    expect(within(dialog).queryByText(/Historial/i)).not.toBeInTheDocument();
+    expect(within(dialog).getByText('Nuevo León')).toBeInTheDocument();
+    expect(within(dialog).getByText('Yucatán')).toBeInTheDocument();
+    expect(within(dialog).getByText('Jalisco')).toBeInTheDocument();
+    expect(within(dialog).getByText('Ciudad de México')).toBeInTheDocument();
+    expect(within(dialog).getAllByText('Integración priorizada')).toHaveLength(4);
+    expect(screen.queryByText('Guardados')).not.toBeInTheDocument();
   });
 
   it('aplica y conserva el filtro de etapa de una licitación en la URL', async () => {

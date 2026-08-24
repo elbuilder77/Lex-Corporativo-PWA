@@ -49,7 +49,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="space-y-2">
               <h2 className="text-lg font-bold text-slate-900">No se pudo mostrar esta pantalla</h2>
               <p className="text-sm text-slate-500">
-                Recarga la aplicación. Tu historial y tus favoritos permanecen guardados en este navegador.
+                Recarga la aplicación. Tus consultas pueden retomarse desde los filtros presentes en la URL.
               </p>
               {this.state.error && (
                 <details className="text-left mt-4 p-3 rounded-lg bg-slate-50 text-[11px] font-mono text-red-600">
