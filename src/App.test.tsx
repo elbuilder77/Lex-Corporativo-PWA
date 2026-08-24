@@ -4,14 +4,35 @@ import { useSearchStore } from './store/useSearchStore';
 
 describe('App Lex Corporativo PWA', () => {
   beforeEach(() => {
+    localStorage.clear();
     useSearchStore.setState({ favorites: [], favoriteLicitaciones: [] });
     vi.clearAllMocks();
   });
 
-  it('inicia en el buscador normativo con navegación de pestañas', async () => {
+  it('muestra la pantalla inicial de presentación con el logotipo de Lex Corporativo', async () => {
     await act(async () => {
       render(<App />);
     });
+
+    expect(screen.getByAltText('Logotipo Lex Corporativo')).toBeInTheDocument();
+    expect(screen.getByAltText('Emblema Lex Corporativo')).toBeInTheDocument();
+    expect(screen.getByText('Plataforma de Consulta Federal')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /INGRESAR A LA PLATAFORMA/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('permite ingresar a la estación de consulta desde la pantalla de presentación', async () => {
+    await act(async () => {
+      render(<App />);
+    });
+
+    const enterBtn = screen.getByRole('button', { name: /INGRESAR A LA PLATAFORMA/i });
+    await act(async () => {
+      fireEvent.click(enterBtn);
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    });
+
     expect(
       screen.getByRole('heading', { name: 'Consulta la legislación federal con respaldo oficial' }),
     ).toBeInTheDocument();
@@ -19,10 +40,12 @@ describe('App Lex Corporativo PWA', () => {
     expect(screen.getByRole('navigation', { name: 'Módulos de consulta' })).toBeInTheDocument();
   });
 
-  it('permite cambiar a la pestaña de Licitaciones Abiertas', async () => {
+  it('permite cambiar a la pestaña de Licitaciones Abiertas una vez dentro de la plataforma', async () => {
+    localStorage.setItem('lex_pwa_station_opened', '1');
     await act(async () => {
       render(<App />);
     });
+
     const licitacionesTab = screen.getByRole('button', { name: 'Licitaciones' });
     await act(async () => {
       fireEvent.click(licitacionesTab);
@@ -37,9 +60,11 @@ describe('App Lex Corporativo PWA', () => {
   });
 
   it('muestra el portafolio de guardados sin historial de búsqueda', async () => {
+    localStorage.setItem('lex_pwa_station_opened', '1');
     await act(async () => {
       render(<App />);
     });
+
     const openSavedBtn = screen.getByRole('button', { name: 'Abrir guardados' });
     await act(async () => {
       fireEvent.click(openSavedBtn);

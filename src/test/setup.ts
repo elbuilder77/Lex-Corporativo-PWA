@@ -1,12 +1,19 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
-// Mock localStorage
+// Mock localStorage with working in-memory store
+const store = new Map<string, string>();
 const localStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
+  getItem: vi.fn((key: string) => store.get(key) ?? null),
+  setItem: vi.fn((key: string, value: string) => {
+    store.set(key, String(value));
+  }),
+  removeItem: vi.fn((key: string) => {
+    store.delete(key);
+  }),
+  clear: vi.fn(() => {
+    store.clear();
+  }),
 };
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
@@ -33,7 +40,7 @@ Object.defineProperty(navigator, 'wakeLock', {
 // Mock navigator.onLine
 Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
 
-// Mock fetch for the five local corpus files.
+// Mock fetch for the local corpus files.
 global.fetch = vi.fn().mockResolvedValue({
   ok: true,
   status: 200,
