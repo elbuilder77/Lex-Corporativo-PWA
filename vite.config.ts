@@ -10,11 +10,11 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.png', 'assets/*.png', 'wasm/*.wasm', 'corpus/*.json'],
+      includeAssets: ['favicon.png', 'assets/*.png', 'wasm/*.wasm', 'corpus/*.json', 'licitaciones/*.json'],
       manifest: {
-        name: 'Lex Corporativo — Consulta Federal',
+        name: 'Lex Corporativo — Consulta Federal y Licitaciones',
         short_name: 'Lex Corporativo',
-        description: 'Consulta gratuita de legislación federal mexicana con acceso directo a fuentes oficiales.',
+        description: 'Consulta gratuita de legislación federal y buscador de licitaciones abiertas en México (CompraNet).',
         lang: 'es-MX',
         theme_color: '#070b13',
         background_color: '#070b13',

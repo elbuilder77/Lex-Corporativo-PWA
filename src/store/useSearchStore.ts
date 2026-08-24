@@ -1,15 +1,5 @@
 import { create } from 'zustand';
-import type { CorpusSearchScope, LegalArticle } from '../types';
-
-export interface SearchHistoryItem {
-  id: string;
-  query: string;
-  scope: CorpusSearchScope;
-  scopeLabel: string;
-  lawCode?: string;
-  timestamp: number;
-  resultCount: number;
-}
+import type { LegalArticle, LicitacionPublica } from '../types';
 
 export interface FavoriteArticle {
   id: string;
@@ -17,60 +7,47 @@ export interface FavoriteArticle {
   savedAt: number;
 }
 
+export interface FavoriteLicitacion {
+  id: string;
+  licitacion: LicitacionPublica;
+  savedAt: number;
+}
+
 interface SearchStore {
-  history: SearchHistoryItem[];
   favorites: FavoriteArticle[];
-  addToHistory: (item: Omit<SearchHistoryItem, 'id' | 'timestamp'>) => void;
-  removeFromHistory: (id: string) => void;
-  clearHistory: () => void;
+  favoriteLicitaciones: FavoriteLicitacion[];
+
+  // Legal Articles favorites
   addToFavorites: (article: LegalArticle) => void;
   removeFromFavorites: (id: string) => void;
   clearFavorites: () => void;
-  clearAll: () => void;
   isFavorite: (articleId: string) => boolean;
+
+  // Licitaciones favorites
+  addToFavoriteLicitaciones: (licitacion: LicitacionPublica) => void;
+  removeFromFavoriteLicitaciones: (id: string) => void;
+  clearFavoriteLicitaciones: () => void;
+  isFavoriteLicitacion: (licitacionId: string) => boolean;
+
+  // Global actions
+  clearAll: () => void;
   loadFromStorage: () => void;
 }
 
-export const HISTORY_KEY = 'lex_pwa_search_history_v2';
 export const FAVORITES_KEY = 'lex_pwa_favorites_v2';
-const MAX_HISTORY = 50;
+export const FAVORITES_LICITACIONES_KEY = 'lex_pwa_fav_licitaciones_v2';
 
 function writeStorage(key: string, value: unknown): void {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* almacenamiento no disponible */ }
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* almacenamiento no disponible */
+  }
 }
 
 export const useSearchStore = create<SearchStore>((set, get) => ({
-  history: [],
   favorites: [],
-
-  addToHistory: (item) => {
-    const newItem: SearchHistoryItem = {
-      ...item,
-      id: `hist_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-      timestamp: Date.now(),
-    };
-    set((state) => {
-      const filtered = state.history.filter(
-        (historyItem) => historyItem.query !== item.query || historyItem.scopeLabel !== item.scopeLabel,
-      );
-      const history = [newItem, ...filtered].slice(0, MAX_HISTORY);
-      writeStorage(HISTORY_KEY, history);
-      return { history };
-    });
-  },
-
-  removeFromHistory: (id) => {
-    set((state) => {
-      const history = state.history.filter((item) => item.id !== id);
-      writeStorage(HISTORY_KEY, history);
-      return { history };
-    });
-  },
-
-  clearHistory: () => {
-    try { localStorage.removeItem(HISTORY_KEY); } catch { /* noop */ }
-    set({ history: [] });
-  },
+  favoriteLicitaciones: [],
 
   addToFavorites: (article) => {
     set((state) => {
@@ -90,28 +67,68 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
   },
 
   clearFavorites: () => {
-    try { localStorage.removeItem(FAVORITES_KEY); } catch { /* noop */ }
-    set({ favorites: [] });
-  },
-
-  clearAll: () => {
     try {
-      localStorage.removeItem(HISTORY_KEY);
       localStorage.removeItem(FAVORITES_KEY);
-    } catch { /* noop */ }
-    set({ history: [], favorites: [] });
+    } catch {
+      /* noop */
+    }
+    set({ favorites: [] });
   },
 
   isFavorite: (articleId) => get().favorites.some((favorite) => favorite.id === articleId),
 
+  addToFavoriteLicitaciones: (licitacion) => {
+    set((state) => {
+      if (state.favoriteLicitaciones.some((item) => item.id === licitacion.id)) return state;
+      const favoriteLicitaciones = [
+        { id: licitacion.id, licitacion, savedAt: Date.now() },
+        ...state.favoriteLicitaciones,
+      ];
+      writeStorage(FAVORITES_LICITACIONES_KEY, favoriteLicitaciones);
+      return { favoriteLicitaciones };
+    });
+  },
+
+  removeFromFavoriteLicitaciones: (id) => {
+    set((state) => {
+      const favoriteLicitaciones = state.favoriteLicitaciones.filter((item) => item.id !== id);
+      writeStorage(FAVORITES_LICITACIONES_KEY, favoriteLicitaciones);
+      return { favoriteLicitaciones };
+    });
+  },
+
+  clearFavoriteLicitaciones: () => {
+    try {
+      localStorage.removeItem(FAVORITES_LICITACIONES_KEY);
+    } catch {
+      /* noop */
+    }
+    set({ favoriteLicitaciones: [] });
+  },
+
+  isFavoriteLicitacion: (licitacionId) =>
+    get().favoriteLicitaciones.some((item) => item.id === licitacionId),
+
+  clearAll: () => {
+    try {
+      localStorage.removeItem(FAVORITES_KEY);
+      localStorage.removeItem(FAVORITES_LICITACIONES_KEY);
+    } catch {
+      /* noop */
+    }
+    set({ favorites: [], favoriteLicitaciones: [] });
+  },
+
   loadFromStorage: () => {
     try {
-      const history = localStorage.getItem(HISTORY_KEY);
       const favorites = localStorage.getItem(FAVORITES_KEY);
-      if (history) set({ history: JSON.parse(history) as SearchHistoryItem[] });
+      const favoriteLicitaciones = localStorage.getItem(FAVORITES_LICITACIONES_KEY);
       if (favorites) set({ favorites: JSON.parse(favorites) as FavoriteArticle[] });
+      if (favoriteLicitaciones) {
+        set({ favoriteLicitaciones: JSON.parse(favoriteLicitaciones) as FavoriteLicitacion[] });
+      }
     } catch {
-      set({ history: [], favorites: [] });
+      set({ favorites: [], favoriteLicitaciones: [] });
     }
   },
 }));

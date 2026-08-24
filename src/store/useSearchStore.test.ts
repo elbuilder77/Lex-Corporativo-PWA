@@ -1,6 +1,10 @@
 import { act, renderHook } from '@testing-library/react';
-import { FAVORITES_KEY, HISTORY_KEY, useSearchStore } from './useSearchStore';
-import type { LegalArticle } from '../types';
+import {
+  FAVORITES_KEY,
+  FAVORITES_LICITACIONES_KEY,
+  useSearchStore,
+} from './useSearchStore';
+import type { LegalArticle, LicitacionPublica } from '../types';
 
 const mockArticle: LegalArticle = {
   id: 'lft-47',
@@ -15,32 +19,37 @@ const mockArticle: LegalArticle = {
   sourceUrl: 'https://www.diputados.gob.mx/LeyesBiblio/index.htm',
 };
 
+const mockLicitacion: LicitacionPublica = {
+  id: 'lic-imss-test',
+  numeroProcedimiento: 'LA-50-GYR-TEST',
+  expediente: 'EXP-TEST',
+  titulo: 'Licitación de Prueba',
+  descripcion: 'Descripción de prueba',
+  convocante: 'Instituto Mexicano del Seguro Social',
+  siglasConvocante: 'IMSS',
+  unidadCompradora: 'Coordinación Central',
+  materia: 'adquisiciones',
+  caracter: 'nacional',
+  tipoProcedimiento: 'licitacion_publica',
+  estatus: 'recepcion_propuestas',
+  entidadFederativa: 'Ciudad de México',
+  fechaPublicacion: '2026-08-10',
+  fechaLimitePropuestas: '2026-09-02T10:00:00',
+  montoEstimado: 1000000,
+  moneda: 'MXN',
+  marcoLegal: 'LAASSP Art. 26',
+  enlaceCompraNet: 'https://compranet.hacienda.gob.mx',
+  requisitosClave: ['SAT 32-D'],
+  anexosDisponibles: ['Bases'],
+};
+
 describe('useSearchStore', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    useSearchStore.setState({ history: [], favorites: [] });
+    useSearchStore.setState({ favorites: [], favoriteLicitaciones: [] });
   });
 
-  it('guarda y deduplica búsquedas por consulta y alcance', () => {
-    const { result } = renderHook(() => useSearchStore());
-    const item = { query: 'rescisión', scope: 'laboral' as const, scopeLabel: 'Laboral', resultCount: 8 };
-    act(() => result.current.addToHistory(item));
-    act(() => result.current.addToHistory({ ...item, resultCount: 4 }));
-
-    expect(result.current.history).toHaveLength(1);
-    expect(result.current.history[0]).toMatchObject({ query: 'rescisión', scope: 'laboral', resultCount: 4 });
-    expect(localStorage.setItem).toHaveBeenCalledWith(HISTORY_KEY, expect.any(String));
-  });
-
-  it('limita el historial a 50 consultas', () => {
-    const { result } = renderHook(() => useSearchStore());
-    for (let index = 0; index < 60; index += 1) {
-      act(() => result.current.addToHistory({ query: `consulta ${index}`, scope: 'todos', scopeLabel: 'Todas las leyes y reglamentos', resultCount: 1 }));
-    }
-    expect(result.current.history).toHaveLength(50);
-  });
-
-  it('guarda favoritos sin duplicarlos y permite eliminarlos', () => {
+  it('guarda artículos favoritos sin duplicarlos y permite eliminarlos', () => {
     const { result } = renderHook(() => useSearchStore());
     act(() => result.current.addToFavorites(mockArticle));
     act(() => result.current.addToFavorites(mockArticle));
@@ -52,28 +61,49 @@ describe('useSearchStore', () => {
     expect(result.current.isFavorite(mockArticle.id)).toBe(false);
   });
 
-  it('carga historial y favoritos desde el navegador', () => {
-    const history = [{ id: 'h1', query: 'artículo 47', scope: 'laboral' as const, scopeLabel: 'Laboral', resultCount: 1, timestamp: 1 }];
+  it('guarda licitaciones en seguimiento sin duplicarlas y permite eliminarlas', () => {
+    const { result } = renderHook(() => useSearchStore());
+    act(() => result.current.addToFavoriteLicitaciones(mockLicitacion));
+    act(() => result.current.addToFavoriteLicitaciones(mockLicitacion));
+    expect(result.current.favoriteLicitaciones).toHaveLength(1);
+    expect(result.current.isFavoriteLicitacion(mockLicitacion.id)).toBe(true);
+    expect(localStorage.setItem).toHaveBeenCalledWith(
+      FAVORITES_LICITACIONES_KEY,
+      expect.any(String),
+    );
+
+    act(() => result.current.removeFromFavoriteLicitaciones(mockLicitacion.id));
+    expect(result.current.isFavoriteLicitacion(mockLicitacion.id)).toBe(false);
+    expect(result.current.favoriteLicitaciones).toHaveLength(0);
+  });
+
+  it('carga favoritos desde localStorage', () => {
     const favorites = [{ id: mockArticle.id, article: mockArticle, savedAt: 1 }];
+    const favoriteLicitaciones = [
+      { id: mockLicitacion.id, licitacion: mockLicitacion, savedAt: 1 },
+    ];
     vi.mocked(localStorage.getItem).mockImplementation((key) => {
-      if (key === HISTORY_KEY) return JSON.stringify(history);
       if (key === FAVORITES_KEY) return JSON.stringify(favorites);
+      if (key === FAVORITES_LICITACIONES_KEY) return JSON.stringify(favoriteLicitaciones);
       return null;
     });
 
     const { result } = renderHook(() => useSearchStore());
     act(() => result.current.loadFromStorage());
-    expect(result.current.history).toEqual(history);
     expect(result.current.favorites).toEqual(favorites);
+    expect(result.current.favoriteLicitaciones).toEqual(favoriteLicitaciones);
   });
 
-  it('borra todos los datos personales de la PWA', () => {
-    useSearchStore.setState({ history: [{ id: 'h1', query: 'iva', scope: 'fiscal', scopeLabel: 'Fiscal', resultCount: 2, timestamp: 1 }], favorites: [{ id: mockArticle.id, article: mockArticle, savedAt: 1 }] });
+  it('borra todos los datos guardados de la PWA de forma limpia', () => {
+    useSearchStore.setState({
+      favorites: [{ id: mockArticle.id, article: mockArticle, savedAt: 1 }],
+      favoriteLicitaciones: [{ id: mockLicitacion.id, licitacion: mockLicitacion, savedAt: 1 }],
+    });
     const { result } = renderHook(() => useSearchStore());
     act(() => result.current.clearAll());
-    expect(result.current.history).toEqual([]);
     expect(result.current.favorites).toEqual([]);
-    expect(localStorage.removeItem).toHaveBeenCalledWith(HISTORY_KEY);
+    expect(result.current.favoriteLicitaciones).toEqual([]);
     expect(localStorage.removeItem).toHaveBeenCalledWith(FAVORITES_KEY);
+    expect(localStorage.removeItem).toHaveBeenCalledWith(FAVORITES_LICITACIONES_KEY);
   });
 });
