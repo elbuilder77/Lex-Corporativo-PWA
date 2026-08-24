@@ -6,7 +6,8 @@ import type {
   LicitacionTipoProcedimiento,
 } from '../types';
 
-export const COMPRANET_PORTAL_URL = 'https://compranet.hacienda.gob.mx';
+export const COMPRANET_PORTAL_URL = 'https://comprasmx.buengobierno.gob.mx';
+export const COMPRANET_GOB_URL = 'https://www.gob.mx/compranet';
 export const DATOS_ABIERTOS_URL = 'https://datos.gob.mx/busca/dataset/concentrado-de-contrataciones-abiertas-de-la-apf';
 export const PDN_CONTRATACIONES_URL = 'https://www.plataformadigitalnacional.org/contrataciones';
 
@@ -100,10 +101,10 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     fechaJuntaAclaraciones: '2026-08-20',
     fechaLimitePropuestas: '2026-09-02T10:00:00',
     fechaFallo: '2026-09-18',
-    montoEstimado: 845000000,
+    montoEstimado: 84500000,
     moneda: 'MXN',
     marcoLegal: 'LAASSP Art. 26 Fracc. I, Art. 28 Fracc. I y Art. 39',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-IMSS-001',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Opinión de cumplimiento positiva SAT 32-D',
       'Registro Único de Proveedores y Contratistas (RUPC)',
@@ -135,7 +136,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 128400000,
     moneda: 'MXN',
     marcoLegal: 'Disposiciones Generales en Materia de Adquisiciones de CFE Art. 24 y TLCAN/TMEC',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-CFE-045',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Certificación vigente en normas IEEE / IEC',
       'Personal técnico certificado con cédula profesional en ingeniería eléctrica',
@@ -143,11 +144,11 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
       'Garantía de cumplimiento del 10%',
       'Capacidad financiera acreditada con estados financieros auditados 2024-2025',
     ],
-    anexosDisponibles: ['Pliego de Requisitos', 'Especificación Técnica CFE C-1000', 'Catálogo de Precios Unitarios'],
+    anexosDisponibles: ['Pliego de Requisitos', 'Especificación Técnica CFE G0100-05', 'Catálogo de Conceptos', 'Programa de Ejecución'],
   },
   {
     id: 'lic-sict-2026-003',
-    numeroProcedimiento: 'LO-009000999-E5-2026',
+    numeroProcedimiento: 'LO-09-000-009000999-N-5-2026',
     expediente: 'EXP-SICT-DGC-2026-892',
     titulo: 'Construcción de puente vehicular de cuatro carriles y modernización del tramo carretero federal km 42+000 al km 68+500',
     descripcion: 'Trabajos de terracerías, obras de drenaje menor y mayor, pavimentación con concreto asfáltico, señalamiento horizontal y vertical, y construcción de estructura de puente vehicular con claros de 35 metros.',
@@ -167,7 +168,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 342000000,
     moneda: 'MXN',
     marcoLegal: 'LOPSRM Art. 27 Fracc. I, Art. 30 y Art. 31',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-SICT-005',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Registro en el Padrón de Contratistas del Sector Público',
       'Constancia de visita al sitio de los trabajos firmada por el Centro SICT',
@@ -198,7 +199,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 215000000,
     moneda: 'MXN',
     marcoLegal: 'LAASSP Art. 26 Fracc. I y Políticas de Seguridad Informática del SAT',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-SAT-038',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Certificaciones ISO/IEC 27001 e ISO/IEC 20000 del proveedor',
       'Personal certificado CISSP, CISM, CEH y GIAC asignado al proyecto',
@@ -229,7 +230,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 45000000,
     moneda: 'USD',
     marcoLegal: 'Ley de Petróleos Mexicanos Art. 75 y Disposiciones Generales de Contratación de PEMEX',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-PEMEX-087',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Certificación API Spec Q2 para servicios de perforación',
       'Cumplimiento del Sistema de Seguridad, Salud en el Trabajo y Protección Ambiental (SSPA)',
@@ -259,7 +260,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 380000000,
     moneda: 'MXN',
     marcoLegal: 'LAASSP Art. 26 Fracc. I y Art. 28',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-ISSSTE-024',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Acreditación ante la Entidad Mexicana de Acreditación (EMA) bajo NMX-EC-15189-IMNC',
       'Licencia sanitaria vigente expedida por COFEPRIS',
@@ -290,7 +291,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 275000000,
     moneda: 'MXN',
     marcoLegal: 'LOPSRM Art. 27 Fracc. I y Art. 30',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-CONAGUA-018',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Constancia de asistencia obligatoria a la visita de campo al Sistema Cutzamala',
       'Currículum empresarial acreditando ejecución de proyectos hidráulicos de gran calado',
@@ -320,7 +321,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 560000000,
     moneda: 'MXN',
     marcoLegal: 'LAASSP Art. 26 Fracc. I, Art. 28 Fracc. I',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-SEP-052',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Capacidad de producción comprobable mínima de 500,000 ejemplares diarios',
       'Certificación Forest Stewardship Council (FSC) en el papel suministrado',
@@ -350,7 +351,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 410000000,
     moneda: 'MXN',
     marcoLegal: 'LAASSP Art. 26 Fracc. I, Art. 27 y Art. 28',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-BIENESTAR-016',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Flotilla vehicular 100% modelo 2026 con entrega escalonada en 30 días',
       'Cobertura de asistencia en el camino y talleres autorizados en todos los estados',
@@ -380,7 +381,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 320000000,
     moneda: 'MXN',
     marcoLegal: 'LAASSP Art. 26 Fracc. I y Normas Militares de Calidad',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-GN-009',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Pruebas de laboratorio acreditadas ante EMA para tejidos y resistencia balística no letal',
       'Fabricante nacional con capacidad instalada verificada',
@@ -411,7 +412,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 195000000,
     moneda: 'MXN',
     marcoLegal: 'LOPSRM Art. 27 Fracc. I y Ley de Puertos',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-ASIPONA-029',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Embarcación draga de tolva autopropulsada con matrícula y permisos de Capitanía de Puerto',
       'Manifiesto de Impacto Ambiental (MIA) SEMARNAT vigente',
@@ -441,7 +442,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 148000000,
     moneda: 'MXN',
     marcoLegal: 'Ley de Obras Públicas del Distrito Federal y Normas Técnicas Complementarias',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-SOBSE-004',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Padrón de Contratistas del Gobierno de la CDMX vigente',
       'Opinión favorable de cumplimiento de obligaciones fiscales locales (Secretaría de Finanzas CDMX)',
@@ -470,7 +471,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 1850000,
     moneda: 'USD',
     marcoLegal: 'LAASSP Art. 26 Fracc. I, Art. 28 Fracc. III (Internacional Abierta)',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-INAOE-003',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Fabricante internacional con soporte técnico autorizado en México',
       'Cumplimiento de tolerancias ópticas micrométricas certificadas en fábrica',
@@ -499,7 +500,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 89000000,
     moneda: 'MXN',
     marcoLegal: 'Ley de Compras Gubernamentales del Estado de Jalisco y NOM-087-SEMARNAT-SSA1-2002',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-SSJ-019',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Permiso SEMARNAT y SCT para transporte de RPBI',
       'Certificación del personal en bioseguridad y manejo de químicos hospitalarios',
@@ -529,7 +530,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 165000000,
     moneda: 'MXN',
     marcoLegal: 'Ley de Adquisiciones del Estado de Nuevo León y Capítulos de Compras del TMEC',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-METRORREY-008',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Certificación EMVCo L1 y L2 en los lectores de pago',
       'Garantía de disponibilidad del software central 99.95%',
@@ -559,7 +560,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 420000000,
     moneda: 'MXN',
     marcoLegal: 'Ley de Obras Públicas y Servicios Relacionados del Estado de Sonora',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-SON-012',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Planta de concreto hidráulico móvil certificada',
       'Padrón de Contratistas de Sonora vigente',
@@ -588,7 +589,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 178000000,
     moneda: 'MXN',
     marcoLegal: 'LAASSP Art. 26 Fracc. I y Art. 28 Fracc. II',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-QROO-021',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Registro sanitario COFEPRIS para equipos médicos clase II y III',
       'Póliza de garantía y mantenimiento preventivo por 5 años en sitio',
@@ -618,7 +619,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 680000000,
     moneda: 'MXN',
     marcoLegal: 'Ley de Obras Públicas de Baja California y Disposiciones de APP',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-BC-005',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Experiencia comprobada en plantas desalinizadoras mayores a 150 lps',
       'Autorización de Impacto Ambiental SEMARNAT',
@@ -647,7 +648,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 198000000,
     moneda: 'MXN',
     marcoLegal: 'Ley de Contrataciones Públicas para el Estado de Guanajuato',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-GTO-014',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Cámaras con precisión de lectura LPR superior al 98% a velocidades de hasta 160 km/h',
       'Padrón de Proveedores de Guanajuato',
@@ -676,7 +677,7 @@ export const LICITACIONES_DATA: LicitacionPublica[] = [
     montoEstimado: 530000000,
     moneda: 'MXN',
     marcoLegal: 'LOPSRM Art. 27 Fracc. I y Ley de Puertos',
-    enlaceCompraNet: 'https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-ASIPONA-DB-006',
+    enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
     requisitosClave: [
       'Equipo de hincado de pilotes marinos certificado',
       'Cumplimiento con el Plan de Protección de la Instalación Portuaria (PBIP)',

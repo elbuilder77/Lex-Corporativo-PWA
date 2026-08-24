@@ -20,7 +20,7 @@
     "montoEstimado": 845000000,
     "moneda": "MXN",
     "marcoLegal": "LAASSP Art. 26 Fracc. I, Art. 28 Fracc. I y Art. 39",
-    "enlaceCompraNet": "https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-IMSS-001",
+    "enlaceCompraNet": "https://comprasmx.buengobierno.gob.mx",
     "requisitosClave": [
       "Opinión de cumplimiento positiva SAT 32-D",
       "Registro Único de Proveedores y Contratistas (RUPC)",
@@ -52,7 +52,7 @@
     "montoEstimado": 128400000,
     "moneda": "MXN",
     "marcoLegal": "Disposiciones Generales en Materia de Adquisiciones de CFE Art. 24 y TLCAN/TMEC",
-    "enlaceCompraNet": "https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-CFE-045",
+    "enlaceCompraNet": "https://comprasmx.buengobierno.gob.mx",
     "requisitosClave": [
       "Certificación vigente en normas IEEE / IEC",
       "Personal técnico certificado con cédula profesional en ingeniería eléctrica",
@@ -84,7 +84,7 @@
     "montoEstimado": 342000000,
     "moneda": "MXN",
     "marcoLegal": "LOPSRM Art. 27 Fracc. I, Art. 30 y Art. 31",
-    "enlaceCompraNet": "https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-SICT-005",
+    "enlaceCompraNet": "https://comprasmx.buengobierno.gob.mx",
     "requisitosClave": [
       "Registro en el Padrón de Contratistas del Sector Público",
       "Constancia de visita al sitio de los trabajos firmada por el Centro SICT",
@@ -115,7 +115,7 @@
     "montoEstimado": 215000000,
     "moneda": "MXN",
     "marcoLegal": "LAASSP Art. 26 Fracc. I y Políticas de Seguridad Informática del SAT",
-    "enlaceCompraNet": "https://compranet.hacienda.gob.mx/esop/guest/go/opportunity/detail?opportunityId=2026-SAT-038",
+    "enlaceCompraNet": "https://comprasmx.buengobierno.gob.mx",
     "requisitosClave": [
       "Certificaciones ISO/IEC 27001 e ISO/IEC 20000 del proveedor",
       "Personal certificado CISSP, CISM, CEH y GIAC asignado al proyecto",

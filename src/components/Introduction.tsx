@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { ArrowRight, BookOpenCheck, Landmark, Scale, ShieldCheck, Sparkles, Zap } from 'lucide-react';
 import logoUrl from '../assets/logo-lockup-transparent.png';
-import logoMark from '../assets/logo-mark.png';
 import type { AppModuleTab } from '../types';
 
 interface IntroductionProps {
@@ -29,20 +28,10 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
 
       {/* Main Presentation Container */}
       <main
-        className={`relative z-10 flex w-full max-w-2xl flex-col items-center gap-4 text-center py-6 sm:py-10 transition-all duration-300 ${
+        className={`relative z-10 flex w-full max-w-2xl flex-col items-center gap-5 sm:gap-6 text-center py-6 sm:py-10 transition-all duration-300 ${
           isEntering ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
         }`}
       >
-        {/* Top Emblem & Pill */}
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-16 w-16 overflow-hidden rounded-2xl border border-legal-gold/40 bg-black/80 p-1 shadow-xl shadow-legal-gold/15">
-            <img src={logoMark} alt="Emblema Lex Corporativo" className="h-full w-full rounded-xl object-cover" />
-          </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-legal-gold/30 bg-legal-gold/10 px-3.5 py-1 text-[11px] font-extrabold uppercase tracking-[0.3em] text-legal-gold">
-            <Sparkles size={13} /> Plataforma de Consulta Federal
-          </span>
-        </div>
-
         {/* Brand Logo Lockup */}
         <div className="w-full max-w-[220px] sm:max-w-[340px] flex justify-center">
           <img
@@ -52,18 +41,13 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
           />
         </div>
 
-        {/* Subtitle / Value Proposition */}
-        <div className="max-w-xl space-y-1.5">
-          <h1 className="font-serif text-xl sm:text-2xl font-bold text-white leading-snug">
-            Legislación Federal y Licitaciones Públicas
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400 leading-6">
-            Consulta determinista y privada de disposiciones jurídicas oficiales y convocatorias vigentes de CompraNet en México, con soporte 100% offline en el dispositivo.
-          </p>
-        </div>
+        {/* Platform Badge Tag */}
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-legal-gold/30 bg-legal-gold/10 px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.25em] text-legal-gold shadow-xs">
+          <Sparkles size={13} /> Plataforma de Consulta Federal
+        </span>
 
         {/* Primary CTA + Module Entry Cards */}
-        <div className="w-full space-y-3">
+        <div className="w-full space-y-3 pt-2">
           {/* Primary CTA */}
           <button
             type="button"

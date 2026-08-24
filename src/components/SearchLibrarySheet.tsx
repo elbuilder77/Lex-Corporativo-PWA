@@ -289,7 +289,7 @@ export function SearchLibrarySheet({ open, onClose }: SearchLibrarySheetProps) {
                         rel="noreferrer"
                         className="inline-flex min-h-8 items-center gap-1.5 rounded-lg bg-legal-gold px-3 text-xs font-bold text-slate-950 hover:bg-legal-goldhover"
                       >
-                        CompraNet <ExternalLink size={12} />
+                        ComprasMX <ExternalLink size={12} />
                       </a>
                     </div>
                   </div>

@@ -9,7 +9,7 @@ import {
   X,
 } from 'lucide-react';
 import { CORPUS_STATS, OFFICIAL_LAWS_URL, OFFICIAL_REGULATIONS_URL } from '../lib/corpus-catalog';
-import { COMPRANET_PORTAL_URL, DATOS_ABIERTOS_URL, LICITACIONES_STATS } from '../lib/licitaciones-catalog';
+import { COMPRANET_GOB_URL, COMPRANET_PORTAL_URL, DATOS_ABIERTOS_URL, LICITACIONES_STATS } from '../lib/licitaciones-catalog';
 import { useSearchStore } from '../store/useSearchStore';
 import { useUiStore } from '../store/useUiStore';
 
@@ -117,7 +117,15 @@ export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
               rel="noreferrer"
               className="inline-flex min-h-11 items-center justify-between rounded-xl border border-slate-200 px-4 text-xs font-bold text-blue-700 hover:bg-slate-50 transition"
             >
-              Portal CompraNet <ExternalLink size={14} />
+              Portal ComprasMX (CompraNet) <ExternalLink size={14} />
+            </a>
+            <a
+              href={COMPRANET_GOB_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center justify-between rounded-xl border border-slate-200 px-4 text-xs font-bold text-blue-700 hover:bg-slate-50 transition"
+            >
+              Portal gob.mx/compranet <ExternalLink size={14} />
             </a>
             <a
               href={DATOS_ABIERTOS_URL}
@@ -134,14 +142,6 @@ export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
               className="inline-flex min-h-11 items-center justify-between rounded-xl border border-slate-200 px-4 text-xs font-bold text-blue-700 hover:bg-slate-50 transition"
             >
               Leyes Federales <ExternalLink size={14} />
-            </a>
-            <a
-              href={OFFICIAL_REGULATIONS_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex min-h-11 items-center justify-between rounded-xl border border-slate-200 px-4 text-xs font-bold text-blue-700 hover:bg-slate-50 transition"
-            >
-              Reglamentos Federales <ExternalLink size={14} />
             </a>
           </div>
         </div>

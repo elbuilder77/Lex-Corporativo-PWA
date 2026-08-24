@@ -38,7 +38,7 @@ const mockLicitacion: LicitacionPublica = {
   montoEstimado: 1000000,
   moneda: 'MXN',
   marcoLegal: 'LAASSP Art. 26',
-  enlaceCompraNet: 'https://compranet.hacienda.gob.mx',
+  enlaceCompraNet: 'https://comprasmx.buengobierno.gob.mx',
   requisitosClave: ['SAT 32-D'],
   anexosDisponibles: ['Bases'],
 };

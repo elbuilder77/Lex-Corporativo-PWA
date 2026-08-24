@@ -9,16 +9,18 @@ describe('App Lex Corporativo PWA', () => {
     vi.clearAllMocks();
   });
 
-  it('muestra la pantalla inicial de presentación con el logotipo de Lex Corporativo', async () => {
+  it('muestra la pantalla inicial de presentación simplificada con el logotipo de Lex Corporativo', async () => {
     await act(async () => {
       render(<App />);
     });
 
     expect(screen.getByAltText('Logotipo Lex Corporativo')).toBeInTheDocument();
-    expect(screen.getByAltText('Emblema Lex Corporativo')).toBeInTheDocument();
     expect(screen.getByText('Plataforma de Consulta Federal')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /INGRESAR A LA PLATAFORMA/i }),
+      screen.getByRole('button', { name: /Explorar Licitaciones/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Consultar Legislación Federal/i }),
     ).toBeInTheDocument();
   });
 
@@ -27,17 +29,17 @@ describe('App Lex Corporativo PWA', () => {
       render(<App />);
     });
 
-    const enterBtn = screen.getByRole('button', { name: /INGRESAR A LA PLATAFORMA/i });
+    const enterBtn = screen.getByRole('button', { name: /Consultar Legislación Federal/i });
     await act(async () => {
       fireEvent.click(enterBtn);
       await new Promise((resolve) => setTimeout(resolve, 250));
     });
 
     expect(
-      screen.getByRole('heading', { name: 'Consulta la legislación federal con respaldo oficial' }),
+      screen.getByRole('heading', { name: 'Consulta de Legislación Federal' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('searchbox', { name: '¿Qué necesitas consultar?' })).toBeInTheDocument();
-    expect(screen.getByRole('navigation', { name: 'Módulos de consulta' })).toBeInTheDocument();
+    expect(screen.getAllByRole('navigation', { name: 'Módulos de consulta' }).length).toBeGreaterThan(0);
   });
 
   it('permite cambiar a la pestaña de Licitaciones Abiertas una vez dentro de la plataforma', async () => {
@@ -46,13 +48,13 @@ describe('App Lex Corporativo PWA', () => {
       render(<App />);
     });
 
-    const licitacionesTab = screen.getByRole('button', { name: 'Licitaciones' });
+    const licitacionesTabs = screen.getAllByRole('button', { name: /Licitaciones/i });
     await act(async () => {
-      fireEvent.click(licitacionesTab);
+      fireEvent.click(licitacionesTabs[0]);
     });
 
     expect(
-      screen.getByRole('heading', { name: 'Buscador de Licitaciones Abiertas en México' }),
+      screen.getByRole('heading', { name: 'Licitaciones Públicas Abiertas en México' }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('searchbox', { name: '¿Qué licitación, insumo o servicio buscas?' }),
@@ -65,14 +67,14 @@ describe('App Lex Corporativo PWA', () => {
       render(<App />);
     });
 
-    const openSavedBtn = screen.getByRole('button', { name: 'Abrir guardados' });
+    const openSavedBtn = screen.getAllByRole('button', { name: /Abrir guardados|Guardados/i })[0];
     await act(async () => {
       fireEvent.click(openSavedBtn);
     });
     const dialog = screen.getByRole('dialog', { name: 'Guardados' });
     expect(dialog).toBeInTheDocument();
-    expect(within(dialog).getByText(/Artículos Legales/i)).toBeInTheDocument();
-    expect(within(dialog).getByText(/Licitaciones \(0\)/i)).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: /Artículos \(0\)/i })).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: /Licitaciones \(0\)/i })).toBeInTheDocument();
     expect(within(dialog).queryByText(/Historial/i)).not.toBeInTheDocument();
   });
 });

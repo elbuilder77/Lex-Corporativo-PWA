@@ -936,7 +936,7 @@ export function BuscadorLicitaciones() {
                         rel="noreferrer"
                         className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-legal-gold px-4 text-xs font-bold text-slate-950 hover:bg-legal-goldhover transition active:scale-95"
                       >
-                        <ExternalLink size={14} /> Ver expediente en CompraNet
+                        <ExternalLink size={14} /> Ver en ComprasMX (CompraNet)
                       </a>
 
                       <button
