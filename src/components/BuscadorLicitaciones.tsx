@@ -194,9 +194,11 @@ export function BuscadorLicitaciones() {
     }
   };
 
-  // Initial load
+  // Initial load - only run when query or filters are explicitly passed in URL
   useEffect(() => {
-    void performSearch(query, materia, caracter, convocante, entidad, estatus, sortBy);
+    if (query.trim() || activeFiltersCount > 0) {
+      void performSearch(query, materia, caracter, convocante, entidad, estatus, sortBy);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -255,7 +257,11 @@ export function BuscadorLicitaciones() {
     setEntidad('todas');
     setEstatus('todos');
     setSortBy('cierre_proximo');
-    void performSearch(query, 'todas', 'todos', 'todas', 'todas', 'todos', 'cierre_proximo');
+    if (query.trim()) {
+      void performSearch(query, 'todas', 'todos', 'todas', 'todas', 'todos', 'cierre_proximo');
+    } else {
+      setResult(null);
+    }
   };
 
   /** Limpia todo: query + filtros */
@@ -267,7 +273,15 @@ export function BuscadorLicitaciones() {
     setEntidad('todas');
     setEstatus('todos');
     setSortBy('cierre_proximo');
-    void performSearch('', 'todas', 'todos', 'todas', 'todas', 'todos', 'cierre_proximo');
+    setResult(null);
+    const url = new URL(window.location.href);
+    url.searchParams.delete('lq');
+    url.searchParams.delete('materia');
+    url.searchParams.delete('caracter');
+    url.searchParams.delete('convocante');
+    url.searchParams.delete('entidad');
+    url.searchParams.delete('estatus');
+    window.history.replaceState(null, '', url);
   };
 
   const copyLicitacion = async (licitacion: LicitacionPublica) => {
@@ -600,27 +614,39 @@ export function BuscadorLicitaciones() {
       {/* Main Content Area */}
       <main className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
 
-        {/* Quick Suggestions — visible when no active filters and no query */}
-        {result && !query.trim() && activeFiltersCount === 0 && (
-          <div className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-            <div className="flex items-center gap-1.5 mb-3">
-              <Sparkles size={14} className="text-legal-golddark" />
-              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
-                Búsquedas frecuentes
-              </span>
+        {/* Quick Suggestions & Initial Prompt — visible when no search performed yet */}
+        {!result && !isSearching && (
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
+              <div className="flex items-center gap-1.5 mb-3">
+                <Sparkles size={14} className="text-legal-golddark" />
+                <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
+                  Búsquedas frecuentes
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {SUGGESTED_LICITACIONES.map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSuggestionClick(item.query, item.convocante, item.materia, item.entidad)}
+                    className="group inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-legal-gold hover:bg-amber-50/60 hover:text-slate-950 transition active:scale-95 cursor-pointer"
+                  >
+                    <Search size={12} className="text-slate-400 group-hover:text-legal-golddark" />
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-1.5">
-              {SUGGESTED_LICITACIONES.map((item, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleSuggestionClick(item.query, item.convocante, item.materia, item.entidad)}
-                  className="group inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:border-legal-gold hover:bg-amber-50/60 hover:text-slate-950 transition active:scale-95"
-                >
-                  <Search size={11} className="text-slate-400 group-hover:text-legal-golddark" />
-                  <span>{item.label}</span>
-                </button>
-              ))}
+
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
+              <Landmark className="mx-auto text-slate-400" size={32} />
+              <h2 className="mt-2.5 text-sm font-extrabold text-slate-900">
+                Consulta convocatorias y licitaciones vigentes
+              </h2>
+              <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-slate-500">
+                Ingresa una palabra clave, dependencia convocante, materia o selecciona una búsqueda frecuente para explorar los procedimientos oficiales de contratación pública.
+              </p>
             </div>
           </div>
         )}
@@ -930,15 +956,7 @@ export function BuscadorLicitaciones() {
 
                     {/* Bottom Actions Bar */}
                     <div className="mt-3.5 flex flex-col gap-2 border-t border-slate-100 pt-3 sm:flex-row sm:items-center sm:justify-between">
-                      <a
-                        href={licitacion.enlaceCompraNet}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-legal-gold px-4 text-xs font-bold text-slate-950 hover:bg-legal-goldhover transition active:scale-95"
-                      >
-                        <ExternalLink size={14} /> Ver en ComprasMX (CompraNet)
-                      </a>
-
+                      {/* Primary Button: Ver requisitos y cronograma completo */}
                       <button
                         type="button"
                         onClick={() =>
@@ -949,11 +967,21 @@ export function BuscadorLicitaciones() {
                             return next;
                           })
                         }
-                        className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-slate-200 px-3.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+                        className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-legal-gold hover:bg-legal-goldhover px-4 text-xs font-bold text-slate-950 shadow-xs transition active:scale-95 cursor-pointer"
                       >
                         {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
                         {isExpanded ? 'Contraer ficha' : 'Ver requisitos y cronograma completo'}
                       </button>
+
+                      {/* Secondary Button: ComprasMX sin relleno amarillo */}
+                      <a
+                        href={licitacion.enlaceCompraNet}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 px-4 text-xs font-bold text-slate-800 transition active:scale-95"
+                      >
+                        <ExternalLink size={14} /> Ver en ComprasMX (CompraNet)
+                      </a>
                     </div>
                   </div>
                 </article>
