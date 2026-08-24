@@ -29,7 +29,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
 
       {/* Main Presentation Container */}
       <main
-        className={`relative z-10 flex w-full max-w-2xl flex-col items-center gap-6 text-center py-8 sm:py-12 transition-all duration-300 ${
+        className={`relative z-10 flex w-full max-w-2xl flex-col items-center gap-4 text-center py-6 sm:py-10 transition-all duration-300 ${
           isEntering ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
         }`}
       >
@@ -38,13 +38,13 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
           <div className="h-16 w-16 overflow-hidden rounded-2xl border border-legal-gold/40 bg-black/80 p-1 shadow-xl shadow-legal-gold/15">
             <img src={logoMark} alt="Emblema Lex Corporativo" className="h-full w-full rounded-xl object-cover" />
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-legal-gold/30 bg-legal-gold/10 px-3.5 py-1 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-[0.3em] text-legal-gold">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-legal-gold/30 bg-legal-gold/10 px-3.5 py-1 text-[11px] font-extrabold uppercase tracking-[0.3em] text-legal-gold">
             <Sparkles size={13} /> Plataforma de Consulta Federal
           </span>
         </div>
 
         {/* Brand Logo Lockup */}
-        <div className="w-full max-w-[300px] sm:max-w-[400px] flex justify-center pt-1">
+        <div className="w-full max-w-[220px] sm:max-w-[340px] flex justify-center">
           <img
             src={logoUrl}
             alt="Logotipo Lex Corporativo"
@@ -53,81 +53,52 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
         </div>
 
         {/* Subtitle / Value Proposition */}
-        <div className="max-w-xl space-y-2">
-          <h1 className="font-serif text-lg sm:text-xl font-bold text-slate-200 leading-snug">
-            Legislación Federal y Buscador de Licitaciones Abiertas
+        <div className="max-w-xl space-y-1.5">
+          <h1 className="font-serif text-xl sm:text-2xl font-bold text-white leading-snug">
+            Legislación Federal y Licitaciones Públicas
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 leading-6">
-            Consulta rápida, determinista y privada de disposiciones jurídicas oficiales y convocatorias vigentes de CompraNet en México, con soporte 100% offline en el dispositivo.
+            Consulta determinista y privada de disposiciones jurídicas oficiales y convocatorias vigentes de CompraNet en México, con soporte 100% offline en el dispositivo.
           </p>
         </div>
 
-        {/* Highlighted Feature Cards (3 columns) */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full pt-2">
-          {/* Card 1: Legislación */}
-          <div
-            onClick={() => handleStart('normativa')}
-            className="group cursor-pointer rounded-2xl border border-slate-800 bg-slate-900/60 p-4 text-center space-y-2 hover:border-legal-gold/50 hover:bg-slate-900/90 transition-all shadow-md"
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-950/80 text-blue-400 mx-auto group-hover:scale-110 transition">
-              <BookOpenCheck size={20} />
-            </div>
-            <p className="text-xs font-bold text-slate-100">Buscador Normativo</p>
-            <p className="text-[11px] text-slate-400 leading-4">
-              5,011 disposiciones en 13 leyes y reglamentos federales
-            </p>
-          </div>
-
-          {/* Card 2: Licitaciones */}
-          <div
-            onClick={() => handleStart('licitaciones')}
-            className="group cursor-pointer rounded-2xl border border-slate-800 bg-slate-900/60 p-4 text-center space-y-2 hover:border-legal-gold/50 hover:bg-slate-900/90 transition-all shadow-md"
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-950/80 text-legal-gold mx-auto group-hover:scale-110 transition">
-              <Landmark size={20} />
-            </div>
-            <p className="text-xs font-bold text-slate-100">Licitaciones CompraNet</p>
-            <p className="text-[11px] text-slate-400 leading-4">
-              Contrataciones públicas abiertas, plazos y presupuestos
-            </p>
-          </div>
-
-          {/* Card 3: Privacidad */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 text-center space-y-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-950/80 text-emerald-400 mx-auto">
-              <ShieldCheck size={20} />
-            </div>
-            <p className="text-xs font-bold text-slate-100">Privacidad y Motor Local</p>
-            <p className="text-[11px] text-slate-400 leading-4">
-              SQLite WASM en tu dispositivo sin historial ni rastreo
-            </p>
-          </div>
-        </div>
-
-        {/* Primary CTA Button */}
-        <div className="w-full pt-4 space-y-3">
+        {/* Primary CTA + Module Entry Cards */}
+        <div className="w-full space-y-3">
+          {/* Primary CTA */}
           <button
             type="button"
-            onClick={() => handleStart()}
-            className="w-full max-w-sm mx-auto flex items-center justify-center gap-3 rounded-2xl bg-legal-gold hover:bg-legal-goldhover text-slate-950 px-8 py-4 text-xs sm:text-sm font-extrabold uppercase tracking-wider transition-all duration-300 shadow-[0_10px_30px_rgba(197,160,89,0.35)] hover:scale-[1.02] cursor-pointer"
+            onClick={() => handleStart('licitaciones')}
+            className="w-full max-w-sm mx-auto flex items-center justify-center gap-3 rounded-2xl bg-legal-gold hover:bg-legal-goldhover text-slate-950 px-8 py-4 text-sm font-extrabold transition-all duration-300 shadow-[0_10px_30px_rgba(197,160,89,0.35)] hover:scale-[1.02] cursor-pointer active:scale-95"
           >
-            <span>INGRESAR A LA PLATAFORMA</span>
+            <Landmark size={18} />
+            <span>Explorar Licitaciones</span>
             <ArrowRight size={18} />
           </button>
 
-          <div className="flex flex-wrap justify-center items-center gap-4 text-[11px] font-semibold text-slate-400 pt-1">
-            <span className="flex items-center gap-1">
-              <Zap size={13} className="text-legal-gold" /> Sin registro ni API Key
-            </span>
-            <span className="text-slate-600">•</span>
-            <span className="flex items-center gap-1">
-              <Scale size={13} className="text-blue-400" /> Respaldo oficial
-            </span>
-            <span className="text-slate-600">•</span>
-            <span className="flex items-center gap-1">
-              <ShieldCheck size={13} className="text-emerald-400" /> PWA Gratuita
-            </span>
-          </div>
+          {/* Secondary entry */}
+          <button
+            type="button"
+            onClick={() => handleStart('normativa')}
+            className="w-full max-w-sm mx-auto flex items-center justify-center gap-2 rounded-2xl border border-slate-700 bg-slate-900/60 hover:bg-slate-900/90 text-slate-200 px-8 py-3 text-sm font-bold transition-all hover:border-slate-600 cursor-pointer active:scale-95"
+          >
+            <BookOpenCheck size={16} className="text-legal-gold" />
+            <span>Consultar Legislación Federal</span>
+          </button>
+        </div>
+
+        {/* Trust Badges */}
+        <div className="flex flex-wrap justify-center items-center gap-4 text-[11px] font-semibold text-slate-400">
+          <span className="flex items-center gap-1">
+            <Zap size={13} className="text-legal-gold" /> Sin registro ni API Key
+          </span>
+          <span className="text-slate-600">•</span>
+          <span className="flex items-center gap-1">
+            <Scale size={13} className="text-blue-400" /> Respaldo oficial
+          </span>
+          <span className="text-slate-600">•</span>
+          <span className="flex items-center gap-1">
+            <ShieldCheck size={13} className="text-emerald-400" /> PWA Gratuita
+          </span>
         </div>
       </main>
     </div>

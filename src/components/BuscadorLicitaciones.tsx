@@ -25,10 +25,7 @@ import {
   Sparkles,
   WifiOff,
   X,
-  Zap,
 } from 'lucide-react';
-import logoMark from '../assets/logo-mark.png';
-import logoLockup from '../assets/logo-lockup-transparent.png';
 import {
   CARACTER_LABELS,
   COMPRANET_PORTAL_URL,
@@ -53,6 +50,13 @@ import type {
   LicitacionPublica,
   LicitacionSearchResult,
 } from '../types';
+
+const SORT_LABELS: Record<'cierre_proximo' | 'reciente' | 'monto_mayor' | 'relevancia', string> = {
+  cierre_proximo: 'Cierre más próximo',
+  reciente: 'Más reciente',
+  monto_mayor: 'Mayor presupuesto',
+  relevancia: 'Relevancia',
+};
 
 const SUGGESTED_LICITACIONES = [
   { label: 'Medicamentos IMSS', query: 'medicamentos', convocante: 'IMSS' },
@@ -243,7 +247,19 @@ export function BuscadorLicitaciones() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  /** Limpia solo filtros, conserva el query */
   const resetFilters = () => {
+    setMateria('todas');
+    setCaracter('todos');
+    setConvocante('todas');
+    setEntidad('todas');
+    setEstatus('todos');
+    setSortBy('cierre_proximo');
+    void performSearch(query, 'todas', 'todos', 'todas', 'todas', 'todos', 'cierre_proximo');
+  };
+
+  /** Limpia todo: query + filtros */
+  const resetAll = () => {
     setQuery('');
     setMateria('todas');
     setCaracter('todos');
@@ -297,41 +313,30 @@ export function BuscadorLicitaciones() {
       {/* Compact Hero & Search Area */}
       <section className="border-b border-slate-800 bg-legal-shell text-white">
         <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-6">
-          {/* Header Bar: Brand + Service Title + Live Status */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <div className="inline-flex items-center gap-2 rounded-xl border border-legal-gold/30 bg-black/60 px-2.5 py-1 backdrop-blur-xs">
-                <img
-                  src={logoMark}
-                  alt="Lex Corporativo"
-                  className="h-6 w-6 rounded-md object-cover border border-legal-gold/20"
-                />
-                <span className="font-serif text-xs font-bold tracking-wide text-white">
-                  Lex Corporativo
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 rounded-full border border-blue-400/40 bg-blue-950/60 px-3 py-0.5 text-[11px] font-extrabold uppercase tracking-wider text-blue-300">
-                <Landmark size={13} /> CompraNet · Contrataciones Abiertas
-              </div>
+          {/* Header Bar: Service Title + Live Status */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 rounded-full border border-blue-400/40 bg-blue-950/60 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-blue-300">
+              <Landmark size={13} />
+              <span>CompraNet · {LICITACIONES_STATS.total.toLocaleString('es-MX')} Convocatorias</span>
             </div>
 
             <div
-              className={`inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full border px-3 py-1 text-[11px] font-bold ${
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-bold ${
                 isOnline
                   ? 'border-emerald-700/60 bg-emerald-950/40 text-emerald-300'
                   : 'border-amber-700/60 bg-amber-950/40 text-amber-200'
               }`}
             >
               {isOnline ? <ShieldCheck size={14} /> : <WifiOff size={14} />}
-              {isOnline ? 'CompraNet en línea' : 'Consulta local'}
+              {isOnline ? 'En línea' : 'Local'}
             </div>
           </div>
 
           <h1 className="mt-3 font-serif text-xl font-bold leading-tight sm:text-2xl text-white">
-            Buscador de Licitaciones Abiertas en México
+            Licitaciones Públicas Abiertas en México
           </h1>
-          <p className="mt-1 text-xs text-slate-300 sm:text-sm">
-            Monitoreo en tiempo real de convocatorias públicas, bases de licitación, fechas de cierre y presupuestos del Gobierno Federal y Estados.
+          <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+            Monitoreo de convocatorias federales y estatales con fechas de cierre, presupuestos y enlace oficial a CompraNet.
           </p>
 
           {/* Integrated Search Box */}
@@ -568,7 +573,7 @@ export function BuscadorLicitaciones() {
                 )}
                 {sortBy !== 'cierre_proximo' && (
                   <span className="inline-flex items-center gap-1 rounded-md bg-slate-800 px-2 py-0.5 text-[11px] font-semibold text-legal-gold">
-                    Orden: {sortBy}
+                    Orden: {SORT_LABELS[sortBy]}
                     <button
                       type="button"
                       onClick={() => handleFilterChange(materia, caracter, convocante, entidad, estatus, 'cierre_proximo')}
@@ -584,7 +589,7 @@ export function BuscadorLicitaciones() {
                   onClick={resetFilters}
                   className="text-[11px] font-bold text-red-400 hover:text-red-300 ml-1 underline"
                 >
-                  Limpiar todos
+                  Limpiar filtros
                 </button>
               </div>
             )}
@@ -594,13 +599,39 @@ export function BuscadorLicitaciones() {
 
       {/* Main Content Area */}
       <main className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
+
+        {/* Quick Suggestions — visible when no active filters and no query */}
+        {result && !query.trim() && activeFiltersCount === 0 && (
+          <div className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
+            <div className="flex items-center gap-1.5 mb-3">
+              <Sparkles size={14} className="text-legal-golddark" />
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
+                Búsquedas frecuentes
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {SUGGESTED_LICITACIONES.map((item, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => handleSuggestionClick(item.query, item.convocante, item.materia, item.entidad)}
+                  className="group inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:border-legal-gold hover:bg-amber-50/60 hover:text-slate-950 transition active:scale-95"
+                >
+                  <Search size={11} className="text-slate-400 group-hover:text-legal-golddark" />
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Results Count & Actions Header */}
         {result && (
           <div className="mb-4 flex flex-col gap-2.5 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-xs sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-sm font-extrabold text-slate-950">
                 {result.total} {result.total === 1 ? 'licitación encontrada' : 'licitaciones abiertas encontradas'}
-                {query.trim() && <span className="font-semibold text-slate-700"> para “{result.query}”</span>}
+                {query.trim() && <span className="font-semibold text-slate-700"> para "{result.query}"</span>}
               </p>
               <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
                 {result.executionTimeMs} ms
@@ -611,7 +642,7 @@ export function BuscadorLicitaciones() {
               {hasActiveFilters && (
                 <button
                   type="button"
-                  onClick={resetFilters}
+                  onClick={resetAll}
                   className="inline-flex min-h-8 items-center gap-1 rounded-lg border border-slate-200 px-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
                 >
                   <RotateCcw size={12} /> Limpiar búsqueda
@@ -629,65 +660,6 @@ export function BuscadorLicitaciones() {
           </div>
         )}
 
-        {/* Initial Showcase Card when no query and no active filters */}
-        {result && !query.trim() && activeFiltersCount === 0 && (
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xs sm:p-6 mb-5">
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-2xl border border-legal-gold/40 bg-slate-950 p-1 shadow-md shadow-legal-gold/10">
-                <img src={logoMark} alt="Lex Corporativo" className="h-full w-full rounded-xl object-cover" />
-              </div>
-              <div className="flex-1 text-center sm:text-left">
-                <img
-                  src={logoLockup}
-                  alt="Lex Corporativo"
-                  className="h-6 object-contain mb-1 mx-auto sm:mx-0"
-                />
-                <h2 className="font-serif text-sm sm:text-base font-bold text-slate-950">
-                  Catálogo Federal y Estatal de Contrataciones Abiertas
-                </h2>
-                <p className="mt-0.5 text-xs text-slate-600 leading-5">
-                  Consulta {LICITACIONES_STATS.total} convocatorias públicas activas con especificaciones técnicas, pliegos de bases, requisitos del SAT/IMSS y enlace oficial a CompraNet.
-                </p>
-
-                <div className="mt-2.5 flex flex-wrap justify-center sm:justify-start gap-1.5">
-                  <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700">
-                    <Zap size={12} className="text-amber-600" /> Monitoreo CompraNet
-                  </span>
-                  <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700">
-                    <Scale size={12} className="text-legal-golddark" /> LAASSP & LOPSRM
-                  </span>
-                  <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700">
-                    <MapPin size={12} className="text-blue-600" /> 32 Estados + Nacional
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Suggestions Chips */}
-            <div className="mt-4 border-t border-slate-100 pt-3">
-              <div className="flex items-center gap-1.5 mb-2">
-                <Sparkles size={14} className="text-legal-golddark" />
-                <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700">
-                  Sugerencias de búsqueda rápida:
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {SUGGESTED_LICITACIONES.map((item, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => handleSuggestionClick(item.query, item.convocante, item.materia, item.entidad)}
-                    className="group inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:border-legal-gold hover:bg-amber-50/60 hover:text-slate-950 transition"
-                  >
-                    <Search size={11} className="text-slate-400 group-hover:text-legal-golddark" />
-                    <span>{item.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Empty State */}
         {result && result.licitaciones.length === 0 && (
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
@@ -696,7 +668,7 @@ export function BuscadorLicitaciones() {
               No se encontraron licitaciones con estos criterios
             </h2>
             <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-slate-500">
-              Prueba modificando las palabras clave, seleccionando “Todas las materias” o quitando los
+              Prueba modificando las palabras clave, seleccionando "Todas las materias" o quitando los
               filtros de dependencia y entidad.
             </p>
             <button
@@ -709,7 +681,7 @@ export function BuscadorLicitaciones() {
           </div>
         )}
 
-        {/* Reordered Tender Cards List */}
+        {/* Tender Cards List */}
         {result && result.licitaciones.length > 0 && (
           <div className="space-y-3.5" aria-live="polite">
             {result.licitaciones.map((licitacion) => {
@@ -773,7 +745,7 @@ export function BuscadorLicitaciones() {
                         </p>
                       </div>
 
-                      {/* Action buttons on desktop/card */}
+                      {/* Action buttons */}
                       <div className="flex shrink-0 items-center gap-1 self-start">
                         <button
                           type="button"
@@ -815,9 +787,9 @@ export function BuscadorLicitaciones() {
                     <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                       <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2">
                         <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                          <DollarSign size={11} className="text-slate-400" /> Presupuesto Estimado
+                          <DollarSign size={11} className="text-slate-400" /> Presupuesto
                         </span>
-                        <p className="mt-0.5 font-mono text-xs font-extrabold text-slate-900 sm:text-sm">
+                        <p className="mt-0.5 font-mono text-xs font-extrabold text-slate-900 truncate">
                           {licitacion.montoEstimado
                             ? formatCurrency(licitacion.montoEstimado, licitacion.moneda)
                             : 'No especificado'}
@@ -828,16 +800,16 @@ export function BuscadorLicitaciones() {
                         <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                           <Scale size={11} className="text-slate-400" /> Materia
                         </span>
-                        <p className="mt-0.5 text-xs font-extrabold text-slate-900 sm:text-sm truncate">
+                        <p className="mt-0.5 text-xs font-extrabold text-slate-900 truncate">
                           {MATERIA_LABELS[licitacion.materia]}
                         </p>
                       </div>
 
                       <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2">
                         <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                          <Calendar size={11} className="text-slate-400" /> Límite de Propuestas
+                          <Calendar size={11} className="text-slate-400" /> Límite
                         </span>
-                        <p className="mt-0.5 text-xs font-extrabold text-slate-900 sm:text-sm">
+                        <p className="mt-0.5 text-xs font-extrabold text-slate-900">
                           {formatDate(licitacion.fechaLimitePropuestas)}
                         </p>
                       </div>
@@ -846,7 +818,7 @@ export function BuscadorLicitaciones() {
                         <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                           <Check size={11} className="text-slate-400" /> Estatus
                         </span>
-                        <p className="mt-0.5 text-xs font-extrabold text-slate-900 sm:text-sm truncate">
+                        <p className="mt-0.5 text-xs font-extrabold text-slate-900 truncate">
                           {ESTATUS_LABELS[licitacion.estatus]}
                         </p>
                       </div>
@@ -962,7 +934,7 @@ export function BuscadorLicitaciones() {
                         href={licitacion.enlaceCompraNet}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 text-xs font-bold text-white hover:bg-slate-800 transition"
+                        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-legal-gold px-4 text-xs font-bold text-slate-950 hover:bg-legal-goldhover transition active:scale-95"
                       >
                         <ExternalLink size={14} /> Ver expediente en CompraNet
                       </a>

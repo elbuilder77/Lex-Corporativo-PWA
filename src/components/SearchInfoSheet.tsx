@@ -8,7 +8,6 @@ import {
   WifiOff,
   X,
 } from 'lucide-react';
-import logoMark from '../assets/logo-mark.png';
 import { CORPUS_STATS, OFFICIAL_LAWS_URL, OFFICIAL_REGULATIONS_URL } from '../lib/corpus-catalog';
 import { COMPRANET_PORTAL_URL, DATOS_ABIERTOS_URL, LICITACIONES_STATS } from '../lib/licitaciones-catalog';
 import { useSearchStore } from '../store/useSearchStore';
@@ -65,7 +64,17 @@ export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
         </header>
 
         <div className="space-y-4 overflow-y-auto p-4">
-          {/* Service 1: Legal Legislation */}
+          {/* Service 1: Open Tenders CompraNet — first because protagonist */}
+          <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/80">
+            <div className="flex items-center gap-2 text-sm font-extrabold text-slate-950">
+              <Landmark size={18} className="text-blue-700" /> Licitaciones CompraNet
+            </div>
+            <p className="mt-2 text-xs leading-5 text-slate-600">
+              Catálogo de contrataciones públicas federales y estatales vigentes en México ({LICITACIONES_STATS.total} procedimientos activos en {LICITACIONES_STATS.convocantes} instituciones convocantes como IMSS, CFE, PEMEX, SICT, SAT, etc.), con fechas críticas, montos estimados, fundamento en LAASSP/LOPSRM y enlace oficial al expediente de CompraNet.
+            </p>
+          </div>
+
+          {/* Service 2: Legal Legislation */}
           <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/80">
             <div className="flex items-center gap-2 text-sm font-extrabold text-slate-950">
               <BookOpenCheck size={18} className="text-legal-golddark" /> Buscador Normativo Federal
@@ -74,16 +83,6 @@ export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
               Corpus local estructurado con {CORPUS_STATS.provisions.toLocaleString('es-MX')} disposiciones en{' '}
               {CORPUS_STATS.instruments} leyes y reglamentos federales (Laboral, Mercantil, Fiscal, Aduanal y Comercio Exterior),
               con motor SQLite WASM de alta velocidad y enlaces directos a la Cámara de Diputados.
-            </p>
-          </div>
-
-          {/* Service 2: Open Tenders CompraNet */}
-          <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/80">
-            <div className="flex items-center gap-2 text-sm font-extrabold text-slate-950">
-              <Landmark size={18} className="text-blue-700" /> Buscador de Licitaciones Abiertas (CompraNet)
-            </div>
-            <p className="mt-2 text-xs leading-5 text-slate-600">
-              Catálogo de contrataciones públicas federales y estatales vigentes en México ({LICITACIONES_STATS.total} procedimientos activos en {LICITACIONES_STATS.convocantes} instituciones convocantes como IMSS, CFE, PEMEX, SICT, SAT, etc.), con fechas críticas, montos estimados, fundamento en LAASSP/LOPSRM y enlace oficial al expediente de CompraNet.
             </p>
           </div>
 
@@ -113,22 +112,6 @@ export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
           {/* Official External Links */}
           <div className="grid gap-2 sm:grid-cols-2">
             <a
-              href={OFFICIAL_LAWS_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex min-h-11 items-center justify-between rounded-xl border border-slate-200 px-4 text-xs font-bold text-blue-700 hover:bg-slate-50 transition"
-            >
-              Leyes Federales <ExternalLink size={14} />
-            </a>
-            <a
-              href={OFFICIAL_REGULATIONS_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex min-h-11 items-center justify-between rounded-xl border border-slate-200 px-4 text-xs font-bold text-blue-700 hover:bg-slate-50 transition"
-            >
-              Reglamentos Federales <ExternalLink size={14} />
-            </a>
-            <a
               href={COMPRANET_PORTAL_URL}
               target="_blank"
               rel="noreferrer"
@@ -144,23 +127,22 @@ export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
             >
               Datos Abiertos México <ExternalLink size={14} />
             </a>
-          </div>
-
-          {/* Desktop App Promo */}
-          <div className="rounded-2xl border border-legal-gold/20 bg-legal-shell p-4 text-white">
-            <div className="flex items-start gap-3">
-              <img
-                src={logoMark}
-                alt=""
-                className="h-12 w-12 shrink-0 rounded-xl border border-legal-gold/20 object-cover"
-              />
-              <div>
-                <h3 className="font-serif text-base font-bold">Lex Corporativo Desktop</h3>
-                <p className="mt-1 text-xs leading-5 text-slate-300">
-                  El espacio profesional con bóveda local cifrada de expedientes, análisis normativo y seguimiento integral de licitaciones corporativas.
-                </p>
-              </div>
-            </div>
+            <a
+              href={OFFICIAL_LAWS_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center justify-between rounded-xl border border-slate-200 px-4 text-xs font-bold text-blue-700 hover:bg-slate-50 transition"
+            >
+              Leyes Federales <ExternalLink size={14} />
+            </a>
+            <a
+              href={OFFICIAL_REGULATIONS_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center justify-between rounded-xl border border-slate-200 px-4 text-xs font-bold text-blue-700 hover:bg-slate-50 transition"
+            >
+              Reglamentos Federales <ExternalLink size={14} />
+            </a>
           </div>
         </div>
       </section>

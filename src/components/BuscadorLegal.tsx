@@ -11,17 +11,13 @@ import {
   Heart,
   LoaderCircle,
   RotateCcw,
-  Scale,
   Search,
   Share2,
   ShieldCheck,
   Sparkles,
   WifiOff,
   X,
-  Zap,
 } from 'lucide-react';
-import logoMark from '../assets/logo-mark.png';
-import logoLockup from '../assets/logo-lockup-transparent.png';
 import { AREA_LABELS, CORPUS_STATS, getLawsForScope } from '../lib/corpus-catalog';
 import { executeCorpusSearch, type CorpusSearchResult } from '../services/corpus-search';
 import { useSearchStore } from '../store/useSearchStore';
@@ -116,7 +112,21 @@ export function BuscadorLegal() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const resetSearch = () => {
+  /** Limpia solo los filtros, conserva el query */
+  const resetFilters = () => {
+    setScope('todos');
+    setLawCode('');
+    if (query.trim()) {
+      void performSearch(query, 'todos', undefined);
+    }
+    const url = new URL(window.location.href);
+    url.searchParams.delete('scope');
+    url.searchParams.delete('law');
+    window.history.replaceState(null, '', url);
+  };
+
+  /** Limpia todo: query + filtros + resultados */
+  const resetAll = () => {
     setQuery('');
     setScope('todos');
     setLawCode('');
@@ -173,40 +183,28 @@ export function BuscadorLegal() {
       <section className="border-b border-slate-800 bg-legal-shell text-white">
         <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-6">
           {/* Header Bar */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <div className="inline-flex items-center gap-2 rounded-xl border border-legal-gold/30 bg-black/60 px-2.5 py-1 backdrop-blur-xs">
-                <img
-                  src={logoMark}
-                  alt="Lex Corporativo"
-                  className="h-6 w-6 rounded-md object-cover border border-legal-gold/20"
-                />
-                <span className="font-serif text-xs font-bold tracking-wide text-white">
-                  Lex Corporativo
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 rounded-full border border-legal-gold/40 bg-legal-gold/10 px-3 py-0.5 text-[11px] font-extrabold uppercase tracking-wider text-legal-gold">
-                <BookOpenCheck size={13} /> Legislación Federal · {CORPUS_STATS.provisions.toLocaleString('es-MX')} Disposiciones
-              </div>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 rounded-full border border-legal-gold/40 bg-legal-gold/10 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-legal-gold">
+              <BookOpenCheck size={13} /> {CORPUS_STATS.provisions.toLocaleString('es-MX')} Disposiciones · {CORPUS_STATS.instruments} Leyes
             </div>
 
             <div
-              className={`inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full border px-3 py-1 text-[11px] font-bold ${
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-bold ${
                 isOnline
                   ? 'border-emerald-700/60 bg-emerald-950/40 text-emerald-300'
                   : 'border-amber-700/60 bg-amber-950/40 text-amber-200'
               }`}
             >
               {isOnline ? <ShieldCheck size={14} /> : <WifiOff size={14} />}
-              {isOnline ? 'SQLite WASM privado' : 'Disponible sin conexión'}
+              {isOnline ? 'SQLite local' : 'Sin conexión'}
             </div>
           </div>
 
           <h1 className="mt-3 font-serif text-xl font-bold leading-tight sm:text-2xl text-white">
-            Consulta la legislación federal con respaldo oficial
+            Consulta de Legislación Federal
           </h1>
-          <p className="mt-1 text-xs text-slate-300 sm:text-sm">
-            Búsqueda determinista e instantánea entre {CORPUS_STATS.provisions.toLocaleString('es-MX')} artículos de {CORPUS_STATS.instruments} leyes federales con enlace directo a la Cámara de Diputados.
+          <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+            Búsqueda determinista entre {CORPUS_STATS.provisions.toLocaleString('es-MX')} artículos de {CORPUS_STATS.instruments} leyes y reglamentos federales, con enlace directo a la Cámara de Diputados.
           </p>
 
           {/* Integrated Search Box */}
@@ -337,10 +335,7 @@ export function BuscadorLegal() {
                 )}
                 <button
                   type="button"
-                  onClick={() => {
-                    setScope('todos');
-                    setLawCode('');
-                  }}
+                  onClick={resetFilters}
                   className="text-[11px] font-bold text-red-400 hover:text-red-300 ml-1 underline"
                 >
                   Restablecer
@@ -359,63 +354,28 @@ export function BuscadorLegal() {
 
       {/* Main Content Area */}
       <main className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
-        {/* Welcome / Home Card when no search performed yet */}
+
+        {/* Suggestions — visible when no search performed yet */}
         {!result && !isSearching && (
-          <div className="space-y-5">
-            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-xs sm:p-7">
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-                <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl border-2 border-legal-gold/40 bg-slate-950 p-1 shadow-md shadow-legal-gold/10">
-                  <img src={logoMark} alt="Lex Corporativo" className="h-full w-full rounded-xl object-cover" />
-                </div>
-                <div className="flex-1 text-center sm:text-left">
-                  <img
-                    src={logoLockup}
-                    alt="Lex Corporativo"
-                    className="h-6 sm:h-7 object-contain mb-1.5 mx-auto sm:mx-0"
-                  />
-                  <h2 className="font-serif text-base sm:text-lg font-bold text-slate-950">
-                    Buscador Normativo Federal de México
-                  </h2>
-                  <p className="mt-1 text-xs sm:text-sm leading-6 text-slate-600 max-w-2xl">
-                    Consulta determinista y exacta de 5,011 artículos en 13 leyes y reglamentos de derecho laboral, mercantil, fiscal, aduanal y comercio exterior.
-                  </p>
-
-                  <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-1.5">
-                    <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700">
-                      <Zap size={13} className="text-amber-600" /> SQLite WASM Local
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700">
-                      <ShieldCheck size={13} className="text-emerald-600" /> Cero Rastreo
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700">
-                      <Scale size={13} className="text-legal-golddark" /> Cámara de Diputados
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Suggestions */}
-              <div className="mt-5 border-t border-slate-100 pt-4">
-                <div className="flex items-center gap-1.5 mb-2.5">
-                  <Sparkles size={15} className="text-legal-golddark" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                    Sugerencias de consulta jurídica:
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {SUGGESTED_LEGAL_SEARCHES.map((item, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => handleSuggestionClick(item.query, item.scope, item.lawCode)}
-                      className="group inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-legal-gold hover:bg-amber-50/60 hover:text-slate-950 transition"
-                    >
-                      <Search size={12} className="text-slate-400 group-hover:text-legal-golddark" />
-                      <span>{item.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
+          <div className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
+            <div className="flex items-center gap-1.5 mb-3">
+              <Sparkles size={14} className="text-legal-golddark" />
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
+                Consultas frecuentes
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {SUGGESTED_LEGAL_SEARCHES.map((item, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => handleSuggestionClick(item.query, item.scope, item.lawCode)}
+                  className="group inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-legal-gold hover:bg-amber-50/60 hover:text-slate-950 transition active:scale-95"
+                >
+                  <Search size={12} className="text-slate-400 group-hover:text-legal-golddark" />
+                  <span>{item.label}</span>
+                </button>
+              ))}
             </div>
           </div>
         )}
@@ -426,14 +386,14 @@ export function BuscadorLegal() {
             <div className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-xs sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-extrabold text-slate-950">
-                  {result.articles.length} {result.articles.length === 1 ? 'resultado' : 'resultados'} para “{result.query}”
+                  {result.articles.length} {result.articles.length === 1 ? 'resultado' : 'resultados'} para "{result.query}"
                 </p>
                 <p className="mt-0.5 text-xs text-slate-500">Área consultada: {result.scopeLabel}</p>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={resetSearch}
+                  onClick={resetAll}
                   className="inline-flex min-h-8 items-center gap-1 rounded-lg border border-slate-200 px-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
                 >
                   <RotateCcw size={12} /> Nueva consulta
@@ -560,8 +520,8 @@ export function BuscadorLegal() {
               </div>
             )}
 
-            <p className="rounded-xl border border-amber-200/70 bg-amber-50 px-4 py-2.5 text-xs leading-5 text-amber-950">
-              Antes de citar o tomar una decisión, confirma la reforma, vigencia y publicación en la fuente oficial.
+            <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs leading-5 text-slate-600">
+              Confirma la reforma, vigencia y publicación en la fuente oficial antes de citar o tomar decisiones.
             </p>
           </div>
         )}

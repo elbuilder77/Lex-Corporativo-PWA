@@ -83,16 +83,13 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
               <strong className="block font-serif text-sm font-semibold tracking-wide text-white leading-none">
                 Lex Corporativo
               </strong>
-              <span className="block text-[9px] font-extrabold uppercase tracking-[0.2em] text-legal-gold mt-0.5">
-                PWA Consulta
-              </span>
             </span>
           </button>
 
           {/* Module Switcher Tabs */}
           <nav
             aria-label="Módulos de consulta"
-            className="flex items-center rounded-xl bg-slate-900/90 p-1 border border-slate-800"
+            className="hidden sm:flex items-center rounded-xl bg-slate-900/90 p-1 border border-slate-800"
           >
             <button
               type="button"
@@ -150,7 +147,9 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
       </header>
 
       {/* Active Module Content */}
-      {children}
+      <div className="pb-16 sm:pb-0">
+        {children}
+      </div>
 
       {/* Saved Library Sheet */}
       <SearchLibrarySheet open={panel === 'library'} onClose={() => setPanel(null)} />
@@ -216,6 +215,57 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
           </button>
         </div>
       )}
+
+      {/* Mobile Bottom Navigation Bar */}
+      <nav
+        aria-label="Módulos de consulta"
+        className="sm:hidden fixed bottom-0 left-0 right-0 z-30 flex border-t border-slate-800 bg-legal-shell/98 backdrop-blur-md"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        <button
+          type="button"
+          onClick={() => onTabChange('normativa')}
+          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest transition ${
+            activeTab === 'normativa'
+              ? 'text-legal-gold'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Scale size={20} />
+          <span>Leyes</span>
+          {activeTab === 'normativa' && (
+            <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-10 rounded-b-full bg-legal-gold" />
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={() => onTabChange('licitaciones')}
+          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest transition ${
+            activeTab === 'licitaciones'
+              ? 'text-legal-gold'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Landmark size={20} />
+          <span>Licitaciones</span>
+          {activeTab === 'licitaciones' && (
+            <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-10 rounded-b-full bg-legal-gold" />
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={() => setPanel('library')}
+          className="relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 hover:text-slate-200 transition"
+        >
+          <BookMarked size={20} />
+          <span>Guardados</span>
+          {totalSaved > 0 && (
+            <span className="absolute top-2 right-[calc(50%-18px)] flex h-4 w-4 items-center justify-center rounded-full bg-legal-gold text-[9px] font-extrabold text-slate-950">
+              {totalSaved > 9 ? '9+' : totalSaved}
+            </span>
+          )}
+        </button>
+      </nav>
     </div>
   );
 }

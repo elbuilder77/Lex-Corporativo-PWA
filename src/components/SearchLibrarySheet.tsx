@@ -21,6 +21,10 @@ interface SearchLibrarySheetProps {
 
 export function SearchLibrarySheet({ open, onClose }: SearchLibrarySheetProps) {
   const [tab, setTab] = useState<'articles' | 'licitaciones'>('articles');
+  const [confirmClear, setConfirmClear] = useState(false);
+  const [dragStart, setDragStart] = useState<number | null>(null);
+  const [dragDelta, setDragDelta] = useState(0);
+
   const {
     favorites,
     favoriteLicitaciones,
@@ -43,10 +47,27 @@ export function SearchLibrarySheet({ open, onClose }: SearchLibrarySheetProps) {
         aria-modal="true"
         role="dialog"
         aria-label="Guardados"
-        className="flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-white shadow-2xl sm:rounded-3xl"
+        className="flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-white shadow-2xl sm:rounded-3xl transition-transform"
         onClick={(event) => event.stopPropagation()}
+        onTouchStart={(e) => setDragStart(e.touches[0].clientY)}
+        onTouchMove={(e) => {
+          if (dragStart === null) return;
+          const delta = e.touches[0].clientY - dragStart;
+          if (delta > 0) setDragDelta(delta);
+        }}
+        onTouchEnd={() => {
+          if (dragDelta > 80) onClose();
+          setDragStart(null);
+          setDragDelta(0);
+        }}
+        style={dragDelta > 0 ? { transform: `translateY(${dragDelta}px)`, transition: 'none' } : {}}
       >
-        <header className="flex items-center justify-between border-b border-slate-200 p-4">
+        {/* Drag handle - mobile only */}
+        <div className="sm:hidden flex justify-center pt-2.5 pb-0 shrink-0">
+          <div className="h-1 w-10 rounded-full bg-slate-300" />
+        </div>
+
+        <header className="flex items-center justify-between border-b border-slate-200 p-4 shrink-0">
           <div className="flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
               <BookMarked size={20} />
@@ -67,20 +88,20 @@ export function SearchLibrarySheet({ open, onClose }: SearchLibrarySheetProps) {
         </header>
 
         {/* Tab Switcher */}
-        <div className="grid grid-cols-2 bg-slate-100 p-1">
+        <div className="grid grid-cols-2 bg-slate-100 p-1 shrink-0">
           <button
             type="button"
-            onClick={() => setTab('articles')}
+            onClick={() => { setTab('articles'); setConfirmClear(false); }}
             className={`flex items-center justify-center gap-2 min-h-11 rounded-lg text-xs font-bold transition ${
               tab === 'articles' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-900'
             }`}
           >
             <Scale size={15} />
-            <span>Artículos Legales ({favorites.length})</span>
+            <span>Artículos ({favorites.length})</span>
           </button>
           <button
             type="button"
-            onClick={() => setTab('licitaciones')}
+            onClick={() => { setTab('licitaciones'); setConfirmClear(false); }}
             className={`flex items-center justify-center gap-2 min-h-11 rounded-lg text-xs font-bold transition ${
               tab === 'licitaciones' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-900'
             }`}
@@ -92,20 +113,48 @@ export function SearchLibrarySheet({ open, onClose }: SearchLibrarySheetProps) {
 
         {/* Content List */}
         <div className="flex-1 space-y-3 overflow-y-auto p-4">
+          {/* Destructive action — with inline confirmation */}
           {!empty && (
             <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={tab === 'articles' ? clearFavorites : clearFavoriteLicitaciones}
-                className="inline-flex min-h-9 items-center gap-1.5 rounded-xl px-3 text-xs font-bold text-red-600 hover:bg-red-50 transition"
-              >
-                <Trash2 size={14} /> Borrar todos los {tab === 'articles' ? 'artículos' : 'seguimientos'}
-              </button>
+              {!confirmClear ? (
+                <button
+                  type="button"
+                  onClick={() => setConfirmClear(true)}
+                  className="inline-flex min-h-9 items-center gap-1.5 rounded-xl px-3 text-xs font-bold text-slate-500 hover:bg-red-50 hover:text-red-600 transition"
+                >
+                  <Trash2 size={14} /> Borrar todos
+                </button>
+              ) : (
+                <div className="flex items-center gap-2 flex-wrap justify-end">
+                  <span className="text-xs font-bold text-red-600">
+                    ¿Eliminar {tab === 'articles' ? 'artículos' : 'licitaciones'} guardados?
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (tab === 'articles') clearFavorites();
+                      else clearFavoriteLicitaciones();
+                      setConfirmClear(false);
+                    }}
+                    className="inline-flex min-h-8 items-center rounded-lg bg-red-600 px-3 text-xs font-bold text-white hover:bg-red-700"
+                  >
+                    Confirmar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmClear(false)}
+                    className="inline-flex min-h-8 items-center rounded-lg border border-slate-200 px-3 text-xs font-bold text-slate-600 hover:bg-slate-50"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
+          {/* Empty State with navigation CTA */}
           {empty && (
-            <div className="py-12 text-center">
+            <div className="py-10 text-center">
               <Heart className="mx-auto text-slate-300" size={32} />
               <p className="mt-3 text-sm font-bold text-slate-800">
                 {tab === 'articles' ? 'Sin artículos guardados' : 'Sin licitaciones en seguimiento'}
@@ -115,6 +164,13 @@ export function SearchLibrarySheet({ open, onClose }: SearchLibrarySheetProps) {
                   ? 'Guarda artículos de leyes y reglamentos para consultarlos rápidamente sin conexión.'
                   : 'Guarda convocatorias y procedimientos de CompraNet para monitorear sus fechas de cierre.'}
               </p>
+              <button
+                type="button"
+                onClick={onClose}
+                className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-xl bg-slate-900 px-5 text-xs font-bold text-white hover:bg-slate-800 transition active:scale-95"
+              >
+                {tab === 'articles' ? 'Buscar legislación' : 'Explorar licitaciones'}
+              </button>
             </div>
           )}
 
@@ -179,7 +235,7 @@ export function SearchLibrarySheet({ open, onClose }: SearchLibrarySheetProps) {
                         <span className="rounded-md bg-amber-50 px-2 py-0.5 font-mono text-[10px] font-bold text-amber-900 border border-amber-200">
                           {licitacion.numeroProcedimiento}
                         </span>
-                        <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[9px] font-bold text-slate-700 uppercase">
+                        <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700 uppercase">
                           {MATERIA_LABELS[licitacion.materia]}
                         </span>
                       </div>
@@ -231,7 +287,7 @@ export function SearchLibrarySheet({ open, onClose }: SearchLibrarySheetProps) {
                         href={licitacion.enlaceCompraNet}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex min-h-8 items-center gap-1.5 rounded-lg bg-slate-900 px-3 text-xs font-bold text-white hover:bg-slate-800"
+                        className="inline-flex min-h-8 items-center gap-1.5 rounded-lg bg-legal-gold px-3 text-xs font-bold text-slate-950 hover:bg-legal-goldhover"
                       >
                         CompraNet <ExternalLink size={12} />
                       </a>
