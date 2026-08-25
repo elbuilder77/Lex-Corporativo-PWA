@@ -35,8 +35,8 @@ export const DESKTOP_SPECS: DesktopSpecification = {
   signatureDetails: 'Firma digital de código y binario verificada',
   sha512: '7m0dtXrd0Z4PD0XcxQwkOKMD8vbeoQcHTE6azXn9CMARTKMz513zlJWXdT9j4MbxPDjTTrkaaOcjs7FvaFXaPQ==',
   customProtocol: 'lexcorp://',
-  downloadUrl: 'https://github.com/JPatronC92/Lex-Corp-Electron/releases/download/v1.0.0-rc.13/Lex-Corporativo-Setup-1.0.0-rc.13.exe',
-  githubReleaseUrl: 'https://github.com/JPatronC92/Lex-Corp-Electron/releases/tag/v1.0.0-rc.13',
+  downloadUrl: 'https://github.com/elbuilder77/Lex-Corporativo-Desktop-app/releases/download/v1.0.0-rc.13/Lex-Corporativo-Setup-1.0.0-rc.13.exe',
+  githubReleaseUrl: 'https://github.com/elbuilder77/Lex-Corporativo-Desktop-app/releases/tag/v1.0.0-rc.13',
   requirements: [
     { label: 'Sistema Operativo', minimum: 'Windows 10 (64-bit) v1903+', recommended: 'Windows 11 (64-bit) actualizado' },
     { label: 'Procesador (CPU)', minimum: 'Intel Core i3 / AMD Ryzen 3 (2.0 GHz)', recommended: 'Intel Core i5 / AMD Ryzen 5 o superior' },
