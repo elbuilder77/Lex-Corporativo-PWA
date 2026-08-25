@@ -9,7 +9,6 @@ import {
   ExternalLink,
   FileCheck2,
   FileSignature,
-  FileText,
   FolderLock,
   HardDrive,
   KeyRound,

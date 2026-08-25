@@ -40,7 +40,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,wasm,json}'],
-        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
+        maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
         cleanupOutdatedCaches: true,
         // Navegación fallback para SPA
         navigateFallback: '/index.html',
@@ -53,4 +53,25 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    chunkSizeWarningLimit: 1200,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('sql.js')) {
+              return 'vendor-sqljs';
+            }
+            if (id.includes('lucide-react')) {
+              return 'vendor-lucide';
+            }
+            if (id.includes('react') || id.includes('react-dom') || id.includes('zustand')) {
+              return 'vendor-framework';
+            }
+            return 'vendor-libs';
+          }
+        },
+      },
+    },
+  },
 });

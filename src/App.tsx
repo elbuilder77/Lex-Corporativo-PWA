@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { AppShell } from './components/AppShell';
 import { BuscadorLegal } from './components/BuscadorLegal';
 import { BuscadorLicitaciones } from './components/BuscadorLicitaciones';
-import { DesktopPresentation } from './components/DesktopPresentation';
 import { Introduction } from './components/Introduction';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import type { AppModuleTab } from './types';
+
+const DesktopPresentation = lazy(() =>
+  import('./components/DesktopPresentation').then((m) => ({ default: m.DesktopPresentation })),
+);
 
 export function App() {
   const [stationOpened, setStationOpened] = useState<boolean>(() => {
@@ -102,7 +105,18 @@ export function App() {
           ) : activeTab === 'licitaciones' ? (
             <BuscadorLicitaciones />
           ) : (
-            <DesktopPresentation />
+            <Suspense
+              fallback={
+                <div className="flex min-h-[50vh] items-center justify-center p-8 text-slate-400">
+                  <div className="flex items-center gap-2.5 text-xs font-semibold">
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-legal-gold border-t-transparent" />
+                    <span>Cargando Estación Desktop...</span>
+                  </div>
+                </div>
+              }
+            >
+              <DesktopPresentation />
+            </Suspense>
           )}
         </AppShell>
       )}

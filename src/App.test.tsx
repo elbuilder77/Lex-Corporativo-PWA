@@ -112,11 +112,11 @@ describe('App Lex Corporativo PWA', () => {
       fireEvent.click(desktopTabs[0]);
     });
 
-    expect(screen.getByRole('heading', { name: 'Lex Corporativo Desktop' })).toBeInTheDocument();
-    expect(screen.getByText(/Ficha Técnica: Capacidades de la Estación Desktop/i)).toBeInTheDocument();
-    expect(screen.getByText(/Auditoría Contractual/i)).toBeInTheDocument();
-    expect(screen.getByText(/Redactor & Plantillas/i)).toBeInTheDocument();
-    expect(screen.getByText(/Bóveda Local de Asuntos/i)).toBeInTheDocument();
-    expect(screen.getByText(/Modelo de Privacidad BYOK/i)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Lex Corporativo Desktop' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /Ficha Técnica: Capacidades de la Estación Desktop/i })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Auditoría Contractual' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Redactor & Plantillas' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Bóveda Local de Asuntos' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /Modelo de Privacidad BYOK/i })).toBeInTheDocument();
   });
 });
