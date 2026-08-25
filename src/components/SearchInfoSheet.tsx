@@ -75,6 +75,30 @@ export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
             </p>
           </div>
 
+          {/* Service 3: Desktop Station Showcase */}
+          <div className="rounded-2xl bg-slate-950 p-4 border border-legal-gold/40 text-white">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm font-extrabold text-legal-gold">
+                <span>💻</span> Estación Desktop para Windows
+              </div>
+              <span className="rounded-md bg-legal-gold/20 px-2 py-0.5 text-[10px] font-extrabold text-legal-gold">
+                v1.0.0-rc.13
+              </span>
+            </div>
+            <p className="mt-2 text-xs leading-5 text-slate-300">
+              Estación de trabajo local complementaria para <strong>auditoría contractual multi-materia</strong> (Mercantil, Laboral, Comercio Exterior, Aduanal, Fiscal), redacción de instrumentos en Word (.docx) y PDF, bóveda local cifrada y privacidad con método BYOK.
+            </p>
+            <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-slate-800">
+              <span className="text-[11px] text-slate-400">Instalador firmado (358.9 MB)</span>
+              <a
+                href="https://github.com/JPatronC92/Lex-Corp-Electron/releases/download/v1.0.0-rc.13/Lex-Corporativo-Setup-1.0.0-rc.13.exe"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-legal-gold hover:bg-legal-goldhover text-slate-950 px-3 py-1.5 text-xs font-bold transition cursor-pointer"
+              >
+                <span>Descargar .EXE</span>
+              </a>
+            </div>
+          </div>
+
           {/* Privacy & No History */}
           <div className="rounded-2xl border border-slate-200 p-4">
             <div className="flex items-center gap-2 text-sm font-extrabold text-slate-950">

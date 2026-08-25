@@ -527,10 +527,10 @@ export function BuscadorLicitaciones() {
                     }
                     className="mt-1 min-h-10 w-full rounded-xl border border-slate-600 bg-slate-950 px-2.5 text-xs text-white focus:border-legal-gold focus:outline-none"
                   >
-                    <option value="cierre_proximo">🔥 Cierre más próximo</option>
-                    <option value="reciente">📅 Más reciente</option>
-                    <option value="monto_mayor">💰 Mayor presupuesto</option>
-                    <option value="relevancia">🎯 Relevancia</option>
+                    <option value="cierre_proximo">Cierre más próximo</option>
+                    <option value="reciente">Más reciente</option>
+                    <option value="monto_mayor">Mayor presupuesto</option>
+                    <option value="relevancia">Relevancia</option>
                   </select>
                 </label>
               </div>
@@ -720,16 +720,14 @@ export function BuscadorLicitaciones() {
               return (
                 <article
                   key={licitacion.id}
-                  className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition hover:border-slate-300"
+                  className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition hover:border-slate-300 hover:shadow-md"
                 >
                   <div className="p-4 sm:p-5">
-                    {/* Top Row: Convocante Badge + Procedure ID + Entity + Urgency Countdown */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="rounded-md bg-slate-950 px-2 py-0.5 text-[11px] font-extrabold tracking-wide text-white">
-                          {licitacion.siglasConvocante}
-                        </span>
-                        <span className="rounded-md bg-amber-50 px-2 py-0.5 font-mono text-[11px] font-bold text-amber-900 border border-amber-200/60">
+                    {/* Header Row: Badges + Action Buttons */}
+                    <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+                      {/* Left: Tags and Deadline */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-extrabold text-slate-800">
                           {licitacion.numeroProcedimiento}
                         </span>
                         <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700">
@@ -1005,6 +1003,30 @@ export function BuscadorLicitaciones() {
                 </article>
               );
             })}
+
+            {/* Desktop Complementary Banner */}
+            <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 p-4 text-white flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
+              <div className="text-center sm:text-left">
+                <p className="text-xs font-bold text-legal-gold flex items-center justify-center sm:justify-start gap-1.5">
+                  <span>💻</span> ¿Necesitas auditar contratos de proveedores o redactar convenios de licitación?
+                </p>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Descarga <strong>Lex Corporativo Desktop</strong> con auditoría contractual multi-materia, redactor en Word/PDF y bóveda de asuntos.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const url = new URL(window.location.href);
+                  url.searchParams.set('tab', 'desktop');
+                  window.history.pushState(null, '', url);
+                  window.dispatchEvent(new PopStateEvent('popstate'));
+                }}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-legal-gold hover:bg-legal-goldhover text-slate-950 px-3.5 py-1.5 text-xs font-extrabold transition cursor-pointer shrink-0"
+              >
+                <span>Ver Estación Desktop</span>
+              </button>
+            </div>
 
             <div className="rounded-xl border border-blue-200/70 bg-blue-50 px-4 py-3 text-xs leading-5 text-blue-950">
               <strong>Nota de consulta:</strong> Lex identifica la procedencia y señala expresamente los

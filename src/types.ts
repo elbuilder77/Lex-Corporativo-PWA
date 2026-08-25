@@ -22,7 +22,7 @@ export interface LegalArticle {
   score?: number;
 }
 
-export type AppModuleTab = 'normativa' | 'licitaciones';
+export type AppModuleTab = 'normativa' | 'licitaciones' | 'desktop';
 
 export type LicitacionMateria =
   | 'adquisiciones'

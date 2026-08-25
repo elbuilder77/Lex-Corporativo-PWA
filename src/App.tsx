@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AppShell } from './components/AppShell';
 import { BuscadorLegal } from './components/BuscadorLegal';
 import { BuscadorLicitaciones } from './components/BuscadorLicitaciones';
+import { DesktopPresentation } from './components/DesktopPresentation';
 import { Introduction } from './components/Introduction';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import type { AppModuleTab } from './types';
@@ -31,7 +32,7 @@ export function App() {
   const [activeTab, setActiveTab] = useState<AppModuleTab>(() => {
     const params = new URLSearchParams(window.location.search);
     const tabParam = params.get('tab');
-    if (tabParam === 'licitaciones' || tabParam === 'normativa') {
+    if (tabParam === 'licitaciones' || tabParam === 'normativa' || tabParam === 'desktop') {
       return tabParam;
     }
     if (
@@ -58,6 +59,7 @@ export function App() {
       setActiveTab(targetTab);
       const url = new URL(window.location.href);
       if (targetTab === 'licitaciones') url.searchParams.set('tab', 'licitaciones');
+      else if (targetTab === 'desktop') url.searchParams.set('tab', 'desktop');
       else url.searchParams.delete('tab');
       window.history.replaceState(null, '', url);
     }
@@ -69,6 +71,8 @@ export function App() {
     const url = new URL(window.location.href);
     if (nextTab === 'licitaciones') {
       url.searchParams.set('tab', 'licitaciones');
+    } else if (nextTab === 'desktop') {
+      url.searchParams.set('tab', 'desktop');
     } else {
       url.searchParams.delete('tab');
     }
@@ -80,6 +84,7 @@ export function App() {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get('tab');
       if (tabParam === 'licitaciones') setActiveTab('licitaciones');
+      else if (tabParam === 'desktop') setActiveTab('desktop');
       else if (tabParam === 'normativa') setActiveTab('normativa');
     };
     window.addEventListener('popstate', onPopState);
@@ -92,7 +97,13 @@ export function App() {
         <Introduction onOpenStation={handleOpenStation} />
       ) : (
         <AppShell activeTab={activeTab} onTabChange={handleTabChange}>
-          {activeTab === 'normativa' ? <BuscadorLegal /> : <BuscadorLicitaciones />}
+          {activeTab === 'normativa' ? (
+            <BuscadorLegal />
+          ) : activeTab === 'licitaciones' ? (
+            <BuscadorLicitaciones />
+          ) : (
+            <DesktopPresentation />
+          )}
         </AppShell>
       )}
     </ErrorBoundary>

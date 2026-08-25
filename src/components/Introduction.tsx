@@ -68,6 +68,16 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
             <BookOpenCheck size={16} className="text-legal-gold" />
             <span>Consultar Legislación Federal</span>
           </button>
+
+          {/* Desktop App Link */}
+          <button
+            type="button"
+            onClick={() => handleStart('desktop')}
+            className="w-full max-w-sm mx-auto flex items-center justify-center gap-2 rounded-2xl border border-legal-gold/30 bg-slate-950/80 hover:bg-slate-900 text-legal-gold px-8 py-2.5 text-xs font-bold transition-all hover:border-legal-gold cursor-pointer active:scale-95 shadow-sm"
+          >
+            <span>💻</span>
+            <span>Estación Desktop (Instalador Windows)</span>
+          </button>
         </div>
 
         {/* Trust Badges */}

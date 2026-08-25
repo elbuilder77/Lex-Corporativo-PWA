@@ -495,6 +495,30 @@ export function BuscadorLegal() {
               </div>
             )}
 
+            {/* Desktop Complementary Banner */}
+            <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 p-4 text-white flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
+              <div className="text-center sm:text-left">
+                <p className="text-xs font-bold text-legal-gold flex items-center justify-center sm:justify-start gap-1.5">
+                  <span>💻</span> ¿Necesitas auditar un contrato o redactar con estos fundamentos?
+                </p>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Usa <strong>Lex Corporativo Desktop</strong> para redacción en Word/PDF, auditoría de riesgos y expedientes locales.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const url = new URL(window.location.href);
+                  url.searchParams.set('tab', 'desktop');
+                  window.history.pushState(null, '', url);
+                  window.dispatchEvent(new PopStateEvent('popstate'));
+                }}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-legal-gold hover:bg-legal-goldhover text-slate-950 px-3.5 py-1.5 text-xs font-extrabold transition cursor-pointer shrink-0"
+              >
+                <span>Ver Estación Desktop</span>
+              </button>
+            </div>
+
             <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs leading-5 text-slate-600">
               Confirma la reforma, vigencia y publicación en la fuente oficial antes de citar o tomar decisiones.
             </p>

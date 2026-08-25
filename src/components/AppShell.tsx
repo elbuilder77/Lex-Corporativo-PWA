@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { AlertCircle, CheckCircle2, Info, Landmark, Map, Scale, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Info, Landmark, Map, MonitorDown, Scale, X } from 'lucide-react';
 import logoMark from '../assets/logo-mark.png';
 import { clearRetiredSavedData } from '../lib/coverage-sources';
 import { CoverageSourcesSheet } from './CoverageSourcesSheet';
@@ -91,7 +91,7 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
             <button
               type="button"
               onClick={() => onTabChange('normativa')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
                 activeTab === 'normativa'
                   ? 'bg-legal-gold text-slate-950 shadow-sm font-extrabold'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -104,7 +104,7 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
             <button
               type="button"
               onClick={() => onTabChange('licitaciones')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
                 activeTab === 'licitaciones'
                   ? 'bg-legal-gold text-slate-950 shadow-sm font-extrabold'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -112,6 +112,18 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
             >
               <Landmark size={15} />
               <span>Licitaciones</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onTabChange('desktop')}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                activeTab === 'desktop'
+                  ? 'bg-legal-gold text-slate-950 shadow-sm font-extrabold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <MonitorDown size={15} />
+              <span>Estación Desktop</span>
             </button>
           </nav>
 
@@ -223,10 +235,10 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <Scale size={20} />
+          <Scale size={18} />
           <span>Leyes</span>
           {activeTab === 'normativa' && (
-            <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-10 rounded-b-full bg-legal-gold" />
+            <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-b-full bg-legal-gold" />
           )}
         </button>
         <button
@@ -238,10 +250,25 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <Landmark size={20} />
+          <Landmark size={18} />
           <span>Licitaciones</span>
           {activeTab === 'licitaciones' && (
-            <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-10 rounded-b-full bg-legal-gold" />
+            <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-b-full bg-legal-gold" />
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={() => onTabChange('desktop')}
+          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest transition ${
+            activeTab === 'desktop'
+              ? 'text-legal-gold'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <MonitorDown size={18} />
+          <span>Desktop</span>
+          {activeTab === 'desktop' && (
+            <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-b-full bg-legal-gold" />
           )}
         </button>
         <button
@@ -249,7 +276,7 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
           onClick={() => setPanel('coverage')}
           className="relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 hover:text-slate-200 transition"
         >
-          <Map size={20} />
+          <Map size={18} />
           <span>Cobertura</span>
         </button>
       </nav>

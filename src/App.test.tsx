@@ -100,4 +100,23 @@ describe('App Lex Corporativo PWA', () => {
     });
     expect(screen.getByRole('button', { name: 'Quitar filtro de etapa' })).toBeInTheDocument();
   });
+
+  it('permite navegar y visualizar la ficha técnica oficial de Lex Corporativo Desktop', async () => {
+    localStorage.setItem('lex_pwa_station_opened', '1');
+    await act(async () => {
+      render(<App />);
+    });
+
+    const desktopTabs = screen.getAllByRole('button', { name: /Desktop/i });
+    await act(async () => {
+      fireEvent.click(desktopTabs[0]);
+    });
+
+    expect(screen.getByRole('heading', { name: 'Lex Corporativo Desktop' })).toBeInTheDocument();
+    expect(screen.getByText(/Ficha Técnica: Capacidades de la Estación Desktop/i)).toBeInTheDocument();
+    expect(screen.getByText(/Auditoría Contractual/i)).toBeInTheDocument();
+    expect(screen.getByText(/Redactor & Plantillas/i)).toBeInTheDocument();
+    expect(screen.getByText(/Bóveda Local de Asuntos/i)).toBeInTheDocument();
+    expect(screen.getByText(/Modelo de Privacidad BYOK/i)).toBeInTheDocument();
+  });
 });
