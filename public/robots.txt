@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lex-corporativo-pwa.vercel.app/sitemap.xml

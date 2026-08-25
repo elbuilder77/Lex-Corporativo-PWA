@@ -20,6 +20,7 @@ import {
 import { AREA_LABELS, CORPUS_STATS, getLawsForScope } from '../lib/corpus-catalog';
 import { executeCorpusSearch, type CorpusSearchResult } from '../services/corpus-search';
 import { useUiStore } from '../store/useUiStore';
+import { trackEvent } from '../lib/analytics';
 import type { CorpusSearchScope, LegalArticle } from '../types';
 
 const scopes = Object.entries(AREA_LABELS) as Array<[CorpusSearchScope, string]>;
@@ -82,6 +83,12 @@ export function BuscadorLegal() {
         limit: 30,
       });
       setResult(nextResult);
+      trackEvent('legal_search_performed', {
+        query_length: normalizedQuery.length,
+        scope: requestedScope,
+        law: requestedLawCode || 'todos',
+        results_count: nextResult.articles.length,
+      });
 
       const url = new URL(window.location.href);
       url.searchParams.set('q', normalizedQuery);
@@ -140,6 +147,10 @@ export function BuscadorLegal() {
     try {
       await navigator.clipboard.writeText(articlePlainText(article));
       setCopiedId(article.id);
+      trackEvent('article_copy', {
+        article_id: article.id,
+        law_code: article.lawCode,
+      });
       window.setTimeout(() => setCopiedId(null), 1600);
       notify('Artículo copiado al portapapeles.', 'success');
     } catch {

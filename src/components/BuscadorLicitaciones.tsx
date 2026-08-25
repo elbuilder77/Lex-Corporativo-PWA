@@ -41,6 +41,7 @@ import {
 } from '../lib/licitaciones-catalog';
 import { executeLicitacionesSearch } from '../services/licitaciones-search';
 import { useUiStore } from '../store/useUiStore';
+import { trackEvent } from '../lib/analytics';
 import type {
   LicitacionCaracter,
   LicitacionEstatus,
@@ -162,6 +163,13 @@ export function BuscadorLicitaciones() {
         sortBy: sort,
       });
       setResult(searchResult);
+      trackEvent('tender_search_performed', {
+        query_length: q.trim().length,
+        materia: mat,
+        caracter: car,
+        status: est,
+        results_count: searchResult.total,
+      });
 
       const url = new URL(window.location.href);
       if (q.trim()) url.searchParams.set('lq', q.trim());

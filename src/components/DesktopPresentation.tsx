@@ -20,6 +20,7 @@ import {
 import logoMark from '../assets/logo-mark.png';
 import { DESKTOP_AREAS, DESKTOP_SPECS } from '../lib/desktop-specs';
 import { useUiStore } from '../store/useUiStore';
+import { trackEvent } from '../lib/analytics';
 
 export function DesktopPresentation() {
   const [copiedSha, setCopiedSha] = useState(false);
@@ -30,6 +31,7 @@ export function DesktopPresentation() {
     try {
       await navigator.clipboard.writeText(DESKTOP_SPECS.sha512);
       setCopiedSha(true);
+      trackEvent('copy_hash_click', { algorithm: 'sha512' });
       notify('Hash SHA-512 copiado al portapapeles.', 'success');
       setTimeout(() => setCopiedSha(false), 2500);
     } catch {
@@ -38,6 +40,11 @@ export function DesktopPresentation() {
   };
 
   const handleDownload = () => {
+    trackEvent('download_desktop_click', {
+      version: DESKTOP_SPECS.version,
+      platform: DESKTOP_SPECS.platform,
+      fileName: DESKTOP_SPECS.fileName,
+    });
     // Trigger download of the installer
     window.location.href = DESKTOP_SPECS.downloadUrl;
   };

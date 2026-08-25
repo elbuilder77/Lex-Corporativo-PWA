@@ -1,9 +1,12 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { AppShell } from './components/AppShell';
 import { BuscadorLegal } from './components/BuscadorLegal';
 import { BuscadorLicitaciones } from './components/BuscadorLicitaciones';
 import { Introduction } from './components/Introduction';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { trackEvent } from './lib/analytics';
 import type { AppModuleTab } from './types';
 
 const DesktopPresentation = lazy(() =>
@@ -58,6 +61,7 @@ export function App() {
     } catch {
       /* noop */
     }
+    trackEvent('station_enter', { target_tab: targetTab || 'normativa' });
     if (targetTab) {
       setActiveTab(targetTab);
       const url = new URL(window.location.href);
@@ -71,6 +75,7 @@ export function App() {
 
   const handleTabChange = (nextTab: AppModuleTab) => {
     setActiveTab(nextTab);
+    trackEvent('tab_change', { tab: nextTab });
     const url = new URL(window.location.href);
     if (nextTab === 'licitaciones') {
       url.searchParams.set('tab', 'licitaciones');
@@ -120,6 +125,8 @@ export function App() {
           )}
         </AppShell>
       )}
+      <Analytics />
+      <SpeedInsights />
     </ErrorBoundary>
   );
 }
