@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  Check,
   CheckCircle2,
   Copy,
   Cpu,
@@ -12,7 +11,6 @@ import {
   FolderLock,
   HardDrive,
   KeyRound,
-  Laptop,
   Layers,
   Lock,
   Scale,
@@ -89,14 +87,9 @@ export function DesktopPresentation() {
                   <p className="text-xs text-slate-400 mt-1">
                     {DESKTOP_SPECS.platform} · {DESKTOP_SPECS.architecture} · {DESKTOP_SPECS.fileSizeFormatted}
                   </p>
-                  <div className="mt-2 flex flex-wrap items-center justify-center sm:justify-start gap-2 text-[11px] text-emerald-400 font-semibold">
-                    <span className="flex items-center gap-1">
-                      <ShieldCheck size={14} /> Binario firmado digitalmente
-                    </span>
-                    <span className="text-slate-600 hidden sm:inline">•</span>
-                    <span className="flex items-center gap-1 text-slate-300">
-                      <Lock size={13} className="text-legal-gold" /> Bóveda local cifrada
-                    </span>
+                  <div className="mt-2 flex items-center justify-center sm:justify-start gap-1.5 text-[11px] text-emerald-400 font-semibold">
+                    <ShieldCheck size={14} />
+                    <span>Binario firmado digitalmente y distribuible</span>
                   </div>
                 </div>
 
@@ -108,30 +101,6 @@ export function DesktopPresentation() {
                   <Download size={18} />
                   <span>Descargar .EXE</span>
                 </a>
-              </div>
-
-              {/* SHA-512 Verification Row */}
-              <div className="mt-4 pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px]">
-                <span className="text-slate-400 truncate max-w-full font-mono text-[10px]">
-                  SHA-512: {DESKTOP_SPECS.sha512.slice(0, 32)}...
-                </span>
-                <button
-                  type="button"
-                  onClick={handleCopySha}
-                  className="inline-flex items-center gap-1.5 text-legal-gold hover:text-white font-semibold text-[11px] transition shrink-0 cursor-pointer"
-                >
-                  {copiedSha ? (
-                    <>
-                      <Check size={13} className="text-emerald-400" />
-                      <span className="text-emerald-400">Copiado</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy size={13} />
-                      <span>Copiar hash de verificación</span>
-                    </>
-                  )}
-                </button>
               </div>
             </div>
 
@@ -465,105 +434,22 @@ export function DesktopPresentation() {
           </div>
         </section>
 
-        {/* Ecosystem Synergy Section: PWA vs Desktop */}
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-          <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-legal-gold/20 text-legal-golddark">
-              <Laptop size={20} />
-            </span>
-            <div>
-              <h2 className="font-serif text-lg sm:text-xl font-bold text-slate-950">
-                Sinergia de Marca: ¿Cuándo usar la PWA y cuándo la Desktop?
-              </h2>
-              <p className="text-xs text-slate-500">
-                Herramientas complementarias diseñadas para diferentes momentos de la práctica profesional
-              </p>
-            </div>
+        {/* Bottom Download Banner */}
+        <section className="rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4 border border-legal-gold/30">
+          <div>
+            <h3 className="font-serif text-base font-bold text-white">¿Listo para instalar la Estación de Trabajo?</h3>
+            <p className="text-xs text-slate-400 mt-1">
+              Descarga directa de {DESKTOP_SPECS.fileName} ({DESKTOP_SPECS.fileSizeFormatted}) para Windows 10 y 11.
+            </p>
           </div>
-
-          <div className="mt-6 grid gap-6 md:grid-cols-2">
-            {/* PWA Use Case */}
-            <div className="rounded-2xl border border-blue-200 bg-blue-50/40 p-5 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-2 font-bold text-blue-900 text-sm">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-200/80 text-blue-900 text-xs">
-                    📱
-                  </span>
-                  <h3>Lex Corporativo PWA (Web & Móvil)</h3>
-                </div>
-                <p className="mt-2 text-xs text-slate-700 leading-relaxed">
-                  Ideal para <strong>movilidad y respuesta inmediata</strong>. Se ejecuta al instante desde el navegador en cualquier smartphone, tablet o laptop sin descargas ni credenciales.
-                </p>
-                <ul className="mt-3 space-y-1.5 text-xs text-slate-600">
-                  <li className="flex items-start gap-1.5">
-                    <Check size={14} className="text-blue-600 mt-0.5 shrink-0" />
-                    <span>Consulta táctica de leyes federales en audiencias o juzgados.</span>
-                  </li>
-                  <li className="flex items-start gap-1.5">
-                    <Check size={14} className="text-blue-600 mt-0.5 shrink-0" />
-                    <span>Radar de licitaciones públicas de CompraNet en tiempo real.</span>
-                  </li>
-                  <li className="flex items-start gap-1.5">
-                    <Check size={14} className="text-blue-600 mt-0.5 shrink-0" />
-                    <span>Cero configuración y acceso público universal.</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="mt-4 pt-3 border-t border-blue-200 text-[11px] font-extrabold uppercase text-blue-800">
-                Enfoque: Movilidad, consulta rápida y radar federal.
-              </div>
-            </div>
-
-            {/* Desktop Use Case */}
-            <div className="rounded-2xl border border-legal-gold/40 bg-slate-900 text-white p-5 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-2 font-bold text-legal-gold text-sm">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-legal-gold/20 text-legal-gold text-xs">
-                    💻
-                  </span>
-                  <h3>Lex Corporativo Desktop (Estación Windows)</h3>
-                </div>
-                <p className="mt-2 text-xs text-slate-300 leading-relaxed">
-                  Diseñada para <strong>trabajo profundo en despacho u oficina</strong>. Instalada en Windows para manejar contratos complejos, auditorías de riesgo y expedientes privados.
-                </p>
-                <ul className="mt-3 space-y-1.5 text-xs text-slate-300">
-                  <li className="flex items-start gap-1.5">
-                    <Check size={14} className="text-legal-gold mt-0.5 shrink-0" />
-                    <span>Auditoría de riesgos en contratos (PDF/DOCX) en 5 materias.</span>
-                  </li>
-                  <li className="flex items-start gap-1.5">
-                    <Check size={14} className="text-legal-gold mt-0.5 shrink-0" />
-                    <span>Redactor jurídico con exportación a Word y PDF listos para firma.</span>
-                  </li>
-                  <li className="flex items-start gap-1.5">
-                    <Check size={14} className="text-legal-gold mt-0.5 shrink-0" />
-                    <span>Bóveda local permanente de expedientes y RAG semántico offline.</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] font-extrabold uppercase text-legal-gold">
-                Enfoque: Redacción, auditoría contractual y bóveda de asuntos.
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Download Banner */}
-          <div className="mt-8 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4 border border-legal-gold/30">
-            <div>
-              <h3 className="font-serif text-base font-bold text-white">¿Listo para instalar la Estación de Trabajo?</h3>
-              <p className="text-xs text-slate-400 mt-1">
-                Descarga gratuita de {DESKTOP_SPECS.fileName} ({DESKTOP_SPECS.fileSizeFormatted}) para Windows 10/11.
-              </p>
-            </div>
-            <a
-              href={DESKTOP_SPECS.downloadUrl}
-              onClick={handleDownload}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-legal-gold hover:bg-legal-goldhover text-slate-950 px-6 py-3 text-xs font-extrabold transition shadow-md shrink-0 cursor-pointer"
-            >
-              <Download size={16} />
-              <span>Descargar Instalador .EXE</span>
-            </a>
-          </div>
+          <a
+            href={DESKTOP_SPECS.downloadUrl}
+            onClick={handleDownload}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-legal-gold hover:bg-legal-goldhover text-slate-950 px-6 py-3 text-xs font-extrabold transition shadow-md shrink-0 cursor-pointer"
+          >
+            <Download size={16} />
+            <span>Descargar Instalador .EXE</span>
+          </a>
         </section>
 
       </main>
