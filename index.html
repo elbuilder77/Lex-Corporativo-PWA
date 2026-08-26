@@ -13,39 +13,46 @@
     <meta name="application-name" content="Lex Corporativo" />
 
     <!-- SEO Primary Meta Tags -->
-    <title>Lex Corporativo | Suite Jurídica & Radar Federal</title>
+    <title>Lex Corporativo | Suite Jurídica & Radar Federal México</title>
     <meta
       name="description"
       content="Suite jurídica digital en México. Consulta táctica de leyes federales en vigor, radar de licitaciones públicas de CompraNet y estación de trabajo profesional para Windows."
     />
     <meta
       name="keywords"
-      content="leyes federales mexico, legislacion mexicana, licitaciones compranet, codigo de comercio, ley federal del trabajo, codigo fiscal federacion, contratos mercantiles, auditoria contractual, software juridico mexico, lex corporativo"
+      content="leyes federales mexico, legislacion mexicana, licitaciones compranet, codigo de comercio, ley federal del trabajo 2026, codigo fiscal federacion, contratos mercantiles, auditoria contractual, software juridico mexico, lex corporativo"
     />
     <meta name="author" content="Lex Corporativo" />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="alternate" hreflang="es-MX" href="https://lexcorporativo.com.mx/" />
+    <link rel="alternate" hreflang="x-default" href="https://lexcorporativo.com.mx/" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
 
     <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://lexcorporativo.com.mx/" />
     <meta property="og:site_name" content="Lex Corporativo" />
-    <meta property="og:title" content="Lex Corporativo | Suite Jurídica & Radar Federal" />
+    <meta property="og:title" content="Lex Corporativo | Suite Jurídica & Radar Federal México" />
     <meta
       property="og:description"
       content="Consulta táctica de leyes federales mexicanas, radar de licitaciones CompraNet y estación de trabajo profesional para Windows con privacidad BYOK."
     />
     <meta property="og:image" content="https://lexcorporativo.com.mx/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Lex Corporativo — Suite Jurídica & Radar Federal México" />
     <meta property="og:locale" content="es_MX" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://lexcorporativo.com.mx/" />
-    <meta name="twitter:title" content="Lex Corporativo | Suite Jurídica & Radar Federal" />
+    <meta name="twitter:title" content="Lex Corporativo | Suite Jurídica & Radar Federal México" />
     <meta
       name="twitter:description"
       content="Consulta táctica de leyes federales mexicanas, radar de licitaciones CompraNet y estación de trabajo profesional para Windows con privacidad BYOK."
     />
     <meta name="twitter:image" content="https://lexcorporativo.com.mx/og-image.png" />
+    <meta name="twitter:image:alt" content="Lex Corporativo — Suite Jurídica & Radar Federal México" />
 
     <meta name="geo.region" content="MX" />
     <meta name="geo.placename" content="México" />
@@ -55,36 +62,97 @@
       [
         {
           "@context": "https://schema.org",
-          "@type": "WebSite",
+          "@type": "Organization",
+          "@id": "https://lexcorporativo.com.mx/#organization",
           "name": "Lex Corporativo",
           "url": "https://lexcorporativo.com.mx/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://lexcorporativo.com.mx/favicon.png",
+            "width": 512,
+            "height": 512
+          },
+          "description": "Desarrollador de software legal y plataforma de consulta de legislación federal mexicana y radar de licitaciones públicas.",
+          "sameAs": [
+            "https://github.com/elbuilder77/Lex-Corporativo-PWA",
+            "https://github.com/elbuilder77/Lex-Corporativo-PWA/releases"
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://lexcorporativo.com.mx/#website",
+          "name": "Lex Corporativo",
+          "url": "https://lexcorporativo.com.mx/",
+          "publisher": {
+            "@id": "https://lexcorporativo.com.mx/#organization"
+          },
           "potentialAction": {
             "@type": "SearchAction",
-            "target": "https://lexcorporativo.com.mx/?q={search_term_string}",
+            "target": "https://lexcorporativo.com.mx/?tab=normativa&q={search_term_string}",
             "query-input": "required name=search_term_string"
           }
         },
         {
           "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "@id": "https://lexcorporativo.com.mx/#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Inicio",
+              "item": "https://lexcorporativo.com.mx/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Legislación Federal",
+              "item": "https://lexcorporativo.com.mx/?tab=normativa"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Radar de Licitaciones",
+              "item": "https://lexcorporativo.com.mx/?tab=licitaciones"
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "name": "Estación Desktop",
+              "item": "https://lexcorporativo.com.mx/?tab=desktop"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
           "@type": "SoftwareApplication",
+          "@id": "https://lexcorporativo.com.mx/#software",
           "name": "Lex Corporativo",
           "applicationCategory": "BusinessApplication",
-          "operatingSystem": "Web, Windows 10, Windows 11",
+          "applicationSubCategory": "LegalTech & Compliance Application",
+          "operatingSystem": "Web (PWA), Windows 10 (64-bit), Windows 11 (64-bit)",
           "description": "Suite jurídica digital y plataforma de consulta de legislación federal mexicana y radar de licitaciones públicas de CompraNet.",
+          "featureList": [
+            "Consulta de 5,011 disposiciones en 13 leyes federales con motor SQLite WASM",
+            "Radar de licitaciones públicas federales con filtros facetados CompraNet",
+            "Estación Desktop para Windows con RAG 100% offline y auditoría contractual",
+            "Redacción de instrumentos jurídicos y exportación Word/PDF",
+            "Privacidad local sin registro ni costo en la versión web"
+          ],
           "offers": {
             "@type": "Offer",
             "price": "0",
             "priceCurrency": "MXN"
           },
           "publisher": {
-            "@type": "Organization",
-            "name": "Lex Corporativo",
-            "url": "https://lexcorporativo.com.mx/"
+            "@id": "https://lexcorporativo.com.mx/#organization"
           }
         },
         {
           "@context": "https://schema.org",
           "@type": "FAQPage",
+          "@id": "https://lexcorporativo.com.mx/#faq",
           "mainEntity": [
             {
               "@type": "Question",

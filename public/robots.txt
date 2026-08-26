@@ -1,4 +1,9 @@
 User-agent: *
 Allow: /
 
+# Allow crawling of frontend resources for headless rendering
+Allow: /assets/
+Allow: /corpus/
+Allow: /licitaciones/
+
 Sitemap: https://lexcorporativo.com.mx/sitemap.xml
