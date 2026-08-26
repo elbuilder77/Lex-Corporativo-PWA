@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://lex-corporativo-pwa.vercel.app/sitemap.xml
+Sitemap: https://lexcorporativo.com.mx/sitemap.xml

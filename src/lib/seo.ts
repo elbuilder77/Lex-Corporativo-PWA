@@ -11,25 +11,25 @@ export const SEO_PAGES: Record<AppModuleTab | 'home', SeoConfig> = {
     title: 'Lex Corporativo | Suite Jurídica & Radar Federal México',
     description:
       'Suite jurídica digital y radar federal en México. Consulta táctica de leyes federales en vigor, monitoreo en vivo de licitaciones públicas de CompraNet y estación de trabajo para Windows.',
-    canonicalUrl: 'https://lex-corporativo-pwa.vercel.app/',
+    canonicalUrl: 'https://lexcorporativo.com.mx/',
   },
   normativa: {
     title: 'Consulta de Legislación Federal Mexicana (16 Leyes) | Lex Corporativo',
     description:
       'Buscador normativo sobre 7,348 artículos y reglas federales de México (Código de Comercio, LFT, CFF, LGSM, LIVA, LISR y más) con motor SQLite local sin conexión.',
-    canonicalUrl: 'https://lex-corporativo-pwa.vercel.app/?tab=normativa',
+    canonicalUrl: 'https://lexcorporativo.com.mx/?tab=normativa',
   },
   licitaciones: {
     title: 'Radar de Licitaciones Públicas CompraNet en Vivo | Lex Corporativo',
     description:
       'Monitoreo en tiempo real de contrataciones públicas federales de México, plazos de propuestas, convocatorias oficiales y expedientes de CompraNet.',
-    canonicalUrl: 'https://lex-corporativo-pwa.vercel.app/?tab=licitaciones',
+    canonicalUrl: 'https://lexcorporativo.com.mx/?tab=licitaciones',
   },
   desktop: {
     title: 'Lex Corporativo Desktop | Estación de Auditoría Contractual para Windows',
     description:
       'Descarga oficial de Lex Corporativo Desktop (Windows 10/11). Auditoría de riesgos en 5 materias jurídicas, redactor de instrumentos en Word/PDF y bóveda de expedientes BYOK.',
-    canonicalUrl: 'https://lex-corporativo-pwa.vercel.app/?tab=desktop',
+    canonicalUrl: 'https://lexcorporativo.com.mx/?tab=desktop',
   },
 };
 
