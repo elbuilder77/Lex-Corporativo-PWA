@@ -47,6 +47,11 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
             <img
               src={logoUrl}
               alt="Logotipo Lex Corporativo"
+              width={320}
+              height={70}
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
               className="w-full h-auto object-contain drop-shadow-[0_10px_25px_rgba(197,160,89,0.25)]"
             />
           </div>
@@ -56,7 +61,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
           </span>
 
           <p className="max-w-xl text-xs sm:text-sm text-slate-300 font-normal leading-relaxed">
-            Suite jurídica y radar federal en tiempo real. Consulta táctica en la web o descarga la estación de trabajo profesional para Windows.
+            Suite jurídica digital y radar federal. Consulta táctica en la web o descarga la estación de trabajo profesional para Windows.
           </p>
         </div>
 
@@ -77,7 +82,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
                 Licitaciones Abiertas
               </h2>
               <p className="mt-1.5 text-xs text-slate-400 leading-relaxed">
-                Radar en tiempo real de contrataciones públicas federales, monitoreo de plazos y convocatorias oficiales.
+                Radar de contrataciones públicas federales de CompraNet, monitoreo de plazos y convocatorias oficiales.
               </p>
             </div>
 
@@ -101,14 +106,14 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
                   <BookOpenCheck size={20} />
                 </span>
                 <span className="rounded-md bg-blue-500/20 px-2 py-0.5 text-[10px] font-extrabold text-blue-300 uppercase tracking-wider">
-                  16 Leyes SQLite
+                  13 Leyes Federales
                 </span>
               </div>
               <h2 className="font-serif text-base sm:text-lg font-bold text-white group-hover:text-blue-300 transition">
                 Legislación Federal
               </h2>
               <p className="mt-1.5 text-xs text-slate-400 leading-relaxed">
-                Buscador normativo instantáneo sobre 7,348 artículos y reglas federales en motor SQLite local sin conexión.
+                Buscador normativo instantáneo sobre 5,011 artículos y reglas federales con motor SQLite WASM en sesión.
               </p>
             </div>
 
@@ -161,7 +166,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
         {/* Trust Badges */}
         <div className="flex flex-wrap justify-center items-center gap-4 text-[11px] font-semibold text-slate-400">
           <span className="flex items-center gap-1.5">
-            <Zap size={13} className="text-legal-gold" /> Sin registro ni API Key
+            <Zap size={13} className="text-legal-gold" /> Sin registro ni costo
           </span>
           <span className="text-slate-700">•</span>
           <span className="flex items-center gap-1.5">
@@ -169,7 +174,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
           </span>
           <span className="text-slate-700">•</span>
           <span className="flex items-center gap-1.5">
-            <ShieldCheck size={13} className="text-emerald-400" /> PWA Gratuita & Cero Nube
+            <ShieldCheck size={13} className="text-emerald-400" /> Procesamiento Local en Navegador
           </span>
         </div>
       </main>

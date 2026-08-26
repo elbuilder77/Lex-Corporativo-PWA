@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.png', 'assets/*.png', 'wasm/*.wasm', 'corpus/*.json', 'licitaciones/*.json'],
+      includeAssets: ['favicon.png', 'favicon.svg'],
       manifest: {
         name: 'Lex Corporativo — Consulta Federal y Licitaciones',
         short_name: 'Lex Corporativo',
@@ -39,17 +39,14 @@ export default defineConfig({
         screenshots: [],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,wasm,json}'],
-        maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
+        globPatterns: ['**/*.{js,css,html,svg,woff2}'],
         cleanupOutdatedCaches: true,
         // Navegación fallback para SPA
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/, /\.json$/, /\.wasm$/],
       },
-      // Habilitar SW en modo desarrollo para testing
       devOptions: {
-        enabled: true,
-        type: 'module',
+        enabled: false,
       },
     }),
   ],

@@ -10,25 +10,25 @@ export const SEO_PAGES: Record<AppModuleTab | 'home', SeoConfig> = {
   home: {
     title: 'Lex Corporativo | Suite Jurídica & Radar Federal México',
     description:
-      'Suite jurídica digital y radar federal en México. Consulta táctica de leyes federales en vigor, monitoreo en vivo de licitaciones públicas de CompraNet y estación de trabajo para Windows.',
+      'Suite jurídica digital y radar federal en México. Consulta táctica de leyes federales en vigor, radar de licitaciones públicas de CompraNet y estación de trabajo profesional para Windows.',
     canonicalUrl: 'https://lexcorporativo.com.mx/',
   },
   normativa: {
-    title: 'Consulta de Legislación Federal Mexicana (16 Leyes) | Lex Corporativo',
+    title: 'Consulta de Legislación Federal Mexicana (13 Leyes) | Lex Corporativo',
     description:
-      'Buscador normativo sobre 7,348 artículos y reglas federales de México (Código de Comercio, LFT, CFF, LGSM, LIVA, LISR y más) con motor SQLite local sin conexión.',
+      'Buscador normativo sobre 5,011 artículos y reglas federales de México (Código de Comercio, LFT, CFF, LGSM, LIVA, LISR y más) con motor SQLite WASM en sesión.',
     canonicalUrl: 'https://lexcorporativo.com.mx/?tab=normativa',
   },
   licitaciones: {
-    title: 'Radar de Licitaciones Públicas CompraNet en Vivo | Lex Corporativo',
+    title: 'Radar de Licitaciones Públicas CompraNet | Lex Corporativo',
     description:
-      'Monitoreo en tiempo real de contrataciones públicas federales de México, plazos de propuestas, convocatorias oficiales y expedientes de CompraNet.',
+      'Consulta y filtro de contrataciones públicas federales de México, plazos de propuestas, convocatorias oficiales y expedientes de CompraNet.',
     canonicalUrl: 'https://lexcorporativo.com.mx/?tab=licitaciones',
   },
   desktop: {
     title: 'Lex Corporativo Desktop | Estación de Auditoría Contractual para Windows',
     description:
-      'Descarga oficial de Lex Corporativo Desktop (Windows 10/11). Auditoría de riesgos en 5 materias jurídicas, redactor de instrumentos en Word/PDF y bóveda de expedientes BYOK.',
+      'Descarga oficial de Lex Corporativo Desktop (Windows 10/11). Auditoría de riesgos en 5 materias jurídicas, redactor de instrumentos en Word/PDF y bóveda de expedientes BYOK 100% offline.',
     canonicalUrl: 'https://lexcorporativo.com.mx/?tab=desktop',
   },
 };

@@ -200,7 +200,7 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
             className="h-10 w-10 shrink-0 rounded-xl border border-legal-gold/20 object-cover"
           />
           <p className="flex-1 text-xs font-semibold leading-5">
-            Lleva Lex Corporativo PWA contigo. Consulta legislación y licitaciones incluso sin conexión.
+            Lleva Lex Corporativo contigo. Acceso directo a legislación federal y radar de licitaciones públicas.
           </p>
           <button
             type="button"

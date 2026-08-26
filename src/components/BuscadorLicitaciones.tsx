@@ -330,7 +330,7 @@ export function BuscadorLicitaciones() {
               }`}
             >
               {isOnline ? <ShieldCheck size={14} /> : <WifiOff size={14} />}
-              {isOnline ? 'En línea' : 'Local'}
+              {isOnline ? 'En línea' : 'Sin conexión'}
             </div>
           </div>
 
@@ -1019,7 +1019,7 @@ export function BuscadorLicitaciones() {
                   <span>💻</span> ¿Necesitas auditar contratos de proveedores o redactar convenios de licitación?
                 </p>
                 <p className="text-[11px] text-slate-400 mt-0.5">
-                  Descarga <strong>Lex Corporativo Desktop</strong> con auditoría contractual multi-materia, redactor en Word/PDF y bóveda de asuntos.
+                  Descarga <strong>Lex Corporativo Desktop</strong> con auditoría contractual multi-materia, redactor en Word/PDF y bóveda de asuntos 100% offline con BYOK.
                 </p>
               </div>
               <button
@@ -1032,7 +1032,7 @@ export function BuscadorLicitaciones() {
                 }}
                 className="inline-flex items-center gap-1.5 rounded-xl bg-legal-gold hover:bg-legal-goldhover text-slate-950 px-3.5 py-1.5 text-xs font-extrabold transition cursor-pointer shrink-0"
               >
-                <span>Ver Estación Desktop</span>
+                <span>Descargar Estación Desktop</span>
               </button>
             </div>
 

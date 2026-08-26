@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { CORPUS_STATS, OFFICIAL_LAWS_URL } from '../lib/corpus-catalog';
 import { COMPRANET_GOB_URL, COMPRANET_PORTAL_URL, DATOS_ABIERTOS_URL, LICITACIONES_STATS } from '../lib/licitaciones-catalog';
+import { DESKTOP_SPECS } from '../lib/desktop-specs';
 import { useUiStore } from '../store/useUiStore';
 
 interface SearchInfoSheetProps {
@@ -69,9 +70,9 @@ export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
               <BookOpenCheck size={18} className="text-legal-golddark" /> Buscador Normativo Federal
             </div>
             <p className="mt-2 text-xs leading-5 text-slate-600">
-              Corpus local estructurado con {CORPUS_STATS.provisions.toLocaleString('es-MX')} disposiciones en{' '}
+              Corpus estructurado con {CORPUS_STATS.provisions.toLocaleString('es-MX')} disposiciones en{' '}
               {CORPUS_STATS.instruments} leyes y reglamentos federales (Laboral, Mercantil, Fiscal, Aduanal y Comercio Exterior),
-              con motor SQLite WASM de alta velocidad y enlaces directos a la Cámara de Diputados.
+              con motor SQLite WASM en sesión y enlaces directos a la Cámara de Diputados.
             </p>
           </div>
 
@@ -82,16 +83,16 @@ export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
                 <span>💻</span> Estación Desktop para Windows
               </div>
               <span className="rounded-md bg-legal-gold/20 px-2 py-0.5 text-[10px] font-extrabold text-legal-gold">
-                v1.0.0-rc.13
+                v{DESKTOP_SPECS.version}
               </span>
             </div>
             <p className="mt-2 text-xs leading-5 text-slate-300">
-              Estación de trabajo local complementaria para <strong>auditoría contractual multi-materia</strong> (Mercantil, Laboral, Comercio Exterior, Aduanal, Fiscal), redacción de instrumentos en Word (.docx) y PDF, bóveda local cifrada y privacidad con método BYOK.
+              Estación de trabajo local complementaria para <strong>auditoría contractual multi-materia</strong> (Mercantil, Laboral, Comercio Exterior, Aduanal, Fiscal), redacción de instrumentos en Word (.docx) y PDF, bóveda local cifrada y privacidad con método BYOK 100% offline.
             </p>
             <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-slate-800">
-              <span className="text-[11px] text-slate-400">Instalador firmado (358.9 MB)</span>
+              <span className="text-[11px] text-slate-400">Instalador firmado ({DESKTOP_SPECS.fileSizeFormatted})</span>
               <a
-                href="https://github.com/JPatronC92/Lex-Corp-Electron/releases/download/v1.0.0-rc.13/Lex-Corporativo-Setup-1.0.0-rc.13.exe"
+                href={DESKTOP_SPECS.downloadUrl}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-legal-gold hover:bg-legal-goldhover text-slate-950 px-3 py-1.5 text-xs font-bold transition cursor-pointer"
               >
                 <span>Descargar .EXE</span>
@@ -99,7 +100,7 @@ export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
             </div>
           </div>
 
-          {/* Privacy & No History */}
+          {/* Privacy & Processing */}
           <div className="rounded-2xl border border-slate-200 p-4">
             <div className="flex items-center gap-2 text-sm font-extrabold text-slate-950">
               {isOnline ? (
@@ -107,10 +108,10 @@ export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
               ) : (
                 <WifiOff size={18} className="text-amber-600" />
               )}
-              <span>Consulta privada sin rastreo</span>
+              <span>Privacidad y Procesamiento</span>
             </div>
             <p className="mt-2 text-xs leading-5 text-slate-600">
-              Esta aplicación no recopila historial de navegación, consultas frecuentes ni datos personales. Las búsquedas se procesan localmente cuando corresponde y no se conserva un portafolio de actividad.
+              La consulta de leyes opera sobre motor SQLite WASM en la memoria del navegador durante la sesión, sin almacenar expedientes ni enviar tus consultas a servidores externos. Medimos rendimiento y embudo de forma agregada con Vercel Analytics y Speed Insights para asegurar la calidad de la plataforma.
             </p>
           </div>
 

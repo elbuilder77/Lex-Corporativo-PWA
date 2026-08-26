@@ -194,7 +194,7 @@ export function BuscadorLegal() {
               }`}
             >
               {isOnline ? <ShieldCheck size={14} /> : <WifiOff size={14} />}
-              {isOnline ? 'SQLite local' : 'Sin conexión'}
+              {isOnline ? 'SQLite WASM' : 'Sin conexión'}
             </div>
           </div>
 
@@ -513,7 +513,7 @@ export function BuscadorLegal() {
                   <span>💻</span> ¿Necesitas auditar un contrato o redactar con estos fundamentos?
                 </p>
                 <p className="text-[11px] text-slate-400 mt-0.5">
-                  Usa <strong>Lex Corporativo Desktop</strong> para redacción en Word/PDF, auditoría de riesgos y expedientes locales.
+                  Usa <strong>Lex Corporativo Desktop</strong> para redacción en Word/PDF, auditoría de riesgos y expedientes locales 100% offline con BYOK.
                 </p>
               </div>
               <button
@@ -526,7 +526,7 @@ export function BuscadorLegal() {
                 }}
                 className="inline-flex items-center gap-1.5 rounded-xl bg-legal-gold hover:bg-legal-goldhover text-slate-950 px-3.5 py-1.5 text-xs font-extrabold transition cursor-pointer shrink-0"
               >
-                <span>Ver Estación Desktop</span>
+                <span>Descargar Estación Desktop</span>
               </button>
             </div>
 
