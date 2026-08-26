@@ -7,6 +7,7 @@ import { BuscadorLicitaciones } from './components/BuscadorLicitaciones';
 import { Introduction } from './components/Introduction';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { trackEvent } from './lib/analytics';
+import { updateSeoMeta } from './lib/seo';
 import type { AppModuleTab } from './types';
 
 const DesktopPresentation = lazy(() =>
@@ -98,6 +99,14 @@ export function App() {
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
+
+  useEffect(() => {
+    if (!stationOpened) {
+      updateSeoMeta('home');
+    } else {
+      updateSeoMeta(activeTab);
+    }
+  }, [stationOpened, activeTab]);
 
   return (
     <ErrorBoundary>

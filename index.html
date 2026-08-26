@@ -47,26 +47,80 @@
     />
     <meta name="twitter:image" content="https://lex-corporativo-pwa.vercel.app/og-image.png" />
 
-    <!-- Schema.org JSON-LD Structured Data -->
+    <meta name="geo.region" content="MX" />
+    <meta name="geo.placename" content="México" />
+
+    <!-- Schema.org Multi-Schema JSON-LD Structured Data for Google -->
     <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "Lex Corporativo",
-        "applicationCategory": "BusinessApplication",
-        "operatingSystem": "Web, Windows 10, Windows 11",
-        "description": "Suite jurídica digital y plataforma de consulta de legislación federal mexicana y licitaciones públicas de CompraNet en tiempo real.",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "MXN"
-        },
-        "publisher": {
-          "@type": "Organization",
+      [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
           "name": "Lex Corporativo",
-          "url": "https://lex-corporativo-pwa.vercel.app/"
+          "url": "https://lex-corporativo-pwa.vercel.app/",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://lex-corporativo-pwa.vercel.app/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "Lex Corporativo",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web, Windows 10, Windows 11",
+          "description": "Suite jurídica digital y plataforma de consulta de legislación federal mexicana y licitaciones públicas de CompraNet en tiempo real.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "MXN"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "Lex Corporativo",
+            "url": "https://lex-corporativo-pwa.vercel.app/"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "¿Qué ordenamientos legales incluye el buscador de Lex Corporativo?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Lex Corporativo incluye 16 ordenamientos federales de México íntegros (más de 7,348 artículos y reglas), incluyendo el Código de Comercio, Ley Federal del Trabajo (LFT), Código Fiscal de la Federación (CFF), Ley General de Sociedades Mercantiles (LGSM), Ley de Comercio Exterior, Ley Aduanera, LISR, LIVA y sus reglamentos oficiales."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Cómo funciona el radar de licitaciones públicas de CompraNet?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "El radar de licitaciones de Lex Corporativo monitorea en tiempo real los procedimientos de contratación pública federal de CompraNet, permitiendo filtrar por materia, carácter, convocante, entidad federativa y plazos de recepción de propuestas."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Qué capacidades tiene Lex Corporativo Desktop para Windows?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Lex Corporativo Desktop es una estación de trabajo para Windows (x64) que integra motor RAG semántico offline, auditoría contractual en 5 materias, redacción de instrumentos jurídicos con exportación a Word y PDF, y bóveda local cifrada bajo el método BYOK (Bring Your Own Key)."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿La PWA requiere registro o conexión constante a internet?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No. La consulta de legislación en la PWA opera sobre un motor SQLite local en el navegador (WebAssembly), permitiendo búsquedas instantáneas sin necesidad de registro ni conexión obligatoria a internet."
+              }
+            }
+          ]
         }
-      }
+      ]
     </script>
   </head>
   <body class="bg-legal-shell text-slate-900 antialiased selection:bg-legal-gold/20 selection:text-slate-900">
