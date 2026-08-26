@@ -3,7 +3,7 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!sitemap\\.xml|robots\\.txt|favicon\\.png|favicon\\.svg|og-image\\.png|wasm|assets|corpus|licitaciones|plantillas|.*\\..*).*)",
       "destination": "/index.html"
     }
   ],
