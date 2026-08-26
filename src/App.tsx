@@ -88,13 +88,37 @@ export function App() {
     window.history.replaceState(null, '', url);
   };
 
+  const handleGoHome = () => {
+    try {
+      localStorage.removeItem('lex_pwa_station_opened');
+    } catch {
+      /* noop */
+    }
+    trackEvent('home_return_click');
+    const url = new URL(window.location.href);
+    url.search = '';
+    window.history.pushState(null, '', url);
+    setStationOpened(false);
+  };
+
   useEffect(() => {
     const onPopState = () => {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get('tab');
-      if (tabParam === 'licitaciones') setActiveTab('licitaciones');
-      else if (tabParam === 'desktop') setActiveTab('desktop');
-      else if (tabParam === 'normativa') setActiveTab('normativa');
+      if (tabParam === 'licitaciones') {
+        setActiveTab('licitaciones');
+        setStationOpened(true);
+      } else if (tabParam === 'desktop') {
+        setActiveTab('desktop');
+        setStationOpened(true);
+      } else if (tabParam === 'normativa') {
+        setActiveTab('normativa');
+        setStationOpened(true);
+      } else if (!params.toString()) {
+        if (localStorage.getItem('lex_pwa_station_opened') !== '1') {
+          setStationOpened(false);
+        }
+      }
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
@@ -113,7 +137,7 @@ export function App() {
       {!stationOpened ? (
         <Introduction onOpenStation={handleOpenStation} />
       ) : (
-        <AppShell activeTab={activeTab} onTabChange={handleTabChange}>
+        <AppShell activeTab={activeTab} onTabChange={handleTabChange} onGoHome={handleGoHome}>
           {activeTab === 'normativa' ? (
             <BuscadorLegal />
           ) : activeTab === 'licitaciones' ? (

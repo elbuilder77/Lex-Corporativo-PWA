@@ -8,7 +8,8 @@ export type AnalyticsEvent =
   | 'tender_search_performed'
   | 'article_copy'
   | 'source_link_click'
-  | 'station_enter';
+  | 'station_enter'
+  | 'home_return_click';
 
 export type EventProperties = Record<string, string | number | boolean | null | undefined>;
 

@@ -4,6 +4,7 @@ import App from './App';
 describe('App Lex Corporativo PWA', () => {
   beforeEach(() => {
     localStorage.clear();
+    window.history.replaceState(null, '', '/');
     vi.clearAllMocks();
   });
 
@@ -88,6 +89,9 @@ describe('App Lex Corporativo PWA', () => {
 
     await act(async () => {
       fireEvent.click(screen.getAllByRole('button', { name: /Licitaciones/i })[0]);
+    });
+
+    await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /Filtros/i }));
     });
 
@@ -118,5 +122,23 @@ describe('App Lex Corporativo PWA', () => {
     expect(await screen.findByRole('heading', { name: 'Redactor & Plantillas' })).toBeInTheDocument();
     expect(await screen.findByRole('heading', { name: 'Bóveda Local de Asuntos' })).toBeInTheDocument();
     expect(await screen.findByRole('heading', { name: /Modelo de Privacidad BYOK/i })).toBeInTheDocument();
+  });
+
+  it('permite regresar a la pantalla de inicio desde la estación mediante el botón de Inicio', async () => {
+    localStorage.setItem('lex_pwa_station_opened', '1');
+    await act(async () => {
+      render(<App />);
+    });
+
+    expect(screen.getByRole('heading', { name: 'Consulta de Legislación Federal' })).toBeInTheDocument();
+
+    const homeButtons = screen.getAllByRole('button', { name: /Inicio/i });
+    await act(async () => {
+      fireEvent.click(homeButtons[0]);
+    });
+
+    expect(screen.getByAltText('Logotipo Lex Corporativo')).toBeInTheDocument();
+    expect(screen.getByText('Plataforma de Consulta Federal')).toBeInTheDocument();
+    expect(localStorage.getItem('lex_pwa_station_opened')).toBeNull();
   });
 });

@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { AlertCircle, CheckCircle2, Info, Landmark, Map, MonitorDown, Scale, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Home, Info, Landmark, Map, MonitorDown, Scale, X } from 'lucide-react';
 import logoMark from '../assets/logo-mark.png';
 import { clearRetiredSavedData } from '../lib/coverage-sources';
 import { CoverageSourcesSheet } from './CoverageSourcesSheet';
@@ -15,10 +15,11 @@ interface BeforeInstallPromptEvent extends Event {
 interface AppShellProps {
   activeTab: AppModuleTab;
   onTabChange: (tab: AppModuleTab) => void;
+  onGoHome: () => void;
   children: ReactNode;
 }
 
-export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
+export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShellProps) {
   const { notifications, dismissNotification, setIsOnline } = useUiStore();
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [panel, setPanel] = useState<'coverage' | 'info' | null>(null);
@@ -64,14 +65,13 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
       {/* Top Global Navigation Bar */}
       <header className="sticky top-0 z-30 border-b border-slate-800 bg-legal-shell/95 backdrop-blur-md text-white shadow-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          {/* Brand Logo and Title */}
+          {/* Brand Logo and Title - Returns to Home */}
           <button
             type="button"
-            onClick={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            className="flex items-center gap-2.5 text-left focus:outline-hidden"
-            aria-label="Ir al inicio"
+            onClick={onGoHome}
+            className="flex items-center gap-2.5 text-left focus:outline-hidden hover:opacity-90 transition cursor-pointer"
+            aria-label="Ir a la pantalla de inicio"
+            title="Volver a la portada de inicio"
           >
             <span className="flex h-10 w-10 shrink-0 overflow-hidden rounded-xl border border-legal-gold/30 bg-black shadow-md shadow-black/30">
               <img src={logoMark} alt="Lex Corporativo" className="h-full w-full object-cover" />
@@ -88,6 +88,15 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
             aria-label="Módulos de consulta"
             className="hidden sm:flex items-center rounded-xl bg-slate-900/90 p-1 border border-slate-800"
           >
+            <button
+              type="button"
+              onClick={onGoHome}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition cursor-pointer"
+              title="Volver a la pantalla de inicio"
+            >
+              <Home size={15} />
+              <span>Inicio</span>
+            </button>
             <button
               type="button"
               onClick={() => onTabChange('normativa')}
@@ -226,6 +235,15 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
         className="sm:hidden fixed bottom-0 left-0 right-0 z-30 flex border-t border-slate-800 bg-legal-shell/98 backdrop-blur-md"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
+        <button
+          type="button"
+          onClick={onGoHome}
+          className="relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 hover:text-slate-200 transition"
+          title="Volver a la pantalla de inicio"
+        >
+          <Home size={18} />
+          <span>Inicio</span>
+        </button>
         <button
           type="button"
           onClick={() => onTabChange('normativa')}
