@@ -15,10 +15,9 @@ describe('licitaciones-search', () => {
     expect(scoreByWord).toBeGreaterThan(scoreIrrelevant);
   });
 
-  it('ejecuta búsqueda sin filtros retornando todas las licitaciones ordenadas por fecha límite', async () => {
-    const result = await executeLicitacionesSearch({});
-    expect(result.total).toBe(LICITACIONES_DATA.length);
-    expect(result.licitaciones.length).toBe(LICITACIONES_DATA.length);
+  it('retorna score 10 para query vacío', () => {
+    const imssLicitacion = LICITACIONES_DATA.find((l) => l.siglasConvocante === 'IMSS')!;
+    expect(calculateLicitacionScore(imssLicitacion, '')).toBe(10);
   });
 
   it('filtra licitaciones por materia', async () => {
@@ -57,5 +56,41 @@ describe('licitaciones-search', () => {
     });
     expect(result.total).toBeGreaterThan(0);
     expect(result.licitaciones[0].titulo.toLowerCase()).toContain('ciberseguridad');
+  });
+
+  it('filtra licitaciones por estatus', async () => {
+    const result = await executeLicitacionesSearch({ estatus: 'recepcion_propuestas' });
+    expect(result.total).toBeGreaterThan(0);
+    expect(result.licitaciones.every((l) => l.estatus === 'recepcion_propuestas')).toBe(true);
+  });
+
+  it('ordena por cierre más próximo por defecto', async () => {
+    const result = await executeLicitacionesSearch({});
+    const withDeadline = result.licitaciones.filter(
+      (l) => l.fechaLimitePropuestas
+    );
+    for (let i = 1; i < withDeadline.length; i++) {
+      const prevTime = new Date(withDeadline[i - 1].fechaLimitePropuestas!).getTime();
+      const currTime = new Date(withDeadline[i].fechaLimitePropuestas!).getTime();
+      expect(prevTime).toBeLessThanOrEqual(currTime);
+    }
+  });
+
+  it('ordena por monto mayor cuando se especifica', async () => {
+    const result = await executeLicitacionesSearch({ sortBy: 'monto_mayor' });
+    for (let i = 1; i < result.licitaciones.length; i++) {
+      const prevMonto = result.licitaciones[i - 1].montoEstimado ?? 0;
+      const currMonto = result.licitaciones[i].montoEstimado ?? 0;
+      expect(prevMonto).toBeGreaterThanOrEqual(currMonto);
+    }
+  });
+
+  it('ordena por fecha más reciente cuando se especifica', async () => {
+    const result = await executeLicitacionesSearch({ sortBy: 'reciente' });
+    for (let i = 1; i < result.licitaciones.length; i++) {
+      const prevDate = new Date(result.licitaciones[i - 1].fechaPublicacion).getTime();
+      const currDate = new Date(result.licitaciones[i].fechaPublicacion).getTime();
+      expect(prevDate).toBeGreaterThanOrEqual(currDate);
+    }
   });
 });

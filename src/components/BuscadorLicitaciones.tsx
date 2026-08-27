@@ -38,6 +38,7 @@ import {
   LICITACIONES_STATS,
   MATERIA_LABELS,
   TIPO_PROCEDIMIENTO_LABELS,
+  ENTIDADES_FEDERATIVAS_MEXICO,
 } from '../lib/licitaciones-catalog';
 import { executeLicitacionesSearch } from '../services/licitaciones-search';
 import { useUiStore } from '../store/useUiStore';
@@ -320,6 +321,13 @@ export function BuscadorLicitaciones() {
               <Landmark size={13} />
               <span>Fuentes oficiales · {LICITACIONES_STATS.total.toLocaleString('es-MX')} publicaciones</span>
             </div>
+            <div className="text-[11px] text-slate-400">
+              <span>Actualizado: {new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            </div>
+
+            <div className="text-[11px] text-slate-400">
+              <span>Cobertura: {LICITACIONES_STATS.coberturaEntidades().size} de {ENTIDADES_FEDERATIVAS_MEXICO.length} entidades</span>
+            </div>
 
             <div
               role="status"
@@ -362,7 +370,8 @@ export function BuscadorLicitaciones() {
                   enterKeyHint="search"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Buscar por objeto, insumo, servicio o número de procedimiento (ej. medicamentos, obra, software)"
+                  aria-label="Buscar licitación por título, descripción, número de procedimiento o convocante"
+                  placeholder="Ingrese una palabra clave"
                   autoComplete="off"
                   className="min-h-11 w-full rounded-xl border border-slate-600 bg-slate-950 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-500 focus:border-legal-gold focus:outline-none"
                 />

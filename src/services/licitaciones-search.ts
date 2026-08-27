@@ -94,6 +94,7 @@ export async function executeLicitacionesSearch(
     list = list.filter((item) => {
       const sig = normalizeText(item.siglasConvocante);
       const name = normalizeText(item.convocante);
+      // Match if target conv is contained in siglas, siglas contained in target, or name contains target
       return sig.includes(targetConv) || targetConv.includes(sig) || name.includes(targetConv);
     });
   }
@@ -103,10 +104,11 @@ export async function executeLicitacionesSearch(
     const targetEnt = normalizeText(filter.entidadFederativa);
     list = list.filter((item) => {
       const itemEnt = normalizeText(item.entidadFederativa);
-      if (targetEnt.includes('nacional') || targetEnt.includes('federal')) {
-        return itemEnt.includes('nacional') || itemEnt.includes('federal');
-      }
-      return itemEnt === targetEnt || itemEnt.includes(targetEnt) || itemEnt.includes('nacional') || itemEnt.includes('federal');
+      const isTargetNational = targetEnt.includes('nacional') || targetEnt.includes('federal');
+      const isItemNational = itemEnt.includes('nacional') || itemEnt.includes('federal');
+      if (isTargetNational && isItemNational) return true;
+      if (isTargetNational || isItemNational) return false;
+      return itemEnt === targetEnt || itemEnt.includes(targetEnt);
     });
   }
 
