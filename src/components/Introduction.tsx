@@ -42,21 +42,21 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
         }`}
       >
         {/* Brand Header */}
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-full max-w-[240px] sm:max-w-[320px] flex justify-center">
+        <div className="flex flex-col items-center gap-3.5 sm:gap-4">
+          <div className="w-full max-w-[290px] sm:max-w-[390px] md:max-w-[460px] flex justify-center">
             <img
               src={logoUrl}
               alt="Logotipo Lex Corporativo"
-              width={320}
-              height={70}
+              width={460}
+              height={363}
               loading="eager"
               fetchPriority="high"
               decoding="async"
-              className="w-full h-auto object-contain drop-shadow-[0_10px_25px_rgba(197,160,89,0.25)]"
+              className="w-full h-auto object-contain drop-shadow-[0_12px_30px_rgba(197,160,89,0.30)] transition-transform duration-300 hover:scale-[1.02]"
             />
           </div>
 
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-legal-gold/30 bg-legal-gold/10 px-4 py-1 text-[11px] font-extrabold uppercase tracking-[0.2em] text-legal-gold shadow-xs">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-legal-gold/30 bg-legal-gold/10 px-4 py-1 text-[11px] sm:text-xs font-extrabold uppercase tracking-[0.2em] text-legal-gold shadow-xs">
             <Sparkles size={13} /> Plataforma de Consulta Federal
           </span>
 
