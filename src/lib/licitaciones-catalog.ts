@@ -714,6 +714,13 @@ export const LICITACIONES_STATS = {
   total: LICITACIONES_DATA.length,
   convocantes: new Set(LICITACIONES_DATA.map((l) => l.convocante)).size,
   entidades: new Set(LICITACIONES_DATA.map((l) => l.entidadFederativa)).size,
+  coberturaEntidades: () => {
+    const entidadCounts = new Map<string, number>();
+    LICITACIONES_DATA.forEach((l) => {
+      entidadCounts.set(l.entidadFederativa, (entidadCounts.get(l.entidadFederativa) || 0) + 1);
+    });
+    return entidadCounts;
+  },
 };
 
 export function getAvailableConvocantes(): Array<{ siglas: string; nombre: string }> {
