@@ -1,4 +1,4 @@
-# Lex Corporativo PWA — Consulta Jurídica y Licitaciones Abiertas
+# Lex Corporativo PWA — Consulta Jurídica y Radar de Licitaciones Abiertas
 
 PWA gratuita para consultar legislación federal mexicana y procedimientos de contratación pública (licitaciones abiertas de CompraNet). El producto está enfocado en búsqueda rápida, verificable y limpia; no requiere registro, licencia ni clave de API.
 
