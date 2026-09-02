@@ -25,6 +25,12 @@ export const SEO_PAGES: Record<AppModuleTab | 'home', SeoConfig> = {
       'Consulta y filtro de contrataciones públicas federales de México, plazos de propuestas, convocatorias oficiales y expedientes de CompraNet.',
     canonicalUrl: 'https://lexcorporativo.com.mx/?tab=licitaciones',
   },
+  estudio: {
+    title: 'Estudio Jurídico de Redacción y Contratos (Word/PDF) | Lex Corporativo',
+    description:
+      'Generador y redactor de 25 contratos, pagarés, actas de asamblea y documentos legales en México con exportación profesional a Word (.docx) y PDF.',
+    canonicalUrl: 'https://lexcorporativo.com.mx/?tab=estudio',
+  },
   desktop: {
     title: 'Lex Corporativo Desktop | Estación de Auditoría Contractual para Windows',
     description:

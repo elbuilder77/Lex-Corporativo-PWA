@@ -21,6 +21,7 @@ describe('App Lex Corporativo PWA', () => {
     expect(
       screen.getByRole('button', { name: /Consultar Legislación Federal/i }),
     ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Abrir Estudio/i })).toBeInTheDocument();
   });
 
   it('permite ingresar a la estación de consulta desde la pantalla de presentación', async () => {
@@ -56,7 +57,9 @@ describe('App Lex Corporativo PWA', () => {
       screen.getByRole('heading', { name: 'Radar de Licitaciones Públicas en México' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('searchbox', { name: '¿Qué licitación, insumo o servicio buscas?' }),
+      screen.getByRole('searchbox', {
+        name: 'Buscar licitación por título, descripción, número de procedimiento o convocante',
+      }),
     ).toBeInTheDocument();
   });
 

@@ -195,3 +195,99 @@ body {
   border-color: #cbd5e1;
   margin: 1.5rem 0;
 }
+
+.studio-action,
+.studio-primary {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  padding: 0 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.studio-action {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #334155;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05);
+}
+
+.studio-action:hover { background: #f8fafc; }
+
+.studio-primary {
+  border: 1px solid #c5a059;
+  background: #c5a059;
+  color: #0f172a;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.08);
+}
+
+.studio-primary:hover { background: #b38d47; }
+
+.studio-menu-item {
+  display: flex;
+  min-height: 40px;
+  width: 100%;
+  align-items: center;
+  border-radius: 0.625rem;
+  padding: 0 0.75rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.studio-menu-item:hover { background: #f1f5f9; color: #0f172a; }
+
+.studio-icon-button {
+  display: inline-flex;
+  min-height: 40px;
+  min-width: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  color: #64748b;
+}
+
+.studio-icon-button:hover { background: #f1f5f9; color: #0f172a; }
+
+.studio-input {
+  min-height: 44px;
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+  background: #fff;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  color: #0f172a;
+  font-size: 0.875rem;
+}
+
+.studio-input:focus {
+  border-color: #c5a059;
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(197 160 89 / 0.13);
+}
+
+.studio-editor {
+  color: #334155;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.92rem;
+  line-height: 1.85;
+}
+
+.studio-editor p { margin: 0.65rem 0; text-align: justify; }
+.studio-editor h1, .studio-editor h2, .studio-editor h3 { color: #0f172a; font-family: var(--font-serif); }
+.studio-editor h1 { margin: 1.5rem 0 0.8rem; text-align: center; font-size: 1.35rem; font-weight: 700; }
+.studio-editor h2 { margin: 1.35rem 0 0.65rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.35rem; font-size: 1.1rem; font-weight: 700; }
+.studio-editor ul, .studio-editor ol { margin: 0.65rem 0; padding-left: 1.5rem; }
+.studio-editor blockquote { margin: 1rem 0; border-left: 3px solid #c5a059; background: #fffbeb; padding: 0.65rem 0.9rem; color: #475569; }
+.studio-editor a { color: #1d4ed8; text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .studio-editor { font-size: 0.875rem; line-height: 1.75; }
+}

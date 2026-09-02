@@ -2,6 +2,7 @@ import { useState } from 'react';
 import {
   ArrowRight,
   BookOpenCheck,
+  FilePenLine,
   HardDrive,
   Landmark,
   Scale,
@@ -61,12 +62,12 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
           </span>
 
           <p className="max-w-xl text-xs sm:text-sm text-slate-300 font-normal leading-relaxed">
-            Suite jurídica digital y radar federal. Consulta táctica en la web o descarga la estación de trabajo profesional para Windows.
+            Consulta legislación, monitorea oportunidades públicas y redacta instrumentos jurídicos en un espacio privado que funciona en tu navegador.
           </p>
         </div>
 
         {/* Primary Interactive Cards: Core Web Modules (Dual-Column Grid) */}
-        <div className="w-full grid gap-4 sm:grid-cols-2 text-left">
+        <div className="w-full grid gap-4 md:grid-cols-3 text-left">
           {/* Card 1: Licitaciones Públicas CompraNet (High-Action Primary) */}
           <div className="relative group rounded-2xl border border-legal-gold/30 bg-gradient-to-b from-slate-900/90 to-slate-950/90 p-5 shadow-xl backdrop-blur-md transition-all duration-300 hover:border-legal-gold/60 hover:shadow-2xl hover:shadow-legal-gold/10 flex flex-col justify-between">
             <div>
@@ -124,6 +125,36 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
                 className="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-800 text-slate-200 px-4 py-3 text-xs font-bold transition hover:border-slate-600 hover:text-white group-hover:scale-[1.01] active:scale-95 cursor-pointer"
               >
                 <span>Consultar Legislación Federal</span>
+                <ArrowRight size={15} />
+              </button>
+            </div>
+          </div>
+
+          {/* Card 3: Estudio jurídico local */}
+          <div className="relative group rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg backdrop-blur-md transition-all duration-300 hover:border-legal-gold/50 hover:bg-slate-900/90 flex flex-col justify-between">
+            <div>
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-legal-gold/20 bg-legal-gold/10 text-legal-gold">
+                  <FilePenLine size={20} />
+                </span>
+                <span className="rounded-md bg-emerald-500/15 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-300">
+                  Local · 25 instrumentos
+                </span>
+              </div>
+              <h2 className="font-serif text-base font-bold text-white transition group-hover:text-legal-gold sm:text-lg">
+                Estudio jurídico
+              </h2>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-400">
+                Redacta, importa DOCX, TXT o PDF, consulta fundamentos del corpus y conserva borradores en este dispositivo.
+              </p>
+            </div>
+            <div className="mt-5 border-t border-slate-800/80 pt-3">
+              <button
+                type="button"
+                onClick={() => handleStart('estudio')}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-legal-gold/50 bg-legal-gold/10 px-4 py-3 text-xs font-extrabold text-legal-gold transition hover:bg-legal-gold hover:text-slate-950 active:scale-95"
+              >
+                <span>Abrir Estudio</span>
                 <ArrowRight size={15} />
               </button>
             </div>

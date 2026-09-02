@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { AlertCircle, CheckCircle2, Home, Info, Landmark, Map, MonitorDown, Scale, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, FilePenLine, HelpCircle, Home, Info, Landmark, Map, MonitorDown, Scale, ShieldCheck, X } from 'lucide-react';
 import logoMark from '../assets/logo-mark.png';
 import { clearRetiredSavedData } from '../lib/coverage-sources';
 import { CoverageSourcesSheet } from './CoverageSourcesSheet';
@@ -64,7 +64,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
     <div className="min-h-screen bg-slate-50 text-slate-900">
       {/* Top Global Navigation Bar */}
       <header className="sticky top-0 z-30 border-b border-slate-800 bg-legal-shell/95 backdrop-blur-md text-white shadow-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-3 px-4 sm:px-6">
           {/* Brand Logo and Title - Returns to Home */}
           <button
             type="button"
@@ -80,13 +80,14 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
               <strong className="block font-serif text-sm font-semibold tracking-wide text-white leading-none">
                 Lex Corporativo
               </strong>
+              <span className="mt-1 block text-[9px] font-semibold uppercase tracking-[0.16em] text-slate-400">Plataforma jurídica local</span>
             </span>
           </button>
 
           {/* Module Switcher Tabs */}
           <nav
             aria-label="Módulos de consulta"
-            className="hidden sm:flex items-center rounded-xl bg-slate-900/90 p-1 border border-slate-800"
+            className="hidden md:flex min-w-0 flex-1 items-center justify-center gap-1"
           >
             <button
               type="button"
@@ -124,6 +125,19 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
             </button>
             <button
               type="button"
+              onClick={() => onTabChange('estudio')}
+              className={`flex min-h-11 items-center gap-1.5 rounded-xl px-3 text-xs font-bold transition ${
+                activeTab === 'estudio'
+                  ? 'bg-legal-gold text-slate-950 shadow-sm font-extrabold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <FilePenLine size={15} />
+              <span>Estudio</span>
+            </button>
+            <span className="mx-1 h-6 w-px bg-slate-700" aria-hidden="true" />
+            <button
+              type="button"
               onClick={() => onTabChange('desktop')}
               className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
                 activeTab === 'desktop'
@@ -132,12 +146,16 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
               }`}
             >
               <MonitorDown size={15} />
-              <span>Estación Desktop</span>
+              <span>Desktop</span>
             </button>
           </nav>
 
           {/* Action Buttons: Coverage & Info */}
           <div className="flex items-center gap-1">
+            <div className="hidden items-center gap-2 rounded-xl border border-emerald-800 bg-emerald-950 px-3 py-1.5 xl:flex">
+              <ShieldCheck size={14} className="text-emerald-400" />
+              <span className="text-[9px] font-bold leading-tight text-emerald-200">Datos en este dispositivo<br /><span className="font-medium text-emerald-400">Disponible sin conexión</span></span>
+            </div>
             <button
               type="button"
               onClick={() => setPanel('coverage')}
@@ -153,7 +171,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
               className="flex min-h-10 min-w-10 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition"
               aria-label="Información"
             >
-              <Info size={18} />
+              <HelpCircle size={18} />
             </button>
           </div>
         </div>
@@ -276,6 +294,17 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
         </button>
         <button
           type="button"
+          onClick={() => onTabChange('estudio')}
+          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[9px] font-extrabold uppercase tracking-wider transition ${
+            activeTab === 'estudio' ? 'text-legal-gold' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <FilePenLine size={18} />
+          <span>Estudio</span>
+          {activeTab === 'estudio' && <span className="absolute top-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-b-full bg-legal-gold" />}
+        </button>
+        <button
+          type="button"
           onClick={() => onTabChange('desktop')}
           className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest transition ${
             activeTab === 'desktop'
@@ -288,14 +317,6 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
           {activeTab === 'desktop' && (
             <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-b-full bg-legal-gold" />
           )}
-        </button>
-        <button
-          type="button"
-          onClick={() => setPanel('coverage')}
-          className="relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 hover:text-slate-200 transition"
-        >
-          <Map size={18} />
-          <span>Cobertura</span>
         </button>
       </nav>
     </div>

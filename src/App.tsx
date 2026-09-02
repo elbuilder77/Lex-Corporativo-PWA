@@ -14,6 +14,10 @@ const DesktopPresentation = lazy(() =>
   import('./components/DesktopPresentation').then((m) => ({ default: m.DesktopPresentation })),
 );
 
+const DraftingStudio = lazy(() =>
+  import('./components/DraftingStudio').then((module) => ({ default: module.DraftingStudio })),
+);
+
 export function App() {
   const [stationOpened, setStationOpened] = useState<boolean>(() => {
     const params = new URLSearchParams(window.location.search);
@@ -39,7 +43,7 @@ export function App() {
   const [activeTab, setActiveTab] = useState<AppModuleTab>(() => {
     const params = new URLSearchParams(window.location.search);
     const tabParam = params.get('tab');
-    if (tabParam === 'licitaciones' || tabParam === 'normativa' || tabParam === 'desktop') {
+    if (tabParam === 'licitaciones' || tabParam === 'normativa' || tabParam === 'estudio' || tabParam === 'desktop') {
       return tabParam;
     }
     if (
@@ -68,6 +72,7 @@ export function App() {
       const url = new URL(window.location.href);
       if (targetTab === 'licitaciones') url.searchParams.set('tab', 'licitaciones');
       else if (targetTab === 'desktop') url.searchParams.set('tab', 'desktop');
+      else if (targetTab === 'estudio') url.searchParams.set('tab', 'estudio');
       else url.searchParams.delete('tab');
       window.history.replaceState(null, '', url);
     }
@@ -78,12 +83,10 @@ export function App() {
     setActiveTab(nextTab);
     trackEvent('tab_change', { tab: nextTab });
     const url = new URL(window.location.href);
-    if (nextTab === 'licitaciones') {
-      url.searchParams.set('tab', 'licitaciones');
-    } else if (nextTab === 'desktop') {
-      url.searchParams.set('tab', 'desktop');
-    } else {
+    if (nextTab === 'normativa') {
       url.searchParams.delete('tab');
+    } else {
+      url.searchParams.set('tab', nextTab);
     }
     window.history.replaceState(null, '', url);
   };
@@ -110,6 +113,9 @@ export function App() {
         setStationOpened(true);
       } else if (tabParam === 'desktop') {
         setActiveTab('desktop');
+        setStationOpened(true);
+      } else if (tabParam === 'estudio') {
+        setActiveTab('estudio');
         setStationOpened(true);
       } else if (tabParam === 'normativa') {
         setActiveTab('normativa');
@@ -142,6 +148,19 @@ export function App() {
             <BuscadorLegal />
           ) : activeTab === 'licitaciones' ? (
             <BuscadorLicitaciones />
+          ) : activeTab === 'estudio' ? (
+            <Suspense
+              fallback={
+                <div className="flex min-h-[70vh] items-center justify-center bg-slate-50 p-8 text-slate-500">
+                  <div className="flex items-center gap-2.5 text-xs font-semibold">
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-legal-gold border-t-transparent" />
+                    <span>Preparando Estudio local…</span>
+                  </div>
+                </div>
+              }
+            >
+              <DraftingStudio />
+            </Suspense>
           ) : (
             <Suspense
               fallback={

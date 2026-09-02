@@ -22,7 +22,82 @@ export interface LegalArticle {
   score?: number;
 }
 
-export type AppModuleTab = 'normativa' | 'licitaciones' | 'desktop';
+export type AppModuleTab = 'normativa' | 'licitaciones' | 'estudio' | 'desktop';
+
+export type LegalModule = LegalEngineeringArea;
+
+export interface FormFieldDefinition {
+  id: string;
+  label: string;
+  placeholder?: string;
+  type: 'text' | 'number' | 'date' | 'textarea' | 'select' | 'currency';
+  options?: string[];
+  defaultValue?: string;
+  required?: boolean;
+  helpText?: string;
+}
+
+export interface ClauseToggleDefinition {
+  id: string;
+  label: string;
+  description: string;
+  defaultActive: boolean;
+  content: string;
+}
+
+export interface LegalTemplate {
+  id: string;
+  title: string;
+  description: string;
+  module: LegalModule;
+  intentGroup: string;
+  fields: FormFieldDefinition[];
+  toggles?: ClauseToggleDefinition[];
+  templateHandlebars: string;
+  outputLabel: string;
+}
+
+export interface SavedDraft {
+  id: string;
+  templateId: string;
+  templateTitle: string;
+  module: LegalModule;
+  formData: Record<string, string>;
+  activeToggles: Record<string, boolean>;
+  customNotes?: string;
+  generatedText: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LegalCitation {
+  id: string;
+  articleId: string;
+  lawCode: string;
+  lawName: string;
+  articleNumber: string;
+  title: string;
+  content: string;
+  sourceName: string;
+  sourceUrl: string;
+  createdAt: string;
+}
+
+export type DocumentSourceKind = 'template' | 'docx' | 'txt' | 'pdf' | 'blank';
+
+export interface StudioDocument {
+  id: string;
+  title: string;
+  sourceKind: DocumentSourceKind;
+  templateId?: string;
+  sourceFileName?: string;
+  sourceMimeType?: string;
+  sourceBuffer?: ArrayBuffer;
+  editorHtml: string;
+  citations: LegalCitation[];
+  createdAt: string;
+  updatedAt: string;
+}
 
 export type LicitacionMateria =
   | 'adquisiciones'

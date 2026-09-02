@@ -6,6 +6,7 @@ import {
   ChevronUp,
   Copy,
   ExternalLink,
+  FilePenLine,
   FileSearch,
   Filter,
   LoaderCircle,
@@ -173,6 +174,15 @@ export function BuscadorLegal() {
         notify('No fue posible compartir el artículo.', 'error');
       }
     }
+  };
+
+  const sendToStudio = (article: LegalArticle) => {
+    sessionStorage.setItem('lex_studio_pending_citation', JSON.stringify(article));
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', 'estudio');
+    window.history.pushState(null, '', url);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    trackEvent('legal_article_send_to_studio', { article_id: article.id, law_code: article.lawCode });
   };
 
   return (
@@ -483,6 +493,14 @@ export function BuscadorLegal() {
                           >
                             <ExternalLink size={14} /> {article.sourceName}
                           </a>
+                          <div className="flex flex-wrap items-center justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={() => sendToStudio(article)}
+                              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-xl bg-slate-900 px-3.5 text-xs font-extrabold text-white hover:bg-slate-800"
+                            >
+                              <FilePenLine size={14} /> Usar en Estudio
+                            </button>
                           <button
                             type="button"
                             onClick={() =>
@@ -498,6 +516,7 @@ export function BuscadorLegal() {
                             {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
                             {isExpanded ? 'Contraer texto' : 'Ver texto completo'}
                           </button>
+                          </div>
                         </div>
                       </div>
                     </article>
