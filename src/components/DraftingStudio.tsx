@@ -97,6 +97,7 @@ function createDocument(partial: Partial<StudioDocument>): StudioDocument {
 export function DraftingStudio() {
   const { notify } = useUiStore();
   const fileInput = useRef<HTMLInputElement>(null);
+  const exportDetailsRef = useRef<HTMLDetailsElement>(null);
   const [templates, setTemplates] = useState<LegalTemplate[]>([]);
   const [catalogSearch, setCatalogSearch] = useState('');
   const [catalogModule, setCatalogModule] = useState<LegalModule | 'all'>('all');
@@ -133,17 +134,23 @@ export function DraftingStudio() {
     },
   });
 
-  useEffect(() => {
-    let active = true;
-    let pendingArticle: LegalArticle | null = null;
+  const checkPendingCitation = () => {
     const pending = sessionStorage.getItem('lex_studio_pending_citation');
     if (pending) {
       try {
-        pendingArticle = JSON.parse(pending) as LegalArticle;
+        const pendingArticle = JSON.parse(pending) as LegalArticle;
+        addCitation(pendingArticle);
+        sessionStorage.removeItem('lex_studio_pending_citation');
+        notify('Fundamento recibido desde Legislación.', 'success');
       } catch {
         sessionStorage.removeItem('lex_studio_pending_citation');
       }
     }
+  };
+
+  useEffect(() => {
+    let active = true;
+    checkPendingCitation();
     loadTemplateRegistry().then((registry) => {
       if (!active) return;
       setTemplates(registry);
@@ -151,17 +158,26 @@ export function DraftingStudio() {
         selectTemplate(registry[0]);
         setShowVariables(false);
       }
-      if (pendingArticle) {
-        addCitation(pendingArticle);
-        sessionStorage.removeItem('lex_studio_pending_citation');
-        notify('Fundamento recibido desde Legislación.', 'success');
-      }
+      checkPendingCitation();
     });
     listStudioDocuments().then(setDocuments).catch(() => undefined);
-    return () => { active = false; };
+    window.addEventListener('focus', checkPendingCitation);
+    return () => {
+      active = false;
+      window.removeEventListener('focus', checkPendingCitation);
+    };
     // selectTemplate is intentionally initialized from the loaded registry once.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!showDrafts) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setShowDrafts(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showDrafts]);
 
   useEffect(() => {
     if (!editor || editor.isDestroyed || editor.getHTML() === currentDocument.editorHtml) return;
@@ -275,6 +291,7 @@ export function DraftingStudio() {
   }
 
   async function exportDocx() {
+    exportDetailsRef.current?.removeAttribute('open');
     if (!editor) return;
     try {
       if (currentDocument.sourceKind === 'docx' && currentDocument.sourceBuffer && currentDocument.sourceFileName) {
@@ -294,12 +311,14 @@ export function DraftingStudio() {
   }
 
   async function exportPdf() {
+    exportDetailsRef.current?.removeAttribute('open');
     if (!editor) return;
     await exportDocumentPdf(currentDocument.title, editor.getText({ blockSeparator: '\n\n' }));
     notify('Copia PDF exportada.', 'success');
   }
 
   function exportTxt() {
+    exportDetailsRef.current?.removeAttribute('open');
     if (!editor) return;
     downloadTextCopy(editor.getText({ blockSeparator: '\n\n' }), currentDocument.sourceFileName ?? currentDocument.title);
   }
@@ -352,7 +371,7 @@ export function DraftingStudio() {
             <button type="button" onClick={() => setShowDrafts(true)} className="studio-action"><FolderOpen size={16} /> Borradores</button>
             <input ref={fileInput} className="hidden" type="file" accept=".docx,.txt,.pdf,text/plain,application/pdf" onChange={(event) => handleImport(event.target.files?.[0])} />
             <button type="button" onClick={() => fileInput.current?.click()} className="studio-action"><Upload size={16} /> Importar <span className="hidden sm:inline">DOCX · TXT · PDF</span></button>
-            <details className="relative">
+            <details ref={exportDetailsRef} className="relative">
               <summary className="studio-primary cursor-pointer list-none"><Download size={16} /> Exportar <ChevronDown size={14} /></summary>
               <div className="absolute right-0 z-30 mt-2 w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-dialog">
                 <button type="button" onClick={exportDocx} className="studio-menu-item">Copia DOCX</button>
@@ -454,7 +473,61 @@ export function DraftingStudio() {
         </aside>
       </section>
 
-      {showDrafts && <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/60 p-4" role="dialog" aria-modal="true" aria-label="Borradores locales"><div className="max-h-[80vh] w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-dialog"><div className="flex items-center justify-between border-b border-slate-200 p-4"><div><h2 className="font-serif text-lg font-semibold">Borradores locales</h2><p className="text-xs text-slate-500">Guardados en IndexedDB en este dispositivo.</p></div><button type="button" onClick={() => setShowDrafts(false)} className="studio-icon-button" aria-label="Cerrar"><X size={18} /></button></div><div className="max-h-[60vh] overflow-y-auto p-4">{documents.length === 0 ? <p className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">Todavía no hay borradores.</p> : <div className="space-y-2">{documents.map((document) => <div key={document.id} className="flex items-center gap-3 rounded-xl border border-slate-200 p-3"><FileText size={18} className="text-slate-400" /><button type="button" onClick={() => openDocument(document)} className="min-w-0 flex-1 text-left"><strong className="block truncate text-sm">{document.title}</strong><span className="text-[10px] text-slate-500">{document.sourceKind.toUpperCase()} · {new Date(document.updatedAt).toLocaleString('es-MX')}</span></button><button type="button" onClick={async () => { await deleteStudioDocument(document.id); setDocuments(await listStudioDocuments()); }} className="studio-icon-button text-red-600" aria-label={`Eliminar ${document.title}`}><Trash2 size={16} /></button></div>)}</div>}</div></div></div>}
+      {showDrafts && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/60 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Borradores locales"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowDrafts(false);
+          }}
+        >
+          <div className="max-h-[80vh] w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-dialog">
+            <div className="flex items-center justify-between border-b border-slate-200 p-4">
+              <div>
+                <h2 className="font-serif text-lg font-semibold">Borradores locales</h2>
+                <p className="text-xs text-slate-500">Guardados en IndexedDB en este dispositivo.</p>
+              </div>
+              <button type="button" onClick={() => setShowDrafts(false)} className="studio-icon-button" aria-label="Cerrar">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="max-h-[60vh] overflow-y-auto p-4">
+              {documents.length === 0 ? (
+                <p className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">
+                  Todavía no hay borradores.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {documents.map((document) => (
+                    <div key={document.id} className="flex items-center gap-3 rounded-xl border border-slate-200 p-3">
+                      <FileText size={18} className="text-slate-400" />
+                      <button type="button" onClick={() => openDocument(document)} className="min-w-0 flex-1 text-left">
+                        <strong className="block truncate text-sm">{document.title}</strong>
+                        <span className="text-[10px] text-slate-500">
+                          {document.sourceKind.toUpperCase()} · {new Date(document.updatedAt).toLocaleString('es-MX')}
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          await deleteStudioDocument(document.id);
+                          setDocuments(await listStudioDocuments());
+                        }}
+                        className="studio-icon-button text-red-600"
+                        aria-label={`Eliminar ${document.title}`}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
