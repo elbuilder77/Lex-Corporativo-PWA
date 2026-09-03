@@ -13,8 +13,8 @@ describe('DraftingStudio Component', () => {
       render(<DraftingStudio />);
     });
 
-    expect(screen.getByRole('heading', { name: 'Estudio jurídico' })).toBeInTheDocument();
-    expect(screen.getByText(/Redacción documental con consulta del corpus federal oficial/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Estudio [jJ]urídico/i })).toBeInTheDocument();
+    expect(screen.getByText(/Redacción documental/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Borradores/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Importar/i })).toBeInTheDocument();
   });

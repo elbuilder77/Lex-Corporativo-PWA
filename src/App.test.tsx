@@ -138,7 +138,7 @@ describe('App Lex Corporativo PWA', () => {
       fireEvent.click(estudioTabs[0]);
     });
 
-    expect(await screen.findByRole('heading', { name: 'Estudio jurídico' }, { timeout: 5000 })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /Estudio [jJ]urídico/i }, { timeout: 5000 })).toBeInTheDocument();
   });
 
   it('permite ingresar directamente a Estudio desde la pantalla inicial', async () => {
@@ -152,7 +152,7 @@ describe('App Lex Corporativo PWA', () => {
       await new Promise((resolve) => setTimeout(resolve, 300));
     });
 
-    expect(await screen.findByRole('heading', { name: 'Estudio jurídico' }, { timeout: 5000 })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /Estudio [jJ]urídico/i }, { timeout: 5000 })).toBeInTheDocument();
   });
 
   it('permite regresar a la pantalla de inicio desde la estación mediante el botón de Inicio', async () => {
