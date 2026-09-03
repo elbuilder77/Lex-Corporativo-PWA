@@ -18,6 +18,7 @@ import {
   Plus,
   Redo2,
   Search,
+  Share2,
   ShieldCheck,
   Trash2,
   Undo2,
@@ -216,6 +217,35 @@ export function DraftingStudio() {
     return () => window.clearTimeout(timer);
   }, [currentDocument]);
 
+  useEffect(() => {
+    let wakeLock: { release?: () => Promise<void> } | null = null;
+    const requestWakeLock = async () => {
+      if (
+        typeof navigator !== 'undefined' &&
+        'wakeLock' in navigator &&
+        typeof (navigator as unknown as { wakeLock?: { request?: (type: string) => Promise<{ release?: () => Promise<void> }> } }).wakeLock?.request === 'function' &&
+        document.visibilityState === 'visible'
+      ) {
+        try {
+          wakeLock = await (navigator as unknown as { wakeLock: { request: (type: string) => Promise<{ release?: () => Promise<void> }> } }).wakeLock.request('screen');
+        } catch {
+          // Ignore silently on unsupported or battery-restricted environments
+        }
+      }
+    };
+    requestWakeLock();
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') requestWakeLock();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      if (wakeLock && typeof wakeLock.release === 'function') {
+        wakeLock.release().catch(() => undefined);
+      }
+    };
+  }, []);
+
   const filteredTemplates = useMemo(() => {
     const query = catalogSearch.trim().toLocaleLowerCase('es-MX');
     return templates.filter((template) => {
@@ -317,10 +347,33 @@ export function DraftingStudio() {
     notify('Copia PDF exportada.', 'success');
   }
 
-  function exportTxt() {
+  async function exportTxt() {
     exportDetailsRef.current?.removeAttribute('open');
     if (!editor) return;
     downloadTextCopy(editor.getText({ blockSeparator: '\n\n' }), currentDocument.sourceFileName ?? currentDocument.title);
+  }
+
+  async function shareDocument() {
+    if (!editor) return;
+    const text = editor.getText({ blockSeparator: '\n\n' });
+    const shareData = {
+      title: currentDocument.title,
+      text: `${currentDocument.title}\n\n${text}\n\n---\nGenerado en Lex Corporativo Estudio`,
+    };
+    if (typeof navigator !== 'undefined' && navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+        notify('Documento compartido.', 'success');
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          await navigator.clipboard.writeText(shareData.text);
+          notify('Texto del documento copiado al portapapeles.', 'success');
+        }
+      }
+    } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      await navigator.clipboard.writeText(shareData.text);
+      notify('Texto del documento copiado al portapapeles.', 'success');
+    }
   }
 
   async function searchFoundations(event: React.FormEvent) {
@@ -339,6 +392,9 @@ export function DraftingStudio() {
   }
 
   function addCitation(article: LegalArticle) {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(10);
+    }
     setCurrentDocument((document) => {
       if (document.citations.some((citation) => citation.articleId === article.id)) return document;
       return { ...document, citations: [...document.citations, citationFromArticle(article)], updatedAt: new Date().toISOString() };
@@ -346,6 +402,9 @@ export function DraftingStudio() {
   }
 
   function insertCitation(citation: LegalCitation) {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(10);
+    }
     editor?.chain().focus().insertContent(
       `<blockquote><p><strong>${escapeHtml(citation.lawName)}, ${escapeHtml(citation.articleNumber)}.</strong> ${escapeHtml(citation.content)}</p><p>Fuente oficial: <a href="${escapeHtml(citation.sourceUrl)}">${escapeHtml(citation.sourceName)}</a></p></blockquote>`,
     ).run();
@@ -414,6 +473,14 @@ export function DraftingStudio() {
             >
               <Upload size={16} /> Importar{' '}
               <span className="hidden sm:inline font-normal text-slate-400">· DOCX / PDF / TXT</span>
+            </button>
+            <button
+              type="button"
+              onClick={shareDocument}
+              className="studio-action"
+              title="Compartir documento o copiar texto"
+            >
+              <Share2 size={16} /> Compartir
             </button>
             <details ref={exportDetailsRef} className="relative">
               <summary className="studio-primary cursor-pointer list-none">
@@ -892,7 +959,7 @@ export function DraftingStudio() {
 
       {showDrafts && (
         <div
-          className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/60 p-4"
+          className="fixed inset-0 z-[70] flex items-end justify-center bg-slate-950/60 sm:items-center sm:p-4 backdrop-blur-xs"
           role="dialog"
           aria-modal="true"
           aria-label="Borradores locales"
@@ -900,13 +967,21 @@ export function DraftingStudio() {
             if (e.target === e.currentTarget) setShowDrafts(false);
           }}
         >
-          <div className="max-h-[80vh] w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-dialog">
+          <div className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-white shadow-dialog sm:rounded-2xl">
+            <div className="flex justify-center pb-0 pt-2.5 sm:hidden">
+              <div className="h-1 w-10 rounded-full bg-slate-300" />
+            </div>
             <div className="flex items-center justify-between border-b border-slate-200 p-4">
               <div>
-                <h2 className="font-serif text-lg font-semibold">Borradores locales</h2>
+                <h2 className="font-serif text-lg font-semibold text-slate-950">Borradores locales</h2>
                 <p className="text-xs text-slate-500">Guardados en IndexedDB en este dispositivo.</p>
               </div>
-              <button type="button" onClick={() => setShowDrafts(false)} className="studio-icon-button" aria-label="Cerrar">
+              <button
+                type="button"
+                onClick={() => setShowDrafts(false)}
+                className="studio-icon-button"
+                aria-label="Cerrar"
+              >
                 <X size={18} />
               </button>
             </div>

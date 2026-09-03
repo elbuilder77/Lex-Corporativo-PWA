@@ -208,7 +208,15 @@ body {
   padding: 0 0.75rem;
   font-size: 0.75rem;
   font-weight: 800;
-  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 100ms ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.studio-action:active,
+.studio-primary:active,
+.studio-icon-button:active {
+  transform: scale(0.96);
 }
 
 .studio-action {
@@ -240,6 +248,7 @@ body {
   font-size: 0.75rem;
   font-weight: 700;
   color: #334155;
+  transition: background-color 120ms ease;
 }
 
 .studio-menu-item:hover { background: #f1f5f9; color: #0f172a; }
@@ -252,6 +261,9 @@ body {
   justify-content: center;
   border-radius: 0.75rem;
   color: #64748b;
+  transition: background-color 160ms ease, color 160ms ease, transform 100ms ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .studio-icon-button:hover { background: #f1f5f9; color: #0f172a; }
@@ -265,7 +277,13 @@ body {
   padding-left: 0.75rem;
   padding-right: 0.75rem;
   color: #0f172a;
-  font-size: 0.875rem;
+  font-size: 1rem;
+}
+
+@media (min-width: 640px) {
+  .studio-input {
+    font-size: 0.875rem;
+  }
 }
 
 .studio-input:focus {
