@@ -127,6 +127,34 @@ describe('App Lex Corporativo PWA', () => {
     expect(await screen.findByRole('heading', { name: /Modelo de Privacidad BYOK/i })).toBeInTheDocument();
   });
 
+  it('permite navegar al módulo Estudio jurídico una vez dentro de la plataforma', async () => {
+    localStorage.setItem('lex_pwa_station_opened', '1');
+    await act(async () => {
+      render(<App />);
+    });
+
+    const estudioTabs = screen.getAllByRole('button', { name: /Estudio/i });
+    await act(async () => {
+      fireEvent.click(estudioTabs[0]);
+    });
+
+    expect(await screen.findByRole('heading', { name: 'Estudio jurídico' }, { timeout: 5000 })).toBeInTheDocument();
+  });
+
+  it('permite ingresar directamente a Estudio desde la pantalla inicial', async () => {
+    await act(async () => {
+      render(<App />);
+    });
+
+    const openStudioBtn = screen.getByRole('button', { name: /Abrir Estudio/i });
+    await act(async () => {
+      fireEvent.click(openStudioBtn);
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    });
+
+    expect(await screen.findByRole('heading', { name: 'Estudio jurídico' }, { timeout: 5000 })).toBeInTheDocument();
+  });
+
   it('permite regresar a la pantalla de inicio desde la estación mediante el botón de Inicio', async () => {
     localStorage.setItem('lex_pwa_station_opened', '1');
     await act(async () => {

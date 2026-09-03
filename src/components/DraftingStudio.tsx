@@ -237,7 +237,7 @@ export function DraftingStudio() {
   }
 
   function openDocument(document: StudioDocument) {
-    setSelectedTemplate(document.templateId ? templates.find((template) => template.id === document.templateId) ?? null : null);
+    setSelectedTemplate(null);
     setCurrentDocument(document);
     editor?.commands.setContent(document.editorHtml, { emitUpdate: false });
     setShowDrafts(false);

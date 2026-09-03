@@ -57,19 +57,6 @@ export interface LegalTemplate {
   outputLabel: string;
 }
 
-export interface SavedDraft {
-  id: string;
-  templateId: string;
-  templateTitle: string;
-  module: LegalModule;
-  formData: Record<string, string>;
-  activeToggles: Record<string, boolean>;
-  customNotes?: string;
-  generatedText: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface LegalCitation {
   id: string;
   articleId: string;

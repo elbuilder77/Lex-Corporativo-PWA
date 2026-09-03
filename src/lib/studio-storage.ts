@@ -12,26 +12,31 @@ interface StudioDatabase extends DBSchema {
 const DATABASE_NAME = 'lex-corporativo-estudio';
 const DATABASE_VERSION = 1;
 
-const database = () =>
-  openDB<StudioDatabase>(DATABASE_NAME, DATABASE_VERSION, {
+const database = () => {
+  if (typeof indexedDB === 'undefined') return null;
+  return openDB<StudioDatabase>(DATABASE_NAME, DATABASE_VERSION, {
     upgrade(db) {
       const store = db.createObjectStore('documents', { keyPath: 'id' });
       store.createIndex('by-updated', 'updatedAt');
     },
   });
+};
 
 export async function saveStudioDocument(document: StudioDocument): Promise<void> {
   const db = await database();
+  if (!db) return;
   await db.put('documents', document);
 }
 
 export async function listStudioDocuments(): Promise<StudioDocument[]> {
   const db = await database();
+  if (!db) return [];
   const documents = await db.getAllFromIndex('documents', 'by-updated');
   return documents.reverse();
 }
 
 export async function deleteStudioDocument(id: string): Promise<void> {
   const db = await database();
+  if (!db) return;
   await db.delete('documents', id);
 }
