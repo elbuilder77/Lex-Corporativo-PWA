@@ -25,7 +25,6 @@ import {
   Trash2,
   Undo2,
   Upload,
-  WifiOff,
   X,
 } from 'lucide-react';
 import logoMark from '../assets/logo-mark.png';
@@ -448,8 +447,13 @@ export function DraftingStudio() {
   }
 
   const documentPlainText = useMemo(() => {
-    return editor ? editor.getText() : '';
-  }, [editor]);
+    if (editor && !editor.isDestroyed) {
+      const editorText = editor.getText();
+      if (editorText.trim()) return `${currentDocument.title}\n\n${editorText}`;
+    }
+    const strippedHtml = currentDocument.editorHtml.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').trim();
+    return `${currentDocument.title}\n\n${strippedHtml}`;
+  }, [editor, currentDocument.editorHtml, currentDocument.title]);
 
   return (
     <div className="flex min-h-[calc(100vh-64px)] flex-col bg-slate-100/70 text-slate-950">
@@ -892,12 +896,12 @@ export function DraftingStudio() {
           </div>
 
           {/* Footer Info */}
-          <div className="border-t border-slate-200 p-3 bg-slate-50 flex items-center justify-between text-[10px] text-slate-500 font-bold">
-            <span className="flex items-center gap-1">
-              <WifiOff size={12} className="text-amber-600" /> Búsqueda SQLite WASM
+          <div className="border-t border-slate-200 p-3 bg-slate-50 flex items-center justify-between text-[10px] font-bold">
+            <span className="flex items-center gap-1.5 text-emerald-700">
+              <CheckCircle2 size={13} className="text-emerald-600" /> Motor Local SQLite WASM Activo
             </span>
-            <span className="flex items-center gap-1">
-              <Database size={12} className="text-emerald-600" /> Corpus cargado
+            <span className="flex items-center gap-1.5 text-slate-500">
+              <Database size={12} className="text-slate-400" /> Corpus Federal en Memoria
             </span>
           </div>
         </aside>

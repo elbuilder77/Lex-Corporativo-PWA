@@ -18,37 +18,57 @@ const MEXICAN_LEGAL_RULES: AuditRule[] = [
     id: 'pagare_requisitos',
     name: 'Requisitos de Validez del Pagaré',
     category: 'Mercantil',
-    keywords: ['pagaré', 'pagare', 'pagaré incondicionalmente', 'a la orden de', 'suscriptor'],
+    keywords: ['pagaré', 'pagare', 'pagare incondicionalmente', 'a la orden de', 'suscriptor', 'aval', 'cambiario'],
     suggestedLawCode: 'LGTOC',
     suggestedArticle: 'Art. 170',
-    explanation: 'El pagaré debe contener mención expresa de ser pagaré y la promesa incondicional de pagar una suma determinada.',
-    searchQuery: 'Articulo 170 pagaré promesa incondicional',
+    explanation: 'El pagaré debe contener la mención de ser pagaré y la promesa incondicional de pagar una suma determinada.',
+    searchQuery: 'Articulo 170 pagare promesa incondicional',
   },
   {
     id: 'intereses_moratorios',
-    name: 'Intereses Moratorios y Pacto de Interés',
+    name: 'Intereses Moratorios y Pacto de Demora',
     category: 'Mercantil',
-    keywords: ['moratorio', 'interés moratorio', 'intereses moratorios', 'tasa de interés', 'usura'],
+    keywords: ['moratorio', 'interes moratorio', 'intereses moratorios', 'tasa de interes', 'demora', 'interes legal', 'usura'],
     suggestedLawCode: 'CCom',
     suggestedArticle: 'Art. 362',
-    explanation: 'Los deudores que demoren el pago de sus deudas deben satisfacer desde el día siguiente al vencimiento el interés pactado o el legal.',
-    searchQuery: 'Articulo 362 préstamos mercantiles interés demora',
+    explanation: 'Los deudores que demoren el cumplimiento de su obligación deben pagar desde el día siguiente el interés pactado o el 6% anual legal.',
+    searchQuery: 'Articulo 362 prestamo mercantil interes demora',
   },
   {
-    id: 'jurisdiccion_expresa',
+    id: 'sumision_jurisdiccional',
     name: 'Sumisión Expresa a Tribunales',
     category: 'Procesal Mercantil',
-    keywords: ['jurisdicción', 'jurisdiccion', 'tribunales competentes', 'sumisión expresa', 'fuero'],
+    keywords: ['jurisdiccion', 'tribunales competentes', 'sumision expresa', 'fuero', 'domicilio presente o futuro'],
     suggestedLawCode: 'CCom',
     suggestedArticle: 'Art. 1093',
-    explanation: 'La sumisión es expresa cuando los interesados renuncian formalmente al fuero de su domicilio y designan tribunal competente.',
+    explanation: 'La sumisión es expresa cuando los interesados renuncian formalmente al fuero de su domicilio y designan tribunal.',
     searchQuery: 'Articulo 1093 sumision expresa tribunales fuero',
   },
   {
+    id: 'asamblea_accionistas',
+    name: 'Asamblea General Ordinaria Anual',
+    category: 'Corporativo',
+    keywords: ['asamblea', 'accionistas', 'estados financieros', 'comisario', 'orden del dia', 'sociedad anonima'],
+    suggestedLawCode: 'LGSM',
+    suggestedArticle: 'Art. 181',
+    explanation: 'La asamblea ordinaria debe reunirse por lo menos una vez al año dentro de los cuatro meses siguientes a la clausura del ejercicio social.',
+    searchQuery: 'Articulo 181 asamblea general ordinaria ejercicio',
+  },
+  {
+    id: 'suministro_mercantil',
+    name: 'Compraventa y Suministro Mercantil',
+    category: 'Mercantil',
+    keywords: ['suministro', 'proveedor', 'entrega de mercancias', 'ordenes de compra', 'compraventa mercantil', 'mercancias'],
+    suggestedLawCode: 'CCom',
+    suggestedArticle: 'Art. 371',
+    explanation: 'Serán mercantiles las compraventas a las que el Código de Comercio les da tal carácter y las que se hagan con objeto de tráfico comercial.',
+    searchQuery: 'Articulo 371 compraventas mercantiles',
+  },
+  {
     id: 'clausula_penal',
-    name: 'Cláusula Penal por Incumplimiento',
+    name: 'Cláusula Penal / Pena Convencional',
     category: 'Civil / Contratos',
-    keywords: ['pena convencional', 'cláusula penal', 'penalización', 'en caso de incumplimiento pagará'],
+    keywords: ['pena convencional', 'clausula penal', 'penalizacion', 'en caso de incumplimiento pagara', 'incumplimiento'],
     suggestedLawCode: 'CCF',
     suggestedArticle: 'Art. 1840',
     explanation: 'Pueden los contratantes estipular cierta prestación como pena para el caso de que la obligación no se cumpla.',
@@ -58,17 +78,17 @@ const MEXICAN_LEGAL_RULES: AuditRule[] = [
     id: 'rescision_laboral',
     name: 'Causales de Rescisión Laboral',
     category: 'Laboral',
-    keywords: ['rescisión', 'rescision laboral', 'sin responsabilidad para el patrón', 'despido justificado'],
+    keywords: ['rescision', 'rescision laboral', 'sin responsabilidad para el patron', 'despido justificado', 'patron', 'trabajador', 'salario'],
     suggestedLawCode: 'LFT',
     suggestedArticle: 'Art. 47',
-    explanation: 'Las causas de rescisión de la relación de trabajo sin responsabilidad patronal exigen aviso escrito motivado.',
+    explanation: 'Las causas de rescisión de la relación de trabajo sin responsabilidad para el patrón exigen aviso de rescisión motivado.',
     searchQuery: 'Articulo 47 rescision relacion de trabajo patron',
   },
   {
     id: 'comprobantes_fiscales',
     name: 'Obligación de Emisión de CFDI',
     category: 'Fiscal',
-    keywords: ['cfdi', 'factura', 'facturación', 'comprobante fiscal', 'retención de iva', 'retencion'],
+    keywords: ['cfdi', 'factura', 'facturacion', 'comprobante fiscal', 'retencion de iva', 'retencion', 'iva', 'isr'],
     suggestedLawCode: 'CFF',
     suggestedArticle: 'Art. 29',
     explanation: 'Los contribuyentes que deban expedir comprobantes fiscales por los actos que realicen deben emitir CFDI por internet.',
@@ -78,13 +98,23 @@ const MEXICAN_LEGAL_RULES: AuditRule[] = [
     id: 'confidencialidad_industrial',
     name: 'Secreto Industrial y Confidencialidad',
     category: 'Propiedad Intelectual',
-    keywords: ['secreto industrial', 'información confidencial', 'confidencialidad', 'no divulgación'],
+    keywords: ['secreto industrial', 'informacion confidencial', 'confidencialidad', 'no divulgacion'],
     suggestedLawCode: 'LFPPI',
     suggestedArticle: 'Art. 163',
     explanation: 'Se considera secreto industrial a toda información de aplicación industrial o comercial de carácter confidencial.',
     searchQuery: 'Articulo 163 secreto industrial informacion confidencial',
   },
 ];
+
+function normalizeSearchText(value: string): string {
+  return value
+    .toLocaleLowerCase('es-MX')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 interface ClauseAuditorDrawerProps {
   isOpen: boolean;
@@ -102,15 +132,19 @@ export function ClauseAuditorDrawer({
   onQuickSearch,
 }: ClauseAuditorDrawerProps) {
   const auditResults = useMemo(() => {
-    const textLower = documentText.toLocaleLowerCase('es-MX');
+    const textNormalized = normalizeSearchText(documentText);
 
     return MEXICAN_LEGAL_RULES.map((rule) => {
-      const isDetected = rule.keywords.some((kw) => textLower.includes(kw.toLocaleLowerCase('es-MX')));
-      const isFundamented = citations.some(
-        (cit) =>
-          cit.lawCode.toLocaleLowerCase('es-MX').includes(rule.suggestedLawCode.toLocaleLowerCase('es-MX')) ||
-          cit.articleNumber.toLocaleLowerCase('es-MX').includes(rule.suggestedArticle.toLocaleLowerCase('es-MX')),
-      );
+      // Check if any keyword matches
+      const isDetected = rule.keywords.some((kw) => textNormalized.includes(normalizeSearchText(kw)));
+
+      // Check if already cited
+      const isFundamented = citations.some((cit) => {
+        const citNorm = normalizeSearchText(`${cit.lawCode} ${cit.lawName} ${cit.articleNumber}`);
+        const lawCodeNorm = normalizeSearchText(rule.suggestedLawCode);
+        const artNumClean = rule.suggestedArticle.replace(/art(?:iculo)?\.?\s*/i, '').trim();
+        return citNorm.includes(lawCodeNorm) && (!artNumClean || citNorm.includes(artNumClean));
+      });
 
       return {
         ...rule,
@@ -213,7 +247,7 @@ export function ClauseAuditorDrawer({
               <FileCheck size={28} className="mx-auto text-slate-400" />
               <p className="mt-2 text-xs font-bold">No se detectaron cláusulas complejas en el texto actual.</p>
               <p className="mt-1 text-[11px] text-slate-400">
-                A medida que redactes términos como pagaré, intereses, jurisdicción o finiquitos, el auditor te sugerirá los artículos aplicables.
+                A medida que redactes términos como pagaré, intereses, asambleas, sumisión procesal o finiquitos, el auditor te sugerirá los artículos aplicables.
               </p>
             </div>
           ) : (

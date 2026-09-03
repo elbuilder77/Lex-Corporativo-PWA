@@ -30,8 +30,8 @@ describe('ClauseAuditorDrawer', () => {
     );
 
     expect(screen.getByRole('heading', { name: 'Auditor de Fundamentación' })).toBeInTheDocument();
-    expect(screen.getByText('Requisitos de Validez del Pagaré')).toBeInTheDocument();
-    expect(screen.getByText('Intereses Moratorios y Pacto de Interés')).toBeInTheDocument();
+    expect(screen.getByText(/Requisitos de Validez del Pagaré/i)).toBeInTheDocument();
+    expect(screen.getByText(/Intereses Moratorios/i)).toBeInTheDocument();
 
     const fundamentarBtns = screen.getAllByRole('button', { name: /Fundamentar/i });
     expect(fundamentarBtns.length).toBeGreaterThan(0);
