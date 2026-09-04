@@ -36,6 +36,7 @@ import { exportDocumentPdf } from '../lib/pdf-export';
 import { executeCorpusSearch } from '../services/corpus-search';
 import { useUiStore } from '../store/useUiStore';
 import { TemplateCatalogModal } from './studio/TemplateCatalogModal';
+import { StudioWelcomeHub } from './studio/StudioWelcomeHub';
 import { EditorBubbleMenu } from './studio/EditorBubbleMenu';
 import { FootnotesAppendix } from './studio/FootnotesAppendix';
 import { ClauseAuditorDrawer } from './studio/ClauseAuditorDrawer';
@@ -49,9 +50,9 @@ import type {
 
 const EMPTY_DOCUMENT: StudioDocument = {
   id: 'new-document',
-  title: 'Documento sin título',
+  title: 'Documento Jurídico sin Título',
   sourceKind: 'blank',
-  editorHtml: '<p>Comienza a redactar aquí.</p>',
+  editorHtml: '<h2>INSTRUMENTO JURÍDICO</h2><p>Comienza a redactar tu contrato, convenio o escrito aquí…</p>',
   citations: [],
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
@@ -104,6 +105,7 @@ export function DraftingStudio() {
   const [saveState, setSaveState] = useState<'saved' | 'saving' | 'error'>('saved');
 
   // Modals and Drawers
+  const [showWelcomeHub, setShowWelcomeHub] = useState(false);
   const [showCatalogModal, setShowCatalogModal] = useState(false);
   const [showAuditorDrawer, setShowAuditorDrawer] = useState(false);
   const [showAssistantDrawer, setShowAssistantDrawer] = useState(false);
@@ -156,13 +158,21 @@ export function DraftingStudio() {
     loadTemplateRegistry().then((registry) => {
       if (!active) return;
       setTemplates(registry);
-      if (registry[0]) {
-        selectTemplate(registry[0]);
-        setShowVariablesModal(false);
-      }
-      checkPendingCitation();
     });
-    listStudioDocuments().then(setDocuments).catch(() => undefined);
+    listStudioDocuments().then((storedDocs) => {
+      if (!active) return;
+      setDocuments(storedDocs);
+      const hubSeen = sessionStorage.getItem('lex_studio_hub_seen');
+      if (!hubSeen && storedDocs.length === 0) {
+        setShowWelcomeHub(true);
+        sessionStorage.setItem('lex_studio_hub_seen', 'true');
+      } else if (storedDocs.length > 0) {
+        const latest = storedDocs[0];
+        setCurrentDocument(latest);
+        editor?.commands.setContent(latest.editorHtml, { emitUpdate: false });
+      }
+    }).catch(() => undefined);
+
     window.addEventListener('focus', checkPendingCitation);
     return () => {
       active = false;
@@ -189,25 +199,6 @@ export function DraftingStudio() {
     if (!editor || editor.isDestroyed || editor.getHTML() === currentDocument.editorHtml) return;
     editor.commands.setContent(currentDocument.editorHtml, { emitUpdate: false });
   }, [currentDocument.editorHtml, currentDocument.id, editor]);
-
-  useEffect(() => {
-    if (!editor || editor.isDestroyed || !selectedTemplate) return;
-    try {
-      const generated = Handlebars.compile(selectedTemplate.templateHandlebars)({
-        ...formData,
-        ...(selectedTemplate.toggles ?? []).reduce<Record<string, string>>((values, toggle) => {
-          values[`toggle_${toggle.id}`] = toggle.defaultActive ? toggle.content : '';
-          return values;
-        }, {}),
-      });
-      const editorHtml = textToHtml(generated);
-      editor.commands.setContent(editorHtml, { emitUpdate: false });
-      setCurrentDocument((document) => ({ ...document, editorHtml, updatedAt: new Date().toISOString() }));
-      setSaveState('saving');
-    } catch {
-      notify('La plantilla no pudo compilarse. Revisa los datos capturados.', 'error');
-    }
-  }, [formData, selectedTemplate, editor, notify]);
 
   useEffect(() => {
     const timer = window.setTimeout(async () => {
@@ -283,12 +274,39 @@ export function DraftingStudio() {
         setShowCatalogModal(false);
         setShowVariablesModal(false);
         setShowDraftsModal(false);
+        setShowWelcomeHub(false);
       }
     }
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentDocument, notify]);
+
+  function applyTemplateVariables(template: LegalTemplate, data: Record<string, string>) {
+    try {
+      const generated = Handlebars.compile(template.templateHandlebars)({
+        ...data,
+        ...(template.toggles ?? []).reduce<Record<string, string>>((values, toggle) => {
+          values[`toggle_${toggle.id}`] = toggle.defaultActive ? toggle.content : '';
+          return values;
+        }, {}),
+      });
+      const editorHtml = textToHtml(generated);
+      editor?.commands.setContent(editorHtml, { emitUpdate: false });
+      setCurrentDocument(createDocument({
+        title: template.title,
+        sourceKind: 'template',
+        templateId: template.id,
+        editorHtml,
+      }));
+      setSaveState('saving');
+      setShowVariablesModal(false);
+      setShowWelcomeHub(false);
+      notify('Instrumento generado con variables aplicadas.', 'success');
+    } catch {
+      notify('La plantilla no pudo compilarse. Revisa los datos capturados.', 'error');
+    }
+  }
 
   function selectTemplate(template: LegalTemplate) {
     const values = Object.fromEntries(
@@ -299,19 +317,24 @@ export function DraftingStudio() {
     );
     setSelectedTemplate(template);
     setFormData(values);
-    setCurrentDocument(createDocument({
-      title: template.title,
-      sourceKind: 'template',
-      templateId: template.id,
-      editorHtml: '<p>Cargando plantilla…</p>',
-    }));
-    setShowVariablesModal(false);
+    setShowCatalogModal(false);
+    setShowWelcomeHub(false);
+
+    if (template.fields.length > 0) {
+      setShowVariablesModal(true); // Open Step 2: Variables wizard
+    } else {
+      applyTemplateVariables(template, values);
+    }
   }
 
   function selectBlank() {
     setSelectedTemplate(null);
-    setCurrentDocument(createDocument({}));
+    const blank = createDocument({});
+    setCurrentDocument(blank);
+    editor?.commands.setContent(blank.editorHtml, { emitUpdate: false });
     setShowVariablesModal(false);
+    setShowWelcomeHub(false);
+    notify('Lienzo en blanco iniciado.', 'info');
   }
 
   function openDocument(document: StudioDocument) {
@@ -536,6 +559,17 @@ export function DraftingStudio() {
 
           {/* Action Toolbar */}
           <div className="flex flex-wrap items-center gap-2">
+            {/* Nuevo Documento Trigger */}
+            <button
+              type="button"
+              onClick={() => setShowWelcomeHub(true)}
+              className="studio-action gap-1.5 font-extrabold text-slate-900 border-slate-300 hover:border-legal-gold"
+              title="Iniciar nuevo documento o abrir asistente de inicio"
+            >
+              <Plus size={15} className="text-legal-gold" />
+              <span className="hidden sm:inline">Nuevo</span>
+            </button>
+
             {/* Catalog Button */}
             <button
               type="button"
@@ -965,6 +999,17 @@ export function DraftingStudio() {
         </div>
       )}
 
+      {/* Studio Welcome / Launcher Hub */}
+      <StudioWelcomeHub
+        isOpen={showWelcomeHub}
+        onClose={() => setShowWelcomeHub(false)}
+        onOpenCatalog={() => setShowCatalogModal(true)}
+        onSelectBlank={selectBlank}
+        onTriggerImport={() => fileInput.current?.click()}
+        recentDraft={documents[0] ?? null}
+        onOpenDraft={openDocument}
+      />
+
       {/* Catalog Modal */}
       <TemplateCatalogModal
         isOpen={showCatalogModal}
@@ -1040,13 +1085,20 @@ export function DraftingStudio() {
                 </div>
               ))}
             </div>
-            <div className="border-t border-slate-200 p-4 bg-slate-50 flex justify-end">
+            <div className="border-t border-slate-200 p-4 bg-slate-50 flex items-center justify-between">
               <button
                 type="button"
                 onClick={() => setShowVariablesModal(false)}
-                className="studio-primary px-5 py-2 text-xs"
+                className="studio-action text-xs"
               >
-                Aplicar al documento
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => applyTemplateVariables(selectedTemplate, formData)}
+                className="studio-primary px-5 py-2 text-xs font-bold"
+              >
+                Generar Documento en Editor →
               </button>
             </div>
           </div>

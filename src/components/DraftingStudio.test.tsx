@@ -13,11 +13,12 @@ describe('DraftingStudio Component', () => {
       render(<DraftingStudio />);
     });
 
-    expect(screen.getByRole('heading', { name: /Estudio [jJ]urídico/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Estudio Jurídico', level: 1 })).toBeInTheDocument();
     expect(screen.getByText(/Redacción documental/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Borradores/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Importar/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Auditar/i })).toBeInTheDocument();
+    expect(screen.getByTitle('Iniciar nuevo documento o abrir asistente de inicio')).toBeInTheDocument();
+    expect(screen.getByTitle('Ver borradores locales')).toBeInTheDocument();
+    expect(screen.getByTitle('Importar DOCX, PDF o TXT')).toBeInTheDocument();
+    expect(screen.getByTitle('Auditar fundamentación legal del borrador')).toBeInTheDocument();
   });
 
   it('permite abrir el catálogo modal de instrumentos y filtrar por materia', async () => {
