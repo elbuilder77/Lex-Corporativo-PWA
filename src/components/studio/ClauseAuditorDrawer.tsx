@@ -174,7 +174,7 @@ export function ClauseAuditorDrawer({
 
   return (
     <div
-      className="fixed inset-0 z-[75] flex justify-end bg-slate-950/40 backdrop-blur-xs animate-fadeIn"
+      className="fixed inset-0 z-[75] flex items-end sm:items-stretch sm:justify-end bg-slate-950/40 backdrop-blur-xs animate-fadeIn"
       role="dialog"
       aria-modal="true"
       aria-label="Auditor de Fundamentación Legal"
@@ -182,9 +182,14 @@ export function ClauseAuditorDrawer({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="flex h-full w-full max-w-md flex-col bg-white shadow-2xl animate-slideLeft">
+      <div className="flex max-h-[88vh] sm:max-h-full h-auto sm:h-full w-full max-w-lg sm:max-w-md flex-col rounded-t-3xl sm:rounded-none bg-white shadow-2xl animate-slideUp sm:animate-slideLeft">
+        {/* Mobile Pull Handle */}
+        <div className="pt-3 pb-1 flex justify-center sm:hidden">
+          <div className="w-12 h-1.5 rounded-full bg-slate-300" />
+        </div>
+
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 bg-slate-50/80">
+        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 bg-slate-50/80 rounded-t-3xl sm:rounded-none">
           <div className="flex items-center gap-2.5">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-amber-900">
               <Sparkles size={18} />

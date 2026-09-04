@@ -65,7 +65,7 @@ export function TemplateCatalogModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-white shadow-dialog sm:rounded-2xl">
+      <div className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-white shadow-dialog sm:rounded-2xl animate-slideUp sm:animate-fadeIn">
         {/* Mobile handle */}
         <div className="flex justify-center pb-0 pt-2.5 sm:hidden">
           <div className="h-1 w-10 rounded-full bg-slate-300" />

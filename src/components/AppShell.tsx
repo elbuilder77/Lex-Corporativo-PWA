@@ -193,7 +193,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
         {notifications.map((notification) => (
           <div
             key={notification.id}
-            className="pointer-events-auto flex items-start gap-2.5 rounded-2xl border border-slate-700 bg-slate-950/95 p-3.5 text-xs text-white shadow-2xl backdrop-blur-md"
+            className="pointer-events-auto flex items-start gap-2.5 rounded-2xl border border-slate-700 bg-slate-950/95 p-3.5 text-xs text-white shadow-2xl backdrop-blur-md animate-fadeIn"
           >
             {notification.type === 'success' ? (
               <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-400" />
@@ -206,7 +206,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
             <button
               type="button"
               onClick={() => dismissNotification(notification.id)}
-              className="flex min-h-8 min-w-8 items-center justify-center text-slate-400 hover:text-white"
+              className="flex min-h-8 min-w-8 items-center justify-center text-slate-400 hover:text-white active:scale-95 transition"
               aria-label="Cerrar"
             >
               <X size={15} />
@@ -218,7 +218,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
       {/* PWA Install Prompt */}
       {installPrompt && (
         <div
-          className="fixed bottom-3 left-3 right-3 z-40 mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-slate-700 bg-slate-950 p-3 text-white shadow-2xl"
+          className="fixed bottom-20 sm:bottom-4 left-3 right-3 z-40 mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-slate-700 bg-slate-950 p-3.5 text-white shadow-2xl animate-slideUp"
           style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
         >
           <img
@@ -232,14 +232,14 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
           <button
             type="button"
             onClick={install}
-            className="min-h-10 rounded-xl bg-legal-gold px-4 text-xs font-extrabold text-slate-950 hover:bg-legal-goldhover"
+            className="min-h-10 rounded-xl bg-legal-gold px-4 text-xs font-extrabold text-slate-950 hover:bg-legal-goldhover active:scale-95 transition"
           >
             Instalar
           </button>
           <button
             type="button"
             onClick={() => setInstallPrompt(null)}
-            className="flex min-h-10 min-w-10 items-center justify-center text-slate-400"
+            className="flex min-h-10 min-w-10 items-center justify-center text-slate-400 active:scale-95 transition"
             aria-label="Cerrar"
           >
             <X size={17} />
@@ -256,7 +256,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
         <button
           type="button"
           onClick={onGoHome}
-          className="relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 hover:text-slate-200 transition"
+          className="relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 hover:text-slate-200 active:scale-95 transition"
           title="Volver a la pantalla de inicio"
         >
           <Home size={18} />
@@ -265,7 +265,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
         <button
           type="button"
           onClick={() => onTabChange('normativa')}
-          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest transition ${
+          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest active:scale-95 transition ${
             activeTab === 'normativa'
               ? 'text-legal-gold'
               : 'text-slate-400 hover:text-slate-200'
@@ -280,7 +280,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
         <button
           type="button"
           onClick={() => onTabChange('licitaciones')}
-          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest transition ${
+          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest active:scale-95 transition ${
             activeTab === 'licitaciones'
               ? 'text-legal-gold'
               : 'text-slate-400 hover:text-slate-200'
@@ -295,7 +295,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
         <button
           type="button"
           onClick={() => onTabChange('estudio')}
-          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[9px] font-extrabold uppercase tracking-wider transition ${
+          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[9px] font-extrabold uppercase tracking-wider active:scale-95 transition ${
             activeTab === 'estudio' ? 'text-legal-gold' : 'text-slate-400 hover:text-slate-200'
           }`}
         >
@@ -306,7 +306,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
         <button
           type="button"
           onClick={() => onTabChange('desktop')}
-          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest transition ${
+          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest active:scale-95 transition ${
             activeTab === 'desktop'
               ? 'text-legal-gold'
               : 'text-slate-400 hover:text-slate-200'

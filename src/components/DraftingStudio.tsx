@@ -251,6 +251,45 @@ export function DraftingStudio() {
     };
   }, []);
 
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      const isMac = typeof navigator !== 'undefined' && navigator.platform?.toUpperCase().includes('MAC');
+      const isModifier = isMac ? e.metaKey : e.ctrlKey;
+
+      if (isModifier && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        saveStudioDocument(currentDocument).then(() => {
+          setSaveState('saved');
+          if (typeof navigator !== 'undefined' && navigator.vibrate) {
+            navigator.vibrate(15);
+          }
+          notify('Borrador guardado localmente (Ctrl+S).', 'success');
+        });
+      } else if (isModifier && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setShowAssistantDrawer((prev) => !prev);
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          navigator.vibrate(10);
+        }
+      } else if (isModifier && e.shiftKey && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        setShowAuditorDrawer((prev) => !prev);
+      } else if (isModifier && e.shiftKey && e.key.toLowerCase() === 't') {
+        e.preventDefault();
+        setShowCatalogModal((prev) => !prev);
+      } else if (e.key === 'Escape') {
+        setShowAssistantDrawer(false);
+        setShowAuditorDrawer(false);
+        setShowCatalogModal(false);
+        setShowVariablesModal(false);
+        setShowDraftsModal(false);
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentDocument, notify]);
+
   function selectTemplate(template: LegalTemplate) {
     const values = Object.fromEntries(
       template.fields.map((field) => [
@@ -622,7 +661,7 @@ export function DraftingStudio() {
       </section>
 
       {/* Main Workspace: Clean Centered Canvas */}
-      <main className="mx-auto w-full max-w-4xl flex-1 px-3 py-4 sm:px-6 sm:py-8">
+      <main className="mx-auto w-full max-w-4xl flex-1 px-3 py-4 sm:px-6 sm:py-8 pb-28 sm:pb-12">
         {/* Paper Sheet */}
         <article className="legal-letterhead mx-auto flex w-full flex-col justify-between rounded-2xl bg-white px-6 py-8 shadow-sm transition-all sm:px-12 sm:py-10 border border-slate-200/90">
           {/* Institutional Letterhead Header */}
@@ -740,171 +779,190 @@ export function DraftingStudio() {
 
       {/* Opción A & C: Assistant Drawer for Foundation Search & Insertion */}
       {showAssistantDrawer && (
-        <aside
-          className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-white shadow-2xl border-l border-slate-200 animate-slideLeft"
+        <div
+          className="fixed inset-0 z-[70] flex items-end sm:items-stretch sm:justify-end bg-slate-950/30 backdrop-blur-xs animate-fadeIn"
+          role="dialog"
+          aria-modal="true"
           aria-label="Asistente de Fundamentación Legal"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowAssistantDrawer(false);
+          }}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3.5 bg-slate-50">
-            <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-amber-300">
-                <Search size={16} />
-              </span>
-              <div>
-                <h2 className="font-serif text-sm font-bold text-slate-950">Asistente de Fundamentación</h2>
-                <p className="text-[10px] text-slate-500">Consulta en vivo del corpus federal oficial</p>
+          <aside
+            className="flex max-h-[88vh] sm:max-h-full h-auto sm:h-full w-full max-w-lg sm:max-w-md flex-col rounded-t-3xl sm:rounded-none bg-white shadow-2xl border-t sm:border-t-0 sm:border-l border-slate-200 animate-slideUp sm:animate-slideLeft"
+          >
+            {/* Mobile Pull Handle */}
+            <div className="pt-3 pb-1 flex justify-center sm:hidden">
+              <div className="w-12 h-1.5 rounded-full bg-slate-300" />
+            </div>
+
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3.5 bg-slate-50 rounded-t-3xl sm:rounded-none">
+              <div className="flex items-center gap-2">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-amber-300">
+                  <Search size={16} />
+                </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-serif text-sm font-bold text-slate-950">Asistente de Fundamentación</h2>
+                    <kbd className="hidden sm:inline-block rounded bg-slate-200/80 px-1.5 py-0.2 text-[9px] font-mono font-bold text-slate-600">
+                      Ctrl+K
+                    </kbd>
+                  </div>
+                  <p className="text-[10px] text-slate-500">Consulta en vivo del corpus federal oficial</p>
+                </div>
               </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowAssistantDrawer(false)}
-              className="studio-icon-button"
-              aria-label="Cerrar asistente"
-            >
-              <X size={18} />
-            </button>
-          </div>
-
-          {/* Search Form */}
-          <form onSubmit={handleSearchSubmit} className="p-4 border-b border-slate-100 bg-white space-y-2.5">
-            <div className="relative">
-              <input
-                type="search"
-                aria-label="Buscar fundamento"
-                value={foundationQuery}
-                onChange={(e) => setFoundationQuery(e.target.value)}
-                placeholder="Buscar artículo, término o seleccionar texto…"
-                className="studio-input pl-9 text-base sm:text-xs"
-              />
-              <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            </div>
-
-            <div className="flex items-center justify-between gap-2">
-              <select
-                aria-label="Área jurídica"
-                value={foundationScope}
-                onChange={(e) => setFoundationScope(e.target.value as CorpusSearchScope)}
-                className="studio-input h-8 text-xs font-bold flex-1"
-              >
-                <option value="todos">Todas las materias</option>
-                <option value="mercantil">Mercantil</option>
-                <option value="laboral">Laboral</option>
-                <option value="fiscal">Fiscal</option>
-                <option value="comercio_exterior">Comercio exterior</option>
-                <option value="aduanal">Aduanal</option>
-              </select>
               <button
-                type="submit"
-                disabled={foundationSearching}
-                className="studio-primary h-8 px-3 text-xs"
+                type="button"
+                onClick={() => setShowAssistantDrawer(false)}
+                className="studio-icon-button"
+                aria-label="Cerrar asistente"
               >
-                {foundationSearching ? <LoaderCircle size={13} className="animate-spin" /> : 'Consultar'}
+                <X size={18} />
               </button>
             </div>
-          </form>
 
-          {/* Results List */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {foundationError && (
-              <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
-                {foundationError}
+            {/* Search Form */}
+            <form onSubmit={handleSearchSubmit} className="p-4 border-b border-slate-100 bg-white space-y-2.5">
+              <div className="relative">
+                <input
+                  type="search"
+                  aria-label="Buscar fundamento"
+                  value={foundationQuery}
+                  onChange={(e) => setFoundationQuery(e.target.value)}
+                  placeholder="Buscar artículo, término o seleccionar texto…"
+                  className="studio-input pl-9 text-base sm:text-xs"
+                />
+                <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               </div>
-            )}
 
-            {foundationSearching && (
-              <div className="flex items-center justify-center p-8 text-xs font-bold text-slate-400 gap-2">
-                <LoaderCircle size={16} className="animate-spin text-legal-gold" />
-                <span>Buscando en corpus local…</span>
-              </div>
-            )}
-
-            {!foundationSearching && foundationResults.length === 0 && (
-              <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
-                <BookOpen size={24} className="mx-auto text-slate-400" />
-                <p className="mt-2 text-xs font-bold">Busca cualquier concepto o selecciona texto en el editor.</p>
-                <p className="mt-1 text-[11px] text-slate-400">
-                  Podrás insertar el fundamento como nota al pie <sup>[1]</sup> o cita en bloque.
-                </p>
-              </div>
-            )}
-
-            {foundationResults.map((article) => {
-              const isAlreadyCited = currentDocument.citations.some((c) => c.articleId === article.id);
-              return (
-                <article
-                  key={article.id}
-                  className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs transition hover:border-slate-300"
+              <div className="flex items-center justify-between gap-2">
+                <select
+                  aria-label="Área jurídica"
+                  value={foundationScope}
+                  onChange={(e) => setFoundationScope(e.target.value as CorpusSearchScope)}
+                  className="studio-input h-8 text-xs font-bold flex-1"
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <span className="rounded bg-slate-900 px-1.5 py-0.5 text-[9px] font-black uppercase text-amber-300">
-                        {article.lawCode}
-                      </span>
-                      <strong className="ml-1.5 text-xs font-extrabold text-slate-900">
-                        {article.articleNumber}
-                      </strong>
-                    </div>
-                    <a
-                      href={article.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[10px] font-bold text-legal-golddark hover:underline flex items-center gap-0.5"
-                    >
-                      <span>DOF</span>
-                      <ExternalLink size={10} />
-                    </a>
-                  </div>
+                  <option value="todos">Todas las materias</option>
+                  <option value="mercantil">Mercantil</option>
+                  <option value="laboral">Laboral</option>
+                  <option value="fiscal">Fiscal</option>
+                  <option value="comercio_exterior">Comercio exterior</option>
+                  <option value="aduanal">Aduanal</option>
+                </select>
+                <button
+                  type="submit"
+                  disabled={foundationSearching}
+                  className="studio-primary h-8 px-3 text-xs"
+                >
+                  {foundationSearching ? <LoaderCircle size={13} className="animate-spin" /> : 'Consultar'}
+                </button>
+              </div>
+            </form>
 
-                  <p className="mt-2 text-xs leading-relaxed text-slate-700 line-clamp-4">
-                    {article.content}
+            {/* Results List */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {foundationError && (
+                <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+                  {foundationError}
+                </div>
+              )}
+
+              {foundationSearching && (
+                <div className="flex items-center justify-center p-8 text-xs font-bold text-slate-400 gap-2">
+                  <LoaderCircle size={16} className="animate-spin text-legal-gold" />
+                  <span>Buscando en corpus local…</span>
+                </div>
+              )}
+
+              {!foundationSearching && foundationResults.length === 0 && (
+                <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
+                  <BookOpen size={24} className="mx-auto text-slate-400" />
+                  <p className="mt-2 text-xs font-bold">Busca cualquier concepto o selecciona texto en el editor.</p>
+                  <p className="mt-1 text-[11px] text-slate-400">
+                    Podrás insertar el fundamento como nota al pie <sup>[1]</sup> o cita en bloque.
                   </p>
+                </div>
+              )}
 
-                  <div className="mt-3 flex items-center gap-1.5 border-t border-slate-100 pt-2.5">
-                    <button
-                      type="button"
-                      onClick={() => insertFootnote(article)}
-                      className="flex-1 rounded-lg bg-slate-900 px-2 py-1.5 text-[10px] font-extrabold text-white transition hover:bg-slate-800 active:scale-95 shadow-xs flex items-center justify-center gap-1"
-                    >
-                      <Plus size={11} className="text-amber-300" />
-                      <span>Nota al Pie <sup>[N]</sup></span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => insertBlockquote(article)}
-                      className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-[10px] font-bold text-slate-700 transition hover:bg-slate-100 active:scale-95"
-                      title="Insertar como cita textual en bloque"
-                    >
-                      Cita en Bloque
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => addCitation(article)}
-                      disabled={isAlreadyCited}
-                      className={`rounded-lg px-2 py-1.5 text-[10px] font-bold transition ${
-                        isAlreadyCited
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                      }`}
-                      title="Guardar en apéndice de citas"
-                    >
-                      {isAlreadyCited ? 'Guardada' : 'Guardar'}
-                    </button>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+              {foundationResults.map((article) => {
+                const isAlreadyCited = currentDocument.citations.some((c) => c.articleId === article.id);
+                return (
+                  <article
+                    key={article.id}
+                    className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs transition hover:border-slate-300"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <span className="rounded bg-slate-900 px-1.5 py-0.5 text-[9px] font-black uppercase text-amber-300">
+                          {article.lawCode}
+                        </span>
+                        <strong className="ml-1.5 text-xs font-extrabold text-slate-900">
+                          {article.articleNumber}
+                        </strong>
+                      </div>
+                      <a
+                        href={article.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] font-bold text-legal-golddark hover:underline flex items-center gap-0.5"
+                      >
+                        <span>DOF</span>
+                        <ExternalLink size={10} />
+                      </a>
+                    </div>
 
-          {/* Footer Info */}
-          <div className="border-t border-slate-200 p-3 bg-slate-50 flex items-center justify-between text-[10px] font-bold">
-            <span className="flex items-center gap-1.5 text-emerald-700">
-              <CheckCircle2 size={13} className="text-emerald-600" /> Motor Local SQLite WASM Activo
-            </span>
-            <span className="flex items-center gap-1.5 text-slate-500">
-              <Database size={12} className="text-slate-400" /> Corpus Federal en Memoria
-            </span>
-          </div>
-        </aside>
+                    <p className="mt-2 text-xs leading-relaxed text-slate-700 line-clamp-4">
+                      {article.content}
+                    </p>
+
+                    <div className="mt-3 flex items-center gap-1.5 border-t border-slate-100 pt-2.5">
+                      <button
+                        type="button"
+                        onClick={() => insertFootnote(article)}
+                        className="flex-1 rounded-lg bg-slate-900 px-2 py-1.5 text-[10px] font-extrabold text-white transition hover:bg-slate-800 active:scale-95 shadow-xs flex items-center justify-center gap-1"
+                      >
+                        <Plus size={11} className="text-amber-300" />
+                        <span>Nota al Pie <sup>[N]</sup></span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => insertBlockquote(article)}
+                        className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-[10px] font-bold text-slate-700 transition hover:bg-slate-100 active:scale-95"
+                        title="Insertar como cita textual en bloque"
+                      >
+                        Cita en Bloque
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => addCitation(article)}
+                        disabled={isAlreadyCited}
+                        className={`rounded-lg px-2 py-1.5 text-[10px] font-bold transition ${
+                          isAlreadyCited
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        }`}
+                        title="Guardar en apéndice de citas"
+                      >
+                        {isAlreadyCited ? 'Guardada' : 'Guardar'}
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+
+            {/* Footer Info */}
+            <div className="border-t border-slate-200 p-3 bg-slate-50 flex items-center justify-between text-[10px] font-bold">
+              <span className="flex items-center gap-1.5 text-emerald-700">
+                <CheckCircle2 size={13} className="text-emerald-600" /> Motor Local SQLite WASM Activo
+              </span>
+              <span className="flex items-center gap-1.5 text-slate-500">
+                <Database size={12} className="text-slate-400" /> Corpus Federal en Memoria
+              </span>
+            </div>
+          </aside>
+        </div>
       )}
 
       {/* Catalog Modal */}
