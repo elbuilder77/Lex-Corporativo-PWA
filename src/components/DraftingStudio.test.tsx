@@ -13,7 +13,7 @@ describe('DraftingStudio Component', () => {
       render(<DraftingStudio />);
     });
 
-    expect(screen.getByRole('heading', { name: 'Estudio Jurídico', level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Ingeniería Jurídica', level: 1 })).toBeInTheDocument();
     expect(screen.getByText(/Redacción documental/i)).toBeInTheDocument();
     expect(screen.getByTitle('Iniciar nuevo documento o abrir asistente de inicio')).toBeInTheDocument();
     expect(screen.getByTitle('Ver borradores locales')).toBeInTheDocument();

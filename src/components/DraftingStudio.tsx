@@ -420,7 +420,7 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
     const text = editor.getText({ blockSeparator: '\n\n' });
     const shareData = {
       title: currentDocument.title,
-      text: `${currentDocument.title}\n\n${text}\n\n---\nGenerado en Lex Corporativo Estudio`,
+      text: `${currentDocument.title}\n\n${text}\n\n---\nGenerado en Lex Corporativo · Ingeniería Jurídica`,
     };
     if (typeof navigator !== 'undefined' && navigator.share && navigator.canShare && navigator.canShare(shareData)) {
       try {
@@ -537,7 +537,7 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="font-serif text-lg font-bold tracking-tight text-slate-950 sm:text-xl">
-                  Estudio Jurídico
+                  Ingeniería Jurídica
                 </h1>
                 <span
                   className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-bold ${
@@ -559,7 +559,7 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
                 </span>
               </div>
               <p className="hidden sm:block text-[11px] text-slate-500">
-                Redacción documental con fundamentación directa del corpus federal
+                Redacción documental estructurada y aplicación de variables jurídicas
               </p>
             </div>
           </div>

@@ -22,7 +22,7 @@ import { AREA_LABELS, CORPUS_STATS, getLawsForScope } from '../lib/corpus-catalo
 import { executeCorpusSearch, type CorpusSearchResult } from '../services/corpus-search';
 import { useUiStore } from '../store/useUiStore';
 import { trackEvent } from '../lib/analytics';
-import type { CorpusSearchScope, LegalArticle } from '../types';
+import type { CorpusSearchScope, LegalArticle, LegalEngineeringArea } from '../types';
 
 const scopes = Object.entries(AREA_LABELS) as Array<[CorpusSearchScope, string]>;
 
@@ -36,6 +36,14 @@ const SUGGESTED_LEGAL_SEARCHES = [
   { label: 'Títulos de crédito', query: 'pagaré endoso', scope: 'mercantil' as const, lawCode: 'LGTOC' },
   { label: 'Prácticas desleales', query: 'discriminación de precios', scope: 'comercio_exterior' as const, lawCode: 'LCE' },
 ];
+
+const AREA_BADGES: Record<LegalEngineeringArea, { bg: string; text: string; border: string }> = {
+  laboral: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+  mercantil: { bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-200' },
+  fiscal: { bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-200' },
+  aduanal: { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+  comercio_exterior: { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
+};
 
 function articlePlainText(article: LegalArticle): string {
   return `${article.lawName}\n${article.articleNumber}\n\n${article.content}\n\nFuente oficial para cotejo: ${article.sourceUrl}`;
@@ -209,10 +217,10 @@ export function BuscadorLegal() {
           </div>
 
           <h1 className="mt-3 font-serif text-xl font-bold leading-tight sm:text-2xl text-white">
-            Consulta de Legislación Federal
+            Fundamentador Jurídico Federal
           </h1>
           <p className="mt-1 text-xs text-slate-400 sm:text-sm">
-            Búsqueda determinista entre {CORPUS_STATS.provisions.toLocaleString('es-MX')} artículos de {CORPUS_STATS.instruments} leyes y reglamentos federales, con enlace directo a la Cámara de Diputados.
+            Búsqueda determinista entre {CORPUS_STATS.provisions.toLocaleString('es-MX')} artículos de {CORPUS_STATS.instruments} leyes y reglamentos federales con motor SQLite WASM local.
           </p>
 
           {/* Integrated Search Box */}
@@ -221,7 +229,7 @@ export function BuscadorLegal() {
             className="mt-4 rounded-2xl border border-slate-700 bg-slate-900/90 p-3 shadow-xl shadow-black/30"
           >
             <label htmlFor="legal-query" className="sr-only">
-              ¿Qué necesitas consultar?
+              ¿Qué necesitas fundamentar?
             </label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <div className="relative flex-1">
@@ -245,14 +253,14 @@ export function BuscadorLegal() {
                 <button
                   type="submit"
                   disabled={isSearching}
-                  className="inline-flex min-h-11 flex-1 sm:flex-initial items-center justify-center gap-2 rounded-xl bg-legal-gold px-5 text-xs font-extrabold text-slate-950 transition hover:bg-legal-goldhover disabled:cursor-wait disabled:opacity-60"
+                  className="inline-flex min-h-11 flex-1 sm:flex-initial items-center justify-center gap-2 rounded-xl bg-legal-gold px-5 text-xs font-extrabold text-slate-950 transition hover:bg-legal-goldhover disabled:cursor-wait disabled:opacity-60 cursor-pointer"
                 >
                   {isSearching ? <LoaderCircle size={16} className="animate-spin" /> : <FileSearch size={16} />} Buscar
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border px-3.5 text-xs font-bold transition ${
+                  className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border px-3.5 text-xs font-bold transition cursor-pointer ${
                     showFilters || activeFiltersCount > 0
                       ? 'border-legal-gold bg-legal-gold/20 text-legal-gold font-extrabold'
                       : 'border-slate-600 bg-slate-800 text-slate-300 hover:bg-slate-700'
@@ -260,7 +268,7 @@ export function BuscadorLegal() {
                   aria-expanded={showFilters}
                 >
                   <Filter size={15} />
-                  <span>Área y Ley</span>
+                  <span>Filtros</span>
                   {activeFiltersCount > 0 && (
                     <span className="flex h-5 w-5 items-center justify-center rounded-full bg-legal-gold text-[10px] font-extrabold text-slate-950">
                       {activeFiltersCount}
@@ -268,6 +276,36 @@ export function BuscadorLegal() {
                   )}
                 </button>
               </div>
+            </div>
+
+            {/* Quick 1-Touch Scope Pills */}
+            <div className="mt-3 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 shrink-0 mr-1">
+                Materia:
+              </span>
+              {scopes.map(([scopeKey, scopeLabel]) => {
+                const isActive = scope === scopeKey;
+                return (
+                  <button
+                    key={scopeKey}
+                    type="button"
+                    onClick={() => {
+                      setScope(scopeKey);
+                      setLawCode('');
+                      if (query.trim()) {
+                        void performSearch(query, scopeKey, undefined);
+                      }
+                    }}
+                    className={`shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                      isActive
+                        ? 'bg-legal-gold text-slate-950 font-extrabold shadow-2xs'
+                        : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 hover:text-white'
+                    }`}
+                  >
+                    {scopeLabel}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Collapsible Filters Bar */}
@@ -311,7 +349,7 @@ export function BuscadorLegal() {
             {/* Active Filter Chips */}
             {activeFiltersCount > 0 && (
               <div className="mt-2.5 flex flex-wrap items-center gap-1.5 border-t border-slate-800 pt-2">
-                <span className="text-[11px] font-bold text-slate-400">Filtros:</span>
+                <span className="text-[11px] font-bold text-slate-400">Filtros activos:</span>
                 {scope !== 'todos' && (
                   <span className="inline-flex items-center gap-1 rounded-md bg-slate-800 px-2 py-0.5 text-[11px] font-semibold text-legal-gold">
                     Área: {AREA_LABELS[scope]}
@@ -321,7 +359,7 @@ export function BuscadorLegal() {
                         setScope('todos');
                         setLawCode('');
                       }}
-                      className="hover:text-white"
+                      className="hover:text-white cursor-pointer"
                       title="Quitar filtro de área"
                     >
                       <X size={12} />
@@ -334,7 +372,7 @@ export function BuscadorLegal() {
                     <button
                       type="button"
                       onClick={() => setLawCode('')}
-                      className="hover:text-white"
+                      className="hover:text-white cursor-pointer"
                       title="Quitar filtro de ley"
                     >
                       <X size={12} />
@@ -344,7 +382,7 @@ export function BuscadorLegal() {
                 <button
                   type="button"
                   onClick={resetFilters}
-                  className="text-[11px] font-bold text-red-400 hover:text-red-300 ml-1 underline"
+                  className="text-[11px] font-bold text-red-400 hover:text-red-300 ml-1 underline cursor-pointer"
                 >
                   Restablecer
                 </button>
@@ -378,7 +416,7 @@ export function BuscadorLegal() {
                   key={i}
                   type="button"
                   onClick={() => handleSuggestionClick(item.query, item.scope, item.lawCode)}
-                  className="group inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-legal-gold hover:bg-amber-50/60 hover:text-slate-950 transition active:scale-95"
+                  className="group inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-legal-gold hover:bg-amber-50/60 hover:text-slate-950 transition active:scale-95 cursor-pointer"
                 >
                   <Search size={12} className="text-slate-400 group-hover:text-legal-golddark" />
                   <span>{item.label}</span>
@@ -402,7 +440,7 @@ export function BuscadorLegal() {
                 <button
                   type="button"
                   onClick={resetAll}
-                  className="inline-flex min-h-8 items-center gap-1 rounded-lg border border-slate-200 px-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                  className="inline-flex min-h-8 items-center gap-1 rounded-lg border border-slate-200 px-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
                 >
                   <RotateCcw size={12} /> Nueva consulta
                 </button>
@@ -424,6 +462,8 @@ export function BuscadorLegal() {
               <div className="space-y-3">
                 {result.articles.map((article) => {
                   const isExpanded = expanded.has(article.id);
+                  const areaBadge = AREA_BADGES[article.area] || { bg: 'bg-slate-100', text: 'text-slate-800', border: 'border-slate-200' };
+
                   return (
                     <article
                       key={article.id}
@@ -436,14 +476,17 @@ export function BuscadorLegal() {
                               <span className="rounded-md bg-slate-900 px-2 py-0.5 text-[10px] font-extrabold text-white">
                                 {article.lawCode}
                               </span>
-                              <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">
+                              <span className={`rounded-md border px-2 py-0.5 text-[10px] font-bold ${areaBadge.bg} ${areaBadge.text} ${areaBadge.border}`}>
+                                {AREA_LABELS[article.area] || article.area}
+                              </span>
+                              <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700">
                                 {article.articleNumber}
                               </span>
                               <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
                                 {article.sourceKind}
                               </span>
                             </div>
-                            <h2 className="mt-1.5 text-sm font-extrabold leading-5 text-slate-950 sm:text-base">
+                            <h2 className="mt-1.5 font-serif text-sm font-bold leading-5 text-slate-950 sm:text-base">
                               {article.lawName}
                             </h2>
                             {article.title && (
@@ -454,7 +497,7 @@ export function BuscadorLegal() {
                             <button
                               type="button"
                               onClick={() => copyArticle(article)}
-                              className="flex min-h-9 min-w-9 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                              className="flex min-h-9 min-w-9 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 cursor-pointer"
                               aria-label="Copiar artículo"
                               title="Copiar artículo"
                             >
@@ -467,7 +510,7 @@ export function BuscadorLegal() {
                             <button
                               type="button"
                               onClick={() => shareArticle(article)}
-                              className="flex min-h-9 min-w-9 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                              className="flex min-h-9 min-w-9 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 cursor-pointer"
                               aria-label="Compartir artículo"
                               title="Compartir artículo"
                             >
@@ -497,25 +540,25 @@ export function BuscadorLegal() {
                             <button
                               type="button"
                               onClick={() => sendToStudio(article)}
-                              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-xl bg-slate-900 px-3.5 text-xs font-extrabold text-white hover:bg-slate-800"
+                              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-xl bg-slate-900 px-3.5 text-xs font-extrabold text-white hover:bg-slate-800 cursor-pointer active:scale-95 transition"
                             >
-                              <FilePenLine size={14} /> Usar en Estudio
+                              <FilePenLine size={14} className="text-legal-gold" /> Usar en Ingeniería Jurídica
                             </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setExpanded((current) => {
-                                const next = new Set(current);
-                                if (next.has(article.id)) next.delete(article.id);
-                                else next.add(article.id);
-                                return next;
-                              })
-                            }
-                            className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-xl border border-slate-200 px-3.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
-                          >
-                            {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-                            {isExpanded ? 'Contraer texto' : 'Ver texto completo'}
-                          </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setExpanded((current) => {
+                                  const next = new Set(current);
+                                  if (next.has(article.id)) next.delete(article.id);
+                                  else next.add(article.id);
+                                  return next;
+                                })
+                              }
+                              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-xl border border-slate-200 px-3.5 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                            >
+                              {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+                              {isExpanded ? 'Contraer texto' : 'Ver texto completo'}
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -545,7 +588,7 @@ export function BuscadorLegal() {
                 }}
                 className="inline-flex items-center gap-1.5 rounded-xl bg-legal-gold hover:bg-legal-goldhover text-slate-950 px-3.5 py-1.5 text-xs font-extrabold transition cursor-pointer shrink-0"
               >
-                <span>Descargar Estación Desktop</span>
+                <span>Ficha Técnica Desktop</span>
               </button>
             </div>
 

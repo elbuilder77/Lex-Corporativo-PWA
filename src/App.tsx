@@ -154,7 +154,7 @@ export function App() {
                 <div className="flex min-h-[70vh] items-center justify-center bg-slate-50 p-8 text-slate-500">
                   <div className="flex items-center gap-2.5 text-xs font-semibold">
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-legal-gold border-t-transparent" />
-                    <span>Preparando Estudio local…</span>
+                    <span>Preparando Ingeniería Jurídica…</span>
                   </div>
                 </div>
               }

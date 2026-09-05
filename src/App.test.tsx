@@ -14,14 +14,10 @@ describe('App Lex Corporativo PWA', () => {
     });
 
     expect(screen.getByAltText('Logotipo Lex Corporativo')).toBeInTheDocument();
-    expect(screen.getByText('Plataforma de Consulta Federal')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /Explorar Licitaciones/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /Consultar Legislación Federal/i }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Abrir Estudio/i })).toBeInTheDocument();
+    expect(screen.getByText(/Plataforma de Consulta e Ingeniería Jurídica/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Abrir Ingeniería Jurídica/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Consultar Fundamentador/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Explorar Radar/i })).toBeInTheDocument();
   });
 
   it('permite ingresar a la estación de consulta desde la pantalla de presentación', async () => {
@@ -29,17 +25,17 @@ describe('App Lex Corporativo PWA', () => {
       render(<App />);
     });
 
-    const enterBtn = screen.getByRole('button', { name: /Consultar Legislación Federal/i });
+    const enterBtn = screen.getByRole('button', { name: /Consultar Fundamentador/i });
     await act(async () => {
       fireEvent.click(enterBtn);
       await new Promise((resolve) => setTimeout(resolve, 250));
     });
 
     expect(
-      screen.getByRole('heading', { name: 'Consulta de Legislación Federal' }),
+      screen.getByRole('heading', { name: 'Fundamentador Jurídico Federal' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('searchbox', { name: '¿Qué necesitas consultar?' })).toBeInTheDocument();
-    expect(screen.getAllByRole('navigation', { name: 'Módulos de consulta' }).length).toBeGreaterThan(0);
+    expect(screen.getByRole('searchbox', { name: '¿Qué necesitas fundamentar?' })).toBeInTheDocument();
+    expect(screen.getAllByRole('navigation', { name: /Módulos de consulta/i }).length).toBeGreaterThan(0);
   });
 
   it('permite cambiar a la pestaña de Licitaciones Abiertas una vez dentro de la plataforma', async () => {
@@ -48,7 +44,7 @@ describe('App Lex Corporativo PWA', () => {
       render(<App />);
     });
 
-    const licitacionesTabs = screen.getAllByRole('button', { name: /Licitaciones/i });
+    const licitacionesTabs = screen.getAllByRole('button', { name: /Licitaciones|Radar/i });
     await act(async () => {
       fireEvent.click(licitacionesTabs[0]);
     });
@@ -91,7 +87,7 @@ describe('App Lex Corporativo PWA', () => {
     });
 
     await act(async () => {
-      fireEvent.click(screen.getAllByRole('button', { name: /Licitaciones/i })[0]);
+      fireEvent.click(screen.getAllByRole('button', { name: /Licitaciones|Radar/i })[0]);
     });
 
     await act(async () => {
@@ -127,32 +123,32 @@ describe('App Lex Corporativo PWA', () => {
     expect(await screen.findByRole('heading', { name: /Modelo de Privacidad BYOK/i })).toBeInTheDocument();
   });
 
-  it('permite navegar al módulo Estudio jurídico una vez dentro de la plataforma', async () => {
+  it('permite navegar al módulo Ingeniería Jurídica una vez dentro de la plataforma', async () => {
     localStorage.setItem('lex_pwa_station_opened', '1');
     await act(async () => {
       render(<App />);
     });
 
-    const estudioTabs = screen.getAllByRole('button', { name: /Estudio/i });
+    const estudioTabs = screen.getAllByRole('button', { name: /Ingeniería/i });
     await act(async () => {
       fireEvent.click(estudioTabs[0]);
     });
 
-    expect(await screen.findByRole('heading', { name: /Estudio [jJ]urídico/i }, { timeout: 5000 })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /Ingeniería Jurídica/i }, { timeout: 5000 })).toBeInTheDocument();
   });
 
-  it('permite ingresar directamente a Estudio desde la pantalla inicial', async () => {
+  it('permite ingresar directamente a Ingeniería Jurídica desde la pantalla inicial', async () => {
     await act(async () => {
       render(<App />);
     });
 
-    const openStudioBtn = screen.getByRole('button', { name: /Abrir Estudio/i });
+    const openStudioBtn = screen.getByRole('button', { name: /Abrir Ingeniería Jurídica/i });
     await act(async () => {
       fireEvent.click(openStudioBtn);
       await new Promise((resolve) => setTimeout(resolve, 300));
     });
 
-    expect(await screen.findByRole('heading', { name: /Estudio [jJ]urídico/i }, { timeout: 5000 })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /Ingeniería Jurídica/i }, { timeout: 5000 })).toBeInTheDocument();
   });
 
   it('permite regresar a la pantalla de inicio desde la estación mediante el botón de Inicio', async () => {
@@ -161,7 +157,7 @@ describe('App Lex Corporativo PWA', () => {
       render(<App />);
     });
 
-    expect(screen.getByRole('heading', { name: 'Consulta de Legislación Federal' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Fundamentador Jurídico Federal' })).toBeInTheDocument();
 
     const homeButtons = screen.getAllByRole('button', { name: /Inicio/i });
     await act(async () => {
@@ -169,7 +165,7 @@ describe('App Lex Corporativo PWA', () => {
     });
 
     expect(screen.getByAltText('Logotipo Lex Corporativo')).toBeInTheDocument();
-    expect(screen.getByText('Plataforma de Consulta Federal')).toBeInTheDocument();
+    expect(screen.getByText(/Plataforma de Consulta e Ingeniería Jurídica/i)).toBeInTheDocument();
     expect(localStorage.getItem('lex_pwa_station_opened')).toBeNull();
   });
 });

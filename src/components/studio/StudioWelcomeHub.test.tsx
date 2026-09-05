@@ -46,7 +46,7 @@ describe('StudioWelcomeHub', () => {
       />,
     );
 
-    expect(screen.getByRole('heading', { name: /Estudio Jurídico & Redacción/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Ingeniería Jurídica & Redacción/i })).toBeInTheDocument();
     expect(screen.getByText('Plantilla Jurídica')).toBeInTheDocument();
     expect(screen.getByText('Subir Documento')).toBeInTheDocument();
     expect(screen.getByText('Lienzo en Blanco')).toBeInTheDocument();

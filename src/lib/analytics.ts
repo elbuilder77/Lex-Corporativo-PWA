@@ -9,6 +9,8 @@ export type AnalyticsEvent =
   | 'article_copy'
   | 'legal_article_send_to_studio'
   | 'source_link_click'
+  | 'desktop_lock_modal_download_click'
+  | 'desktop_lock_modal_learn_more_click'
   | 'station_enter'
   | 'home_return_click';
 

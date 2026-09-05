@@ -27,7 +27,7 @@ export function StudioWelcomeHub({
       className="fixed inset-0 z-[85] flex items-end sm:items-center justify-center bg-slate-950/70 p-0 sm:p-4 backdrop-blur-xs animate-fadeIn"
       role="dialog"
       aria-modal="true"
-      aria-label="Inicio de Estudio Jurídico"
+      aria-label="Inicio de Ingeniería Jurídica"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -46,10 +46,10 @@ export function StudioWelcomeHub({
             </span>
             <div>
               <h2 className="font-serif text-lg sm:text-xl font-bold text-slate-950">
-                Estudio Jurídico & Redacción
+                Ingeniería Jurídica & Redacción
               </h2>
               <p className="text-xs text-slate-500">
-                Selecciona cómo deseas comenzar tu documento legal.
+                Selecciona cómo deseas iniciar tu instrumento legal en este dispositivo.
               </p>
             </div>
           </div>

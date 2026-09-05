@@ -86,67 +86,78 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
 
           {/* Module Switcher Tabs */}
           <nav
-            aria-label="Módulos de consulta"
-            className="hidden md:flex min-w-0 flex-1 items-center justify-center gap-1"
+            aria-label="Módulos de consulta e ingeniería jurídica"
+            className="hidden md:flex min-w-0 flex-1 items-center justify-center gap-1.5"
           >
             <button
               type="button"
               onClick={onGoHome}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition cursor-pointer"
-              title="Volver a la pantalla de inicio"
+              className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition cursor-pointer"
+              title="Volver a la portada de inicio"
             >
               <Home size={15} />
               <span>Inicio</span>
             </button>
-            <button
-              type="button"
-              onClick={() => onTabChange('normativa')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                activeTab === 'normativa'
-                  ? 'bg-legal-gold text-slate-950 shadow-sm font-extrabold'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Scale size={15} />
-              <span className="hidden xs:inline">Legislación</span>
-              <span className="xs:hidden">Leyes</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => onTabChange('licitaciones')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                activeTab === 'licitaciones'
-                  ? 'bg-legal-gold text-slate-950 shadow-sm font-extrabold'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Landmark size={15} />
-              <span>Licitaciones</span>
-            </button>
+
+            <span className="mx-1 h-5 w-px bg-slate-800" aria-hidden="true" />
+
+            {/* Core 3 Work Modules */}
             <button
               type="button"
               onClick={() => onTabChange('estudio')}
-              className={`flex min-h-11 items-center gap-1.5 rounded-xl px-3 text-xs font-bold transition ${
+              className={`flex min-h-9 items-center gap-1.5 rounded-xl px-3 text-xs font-bold transition cursor-pointer ${
                 activeTab === 'estudio'
                   ? 'bg-legal-gold text-slate-950 shadow-sm font-extrabold'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
               }`}
             >
               <FilePenLine size={15} />
-              <span>Estudio</span>
+              <span>Ingeniería Jurídica</span>
             </button>
-            <span className="mx-1 h-6 w-px bg-slate-700" aria-hidden="true" />
+
             <button
               type="button"
-              onClick={() => onTabChange('desktop')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                activeTab === 'desktop'
+              onClick={() => onTabChange('normativa')}
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                activeTab === 'normativa'
                   ? 'bg-legal-gold text-slate-950 shadow-sm font-extrabold'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
               }`}
             >
-              <MonitorDown size={15} />
-              <span>Desktop</span>
+              <Scale size={15} />
+              <span className="hidden lg:inline">Fundamentador Jurídico</span>
+              <span className="lg:hidden">Fundamentos</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onTabChange('licitaciones')}
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                activeTab === 'licitaciones'
+                  ? 'bg-legal-gold text-slate-950 shadow-sm font-extrabold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <Landmark size={15} />
+              <span className="hidden lg:inline">Radar Licitaciones</span>
+              <span className="lg:hidden">Licitaciones</span>
+            </button>
+
+            <span className="mx-1.5 h-5 w-px bg-slate-800" aria-hidden="true" />
+
+            {/* Desktop Presentation & Installer Showcase */}
+            <button
+              type="button"
+              onClick={() => onTabChange('desktop')}
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer border ${
+                activeTab === 'desktop'
+                  ? 'bg-legal-gold text-slate-950 border-legal-gold shadow-sm font-extrabold'
+                  : 'border-slate-700/80 bg-slate-900/60 text-slate-300 hover:border-slate-600 hover:text-white hover:bg-slate-800/80'
+              }`}
+            >
+              <MonitorDown size={14} className={activeTab === 'desktop' ? 'text-slate-950' : 'text-amber-400'} />
+              <span>Desktop Windows</span>
+              <span className="rounded-sm bg-legal-gold/20 px-1 py-0.2 text-[8px] font-extrabold uppercase text-amber-300">EXE</span>
             </button>
           </nav>
 
@@ -249,7 +260,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
 
       {/* Mobile Bottom Navigation Bar */}
       <nav
-        aria-label="Módulos de consulta"
+        aria-label="Módulos de consulta e ingeniería jurídica"
         className="sm:hidden fixed bottom-0 left-0 right-0 z-30 flex border-t border-slate-800 bg-legal-shell/98 backdrop-blur-md"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
@@ -257,11 +268,24 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
           type="button"
           onClick={onGoHome}
           className="relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 hover:text-slate-200 active:scale-95 transition"
-          title="Volver a la pantalla de inicio"
+          title="Volver a la portada de inicio"
         >
           <Home size={18} />
           <span>Inicio</span>
         </button>
+
+        <button
+          type="button"
+          onClick={() => onTabChange('estudio')}
+          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[9px] font-extrabold uppercase tracking-wider active:scale-95 transition ${
+            activeTab === 'estudio' ? 'text-legal-gold' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <FilePenLine size={18} />
+          <span>Ingeniería</span>
+          {activeTab === 'estudio' && <span className="absolute top-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-b-full bg-legal-gold" />}
+        </button>
+
         <button
           type="button"
           onClick={() => onTabChange('normativa')}
@@ -277,6 +301,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
             <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-b-full bg-legal-gold" />
           )}
         </button>
+
         <button
           type="button"
           onClick={() => onTabChange('licitaciones')}
@@ -287,22 +312,12 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
           }`}
         >
           <Landmark size={18} />
-          <span>Licitaciones</span>
+          <span>Radar</span>
           {activeTab === 'licitaciones' && (
             <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-b-full bg-legal-gold" />
           )}
         </button>
-        <button
-          type="button"
-          onClick={() => onTabChange('estudio')}
-          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[9px] font-extrabold uppercase tracking-wider active:scale-95 transition ${
-            activeTab === 'estudio' ? 'text-legal-gold' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <FilePenLine size={18} />
-          <span>Estudio</span>
-          {activeTab === 'estudio' && <span className="absolute top-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-b-full bg-legal-gold" />}
-        </button>
+
         <button
           type="button"
           onClick={() => onTabChange('desktop')}
