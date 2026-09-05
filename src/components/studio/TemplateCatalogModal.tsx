@@ -198,7 +198,7 @@ export function TemplateCatalogModal({
 
                     <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] font-bold text-slate-400">
                       <span>{template.fields.length} variables dinámicas</span>
-                      <span className="text-legal-golddark font-extrabold">Configurar variables →</span>
+                      <span className="text-legal-golddark font-extrabold">Abrir en lienzo →</span>
                     </div>
                   </button>
                 );

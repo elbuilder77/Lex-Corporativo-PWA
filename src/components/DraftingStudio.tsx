@@ -111,7 +111,7 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
 
   // Modals and Drawers
   const [showWelcomeHub, setShowWelcomeHub] = useState(false);
-  const [showCatalogModal, setShowCatalogModal] = useState(false);
+  const [showCatalogModal, setShowCatalogModal] = useState(true);
   const [showAuditorDrawer, setShowAuditorDrawer] = useState(false);
   const [showAssistantDrawer, setShowAssistantDrawer] = useState(false);
   const [showVariablesModal, setShowVariablesModal] = useState(false);
@@ -167,15 +167,26 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
     });
     listStudioDocuments().then((storedDocs) => {
       if (!active) return;
-      setDocuments(storedDocs);
-      if (storedDocs.length > 0) {
-        const latest = storedDocs[0];
+      const validDocs = storedDocs.filter(
+        (doc) =>
+          !(
+            doc.sourceKind === 'blank' &&
+            doc.title === EMPTY_DOCUMENT.title &&
+            doc.editorHtml === EMPTY_DOCUMENT.editorHtml
+          ),
+      );
+      setDocuments(validDocs);
+      if (validDocs.length > 0) {
+        const latest = validDocs[0];
         setCurrentDocument(latest);
         editor?.commands.setContent(latest.editorHtml, { emitUpdate: false });
+        setShowCatalogModal(false);
       } else {
         setShowCatalogModal(true);
       }
-    }).catch(() => undefined);
+    }).catch(() => {
+      setShowCatalogModal(true);
+    });
 
     window.addEventListener('focus', checkPendingCitation);
     return () => {
@@ -205,6 +216,15 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
   }, [currentDocument.editorHtml, currentDocument.id, editor]);
 
   useEffect(() => {
+    // Avoid saving untouched empty initial document so local storage isn't polluted with blank documents
+    if (
+      currentDocument.sourceKind === 'blank' &&
+      currentDocument.title === EMPTY_DOCUMENT.title &&
+      currentDocument.editorHtml === EMPTY_DOCUMENT.editorHtml
+    ) {
+      return;
+    }
+
     const timer = window.setTimeout(async () => {
       try {
         await saveStudioDocument(currentDocument);
@@ -307,7 +327,7 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
       setSaveState('saving');
       setShowVariablesModal(false);
       setShowWelcomeHub(false);
-      notify('Instrumento generado con variables aplicadas.', 'success');
+      notify('Instrumento cargado en el editor con éxito.', 'success');
     } catch {
       notify('La plantilla no pudo compilarse. Revisa los datos capturados.', 'error');
     }
@@ -324,12 +344,9 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
     setFormData(values);
     setShowCatalogModal(false);
     setShowWelcomeHub(false);
+    setShowVariablesModal(false);
 
-    if (template.fields.length > 0) {
-      setShowVariablesModal(true); // Open Step 2: Variables wizard
-    } else {
-      applyTemplateVariables(template, values);
-    }
+    applyTemplateVariables(template, values);
   }
 
   function selectBlank() {
@@ -771,6 +788,41 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Active Template Quick Banner */}
+          {selectedTemplate && (
+            <div className="mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 rounded-xl border border-amber-200/80 bg-gradient-to-r from-amber-50/90 via-amber-50/50 to-white px-3.5 py-2.5 text-xs text-amber-950 shadow-2xs">
+              <div className="flex items-center gap-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-amber-200/80 text-amber-800 text-[11px] font-black shrink-0">
+                  ⚡
+                </span>
+                <div>
+                  <span className="font-bold text-slate-800">Instrumento activo: </span>
+                  <span className="font-extrabold text-amber-900">{selectedTemplate.title}</span>
+                  <span className="text-slate-500 ml-1.5 text-[11px]">
+                    ({selectedTemplate.fields.length} variables disponibles)
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 self-end sm:self-auto">
+                <button
+                  type="button"
+                  onClick={() => setShowVariablesModal(true)}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-amber-800 hover:bg-amber-900 px-3 py-1.5 text-[11px] font-extrabold text-white transition cursor-pointer shadow-2xs active:scale-95"
+                >
+                  <SlidersHorizontal size={12} />
+                  <span>Rellenar variables en lote</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCatalogModal(true)}
+                  className="text-[11px] font-bold text-slate-600 hover:text-slate-900 underline px-1.5 py-1 cursor-pointer"
+                >
+                  Cambiar instrumento
+                </button>
+              </div>
             </div>
           )}
 

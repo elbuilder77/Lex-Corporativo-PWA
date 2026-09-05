@@ -82,4 +82,40 @@ describe('DraftingStudio Component', () => {
 
     expect(screen.getByRole('dialog', { name: 'Borradores locales' })).toBeInTheDocument();
   });
+
+  it('renderiza directamente el instrumento en el lienzo sin modal bloqueante y permite abrir variables bajo demanda', async () => {
+    await act(async () => {
+      render(<DraftingStudio />);
+    });
+
+    // Modal de catálogo abierto de inicio
+    const dialog = screen.getByRole('dialog', { name: 'Catálogo de instrumentos y plantillas' });
+    expect(dialog).toBeInTheDocument();
+
+    // Seleccionar el primer instrumento disponible
+    const instrumentCards = within(dialog).getAllByText(/variables dinámicas/i);
+    expect(instrumentCards.length).toBeGreaterThan(0);
+    const firstCard = instrumentCards[0].closest('button');
+    expect(firstCard).not.toBeNull();
+
+    await act(async () => {
+      fireEvent.click(firstCard!);
+    });
+
+    // El catálogo se cierra y el modal de variables NO bloquea la pantalla
+    expect(screen.queryByRole('dialog', { name: 'Catálogo de instrumentos y plantillas' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: 'Variables de la plantilla' })).not.toBeInTheDocument();
+
+    // El banner de instrumento activo aparece en el lienzo
+    expect(screen.getByText(/Instrumento activo:/i)).toBeInTheDocument();
+    const batchVariablesBtn = screen.getByRole('button', { name: /Rellenar variables en lote/i });
+    expect(batchVariablesBtn).toBeInTheDocument();
+
+    // Al presionar el botón de variables, se abre bajo demanda
+    await act(async () => {
+      fireEvent.click(batchVariablesBtn);
+    });
+
+    expect(screen.getByRole('dialog', { name: 'Variables de la plantilla' })).toBeInTheDocument();
+  });
 });
