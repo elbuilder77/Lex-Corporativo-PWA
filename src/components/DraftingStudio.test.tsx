@@ -18,7 +18,8 @@ describe('DraftingStudio Component', () => {
     expect(screen.getByTitle('Iniciar nuevo documento o abrir asistente de inicio')).toBeInTheDocument();
     expect(screen.getByTitle('Ver borradores locales')).toBeInTheDocument();
     expect(screen.getByTitle('Importar DOCX, PDF o TXT')).toBeInTheDocument();
-    expect(screen.getByTitle('Auditar fundamentación legal del borrador')).toBeInTheDocument();
+    expect(screen.getByTitle('Auditoría Contractual (Exclusivo de Lex Corporativo Desktop)')).toBeInTheDocument();
+    expect(screen.getByTitle('Fundamentación y Citas (Exclusivo de Lex Corporativo Desktop)')).toBeInTheDocument();
   });
 
   it('permite abrir el catálogo modal de instrumentos y filtrar por materia', async () => {
@@ -46,34 +47,32 @@ describe('DraftingStudio Component', () => {
     expect(screen.getByPlaceholderText(/Buscar por contrato, pagaré/i)).toBeInTheDocument();
   });
 
-  it('muestra el asistente de fundamentación y permite consultar materias del corpus', async () => {
+  it('bloquea el modo Fundamentar y muestra el modal exclusivo de Desktop', async () => {
     await act(async () => {
       render(<DraftingStudio />);
     });
 
-    const fundBtn = screen.getByTitle('Abrir asistente de fundamentación y citas');
+    const fundBtn = screen.getByTitle('Fundamentación y Citas (Exclusivo de Lex Corporativo Desktop)');
     await act(async () => {
       fireEvent.click(fundBtn);
     });
 
-    expect(screen.getByRole('heading', { name: 'Asistente de Fundamentación' })).toBeInTheDocument();
-    expect(screen.getByRole('searchbox', { name: 'Buscar fundamento' })).toBeInTheDocument();
-    expect(screen.getByRole('combobox', { name: 'Área jurídica' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Motor de Fundamentación y Citas en Vivo/i })).toBeInTheDocument();
+    expect(screen.getByText(/Exclusivo de Lex Desktop/i)).toBeInTheDocument();
   });
 
-  it('permite abrir el auditor semántico de fundamentación', async () => {
+  it('bloquea el modo Auditar y muestra el modal exclusivo de Desktop', async () => {
     await act(async () => {
       render(<DraftingStudio />);
     });
 
-    const auditBtn = screen.getByTitle('Auditar fundamentación legal del borrador');
+    const auditBtn = screen.getByTitle('Auditoría Contractual (Exclusivo de Lex Corporativo Desktop)');
     await act(async () => {
       fireEvent.click(auditBtn);
     });
 
-    expect(screen.getByRole('dialog', { name: 'Auditor de Fundamentación Legal' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Auditor de Fundamentación' })).toBeInTheDocument();
-    expect(screen.getByText(/Salud de Fundamentación/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Auditoría Contractual y Semántica/i })).toBeInTheDocument();
+    expect(screen.getByText(/Exclusivo de Lex Desktop/i)).toBeInTheDocument();
   });
 
   it('abre el modal de borradores locales al hacer clic en Borradores', async () => {

@@ -1,6 +1,6 @@
 import { BubbleMenu } from '@tiptap/react/menus';
 import type { Editor } from '@tiptap/react';
-import { Bold, Italic, List, Sparkles } from 'lucide-react';
+import { Bold, Italic, List, Lock } from 'lucide-react';
 
 interface EditorBubbleMenuProps {
   editor: Editor | null;
@@ -31,10 +31,13 @@ export function EditorBubbleMenu({ editor, onFundamentar }: EditorBubbleMenuProp
           }
         }}
         className="flex items-center gap-1.5 rounded-lg bg-legal-gold/25 px-2.5 py-1 text-xs font-bold text-amber-300 transition hover:bg-legal-gold/35 active:scale-95"
-        title="Buscar fundamento jurídico en el corpus legal para este fragmento"
+        title="Fundamentación y Citas (Exclusivo de Lex Corporativo Desktop)"
       >
-        <Sparkles size={13} className="text-amber-400" />
+        <Lock size={12} className="text-amber-400" />
         <span>Fundamentar</span>
+        <span className="rounded bg-amber-400/20 px-1 py-0.2 text-[9px] font-extrabold uppercase text-amber-300">
+          Desktop
+        </span>
       </button>
 
       <div className="mx-1 h-4 w-px bg-slate-800" />

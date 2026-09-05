@@ -16,12 +16,12 @@ import {
   Italic,
   List,
   LoaderCircle,
+  Lock,
   Plus,
   Redo2,
   Search,
   Share2,
   SlidersHorizontal,
-  Sparkles,
   Trash2,
   Undo2,
   Upload,
@@ -40,6 +40,7 @@ import { StudioWelcomeHub } from './studio/StudioWelcomeHub';
 import { EditorBubbleMenu } from './studio/EditorBubbleMenu';
 import { FootnotesAppendix } from './studio/FootnotesAppendix';
 import { ClauseAuditorDrawer } from './studio/ClauseAuditorDrawer';
+import { DesktopFeatureLockModal, type LockedFeatureType } from './studio/DesktopFeatureLockModal';
 import type {
   CorpusSearchScope,
   LegalArticle,
@@ -91,7 +92,11 @@ function createDocument(partial: Partial<StudioDocument>): StudioDocument {
   };
 }
 
-export function DraftingStudio() {
+export interface DraftingStudioProps {
+  onNavigateToDesktop?: () => void;
+}
+
+export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}) {
   const { notify } = useUiStore();
   const fileInput = useRef<HTMLInputElement>(null);
   const exportDetailsRef = useRef<HTMLDetailsElement>(null);
@@ -111,6 +116,7 @@ export function DraftingStudio() {
   const [showAssistantDrawer, setShowAssistantDrawer] = useState(false);
   const [showVariablesModal, setShowVariablesModal] = useState(false);
   const [showDraftsModal, setShowDraftsModal] = useState(false);
+  const [lockedFeatureModal, setLockedFeatureModal] = useState<LockedFeatureType>(null);
 
   // Foundation Search
   const [foundationQuery, setFoundationQuery] = useState('');
@@ -258,17 +264,18 @@ export function DraftingStudio() {
         });
       } else if (isModifier && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        setShowAssistantDrawer((prev) => !prev);
+        setLockedFeatureModal('fundamentar');
         if (typeof navigator !== 'undefined' && navigator.vibrate) {
           navigator.vibrate(10);
         }
       } else if (isModifier && e.shiftKey && e.key.toLowerCase() === 'a') {
         e.preventDefault();
-        setShowAuditorDrawer((prev) => !prev);
+        setLockedFeatureModal('auditar');
       } else if (isModifier && e.shiftKey && e.key.toLowerCase() === 't') {
         e.preventDefault();
         setShowCatalogModal((prev) => !prev);
       } else if (e.key === 'Escape') {
+        setLockedFeatureModal(null);
         setShowAssistantDrawer(false);
         setShowAuditorDrawer(false);
         setShowCatalogModal(false);
@@ -600,31 +607,32 @@ export function DraftingStudio() {
               </button>
             )}
 
-            {/* Opción D: Auditor de Fundamentación Trigger */}
+            {/* Opción D: Auditor de Fundamentación Trigger (Locked for Desktop) */}
             <button
               type="button"
-              onClick={() => setShowAuditorDrawer(true)}
-              className="studio-action text-slate-800 hover:border-legal-gold"
-              title="Auditar fundamentación legal del borrador"
+              onClick={() => setLockedFeatureModal('auditar')}
+              className="studio-action text-slate-800 hover:border-amber-400 gap-1.5"
+              title="Auditoría Contractual (Exclusivo de Lex Corporativo Desktop)"
             >
-              <Sparkles size={15} className="text-amber-500" />
+              <Lock size={13} className="text-amber-500" />
               <span>Auditar</span>
+              <span className="rounded bg-amber-100 px-1.5 py-0.2 text-[9px] font-extrabold text-amber-900 uppercase">
+                Desktop
+              </span>
             </button>
 
-            {/* Opción A & C: Assistant Trigger */}
+            {/* Opción A & C: Assistant Trigger (Locked for Desktop) */}
             <button
               type="button"
-              onClick={() => setShowAssistantDrawer(!showAssistantDrawer)}
-              className={`studio-action ${showAssistantDrawer ? 'border-slate-900 bg-slate-900 text-white hover:bg-slate-800' : ''}`}
-              title="Abrir asistente de fundamentación y citas"
+              onClick={() => setLockedFeatureModal('fundamentar')}
+              className="studio-action text-slate-800 hover:border-slate-400 gap-1.5"
+              title="Fundamentación y Citas (Exclusivo de Lex Corporativo Desktop)"
             >
-              <Search size={15} />
+              <Lock size={13} className="text-slate-400" />
               <span>Fundamentar</span>
-              {currentDocument.citations.length > 0 && (
-                <span className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${showAssistantDrawer ? 'bg-slate-700 text-amber-300' : 'bg-slate-100 text-slate-700'}`}>
-                  {currentDocument.citations.length}
-                </span>
-              )}
+              <span className="rounded bg-slate-100 px-1.5 py-0.2 text-[9px] font-extrabold text-slate-600 uppercase">
+                Desktop
+              </span>
             </button>
 
             {/* Borradores */}
@@ -791,7 +799,13 @@ export function DraftingStudio() {
           </div>
 
           {/* Opción A: TipTap Bubble Menu for Selection */}
-          <EditorBubbleMenu editor={editor} onFundamentar={(query) => runCorpusSearch(query)} />
+          <EditorBubbleMenu
+            editor={editor}
+            onFundamentar={(query) => {
+              setFoundationQuery(query);
+              setLockedFeatureModal('fundamentar');
+            }}
+          />
 
           {/* TipTap Document Content */}
           <div className="py-2">
@@ -1018,6 +1032,14 @@ export function DraftingStudio() {
         selectedTemplate={selectedTemplate}
         onSelectTemplate={selectTemplate}
         onSelectBlank={selectBlank}
+      />
+
+      {/* Desktop Feature Lock Modal (Exclusivo Desktop) */}
+      <DesktopFeatureLockModal
+        isOpen={lockedFeatureModal !== null}
+        onClose={() => setLockedFeatureModal(null)}
+        feature={lockedFeatureModal}
+        onNavigateToDesktop={onNavigateToDesktop}
       />
 
       {/* Opción D: Clause Auditor Drawer */}

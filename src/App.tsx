@@ -159,7 +159,7 @@ export function App() {
                 </div>
               }
             >
-              <DraftingStudio />
+              <DraftingStudio onNavigateToDesktop={() => handleTabChange('desktop')} />
             </Suspense>
           ) : (
             <Suspense
