@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DraftingStudio } from './DraftingStudio';
 
@@ -8,43 +8,38 @@ describe('DraftingStudio Component', () => {
     sessionStorage.clear();
   });
 
-  it('renderiza la cabecera y acciones principales del Estudio jurídico', async () => {
+  it('renderiza la cabecera y acciones principales de Ingeniería Jurídica', async () => {
     await act(async () => {
       render(<DraftingStudio />);
     });
 
     expect(screen.getByRole('heading', { name: 'Ingeniería Jurídica', level: 1 })).toBeInTheDocument();
     expect(screen.getByText(/Redacción documental/i)).toBeInTheDocument();
-    expect(screen.getByTitle('Iniciar nuevo documento o abrir asistente de inicio')).toBeInTheDocument();
+    expect(screen.getByTitle('Iniciar nuevo documento desde el catálogo de instrumentos')).toBeInTheDocument();
     expect(screen.getByTitle('Ver borradores locales')).toBeInTheDocument();
     expect(screen.getByTitle('Importar DOCX, PDF o TXT')).toBeInTheDocument();
     expect(screen.getByTitle('Auditoría Contractual (Exclusivo de Lex Corporativo Desktop)')).toBeInTheDocument();
     expect(screen.getByTitle('Fundamentación y Citas (Exclusivo de Lex Corporativo Desktop)')).toBeInTheDocument();
   });
 
-  it('permite abrir el catálogo modal de instrumentos y filtrar por materia', async () => {
+  it('abre automáticamente el catálogo de instrumentos al ingresar y permite filtrar por materia', async () => {
     await act(async () => {
       render(<DraftingStudio />);
     });
 
-    const catalogBtn = screen.getByTitle('Abrir catálogo de plantillas e instrumentos');
-    expect(catalogBtn).toBeInTheDocument();
+    // Catálogo modal se abre de inicio para reducir clics
+    const dialog = screen.getByRole('dialog', { name: 'Catálogo de instrumentos y plantillas' });
+    expect(dialog).toBeInTheDocument();
+    expect(within(dialog).getByRole('heading', { name: 'Biblioteca de Instrumentos' })).toBeInTheDocument();
+    expect(within(dialog).getByPlaceholderText(/Buscar por contrato, pagaré/i)).toBeInTheDocument();
 
+    const mercantilTabs = within(dialog).getAllByRole('button', { name: /Mercantil/i });
+    expect(mercantilTabs.length).toBeGreaterThan(0);
     await act(async () => {
-      fireEvent.click(catalogBtn);
+      fireEvent.click(mercantilTabs[0]);
     });
 
-    expect(screen.getByRole('dialog', { name: 'Catálogo de instrumentos y plantillas' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Biblioteca de Instrumentos' })).toBeInTheDocument();
-
-    const mercantilBtns = screen.getAllByRole('button', { name: /Mercantil/i });
-    expect(mercantilBtns.length).toBeGreaterThan(0);
-
-    await act(async () => {
-      fireEvent.click(mercantilBtns[0]);
-    });
-
-    expect(screen.getByPlaceholderText(/Buscar por contrato, pagaré/i)).toBeInTheDocument();
+    expect(within(dialog).getByPlaceholderText(/Buscar por contrato, pagaré/i)).toBeInTheDocument();
   });
 
   it('bloquea el modo Fundamentar y muestra el modal exclusivo de Desktop', async () => {

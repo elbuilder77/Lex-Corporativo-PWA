@@ -168,14 +168,12 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
     listStudioDocuments().then((storedDocs) => {
       if (!active) return;
       setDocuments(storedDocs);
-      const hubSeen = sessionStorage.getItem('lex_studio_hub_seen');
-      if (!hubSeen && storedDocs.length === 0) {
-        setShowWelcomeHub(true);
-        sessionStorage.setItem('lex_studio_hub_seen', 'true');
-      } else if (storedDocs.length > 0) {
+      if (storedDocs.length > 0) {
         const latest = storedDocs[0];
         setCurrentDocument(latest);
         editor?.commands.setContent(latest.editorHtml, { emitUpdate: false });
+      } else {
+        setShowCatalogModal(true);
       }
     }).catch(() => undefined);
 
@@ -569,9 +567,9 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
             {/* Nuevo Documento Trigger */}
             <button
               type="button"
-              onClick={() => setShowWelcomeHub(true)}
-              className="studio-action gap-1.5 font-extrabold text-slate-900 border-slate-300 hover:border-legal-gold"
-              title="Iniciar nuevo documento o abrir asistente de inicio"
+              onClick={() => setShowCatalogModal(true)}
+              className="studio-action gap-1.5 font-extrabold text-slate-900 border-slate-300 hover:border-legal-gold cursor-pointer"
+              title="Iniciar nuevo documento desde el catálogo de instrumentos"
             >
               <Plus size={15} className="text-legal-gold" />
               <span className="hidden sm:inline">Nuevo</span>
@@ -735,6 +733,46 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
               </div>
             </div>
           </header>
+
+          {/* Quick Instrument Selector for Instant 1-Click Start */}
+          {currentDocument.sourceKind === 'blank' && (
+            <div className="mb-5 rounded-2xl border border-legal-gold/40 bg-gradient-to-r from-amber-50/80 via-white to-amber-50/50 p-4 shadow-2xs">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-legal-golddark flex items-center gap-1.5">
+                    <span>⚡</span> Comienza con un instrumento canónico:
+                  </h3>
+                  <p className="text-xs text-slate-600 mt-0.5">
+                    Selecciona una plantilla para rellenar variables interactivas sin redactar desde cero.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowCatalogModal(true)}
+                  className="rounded-xl bg-legal-gold hover:bg-legal-goldhover px-3.5 py-2 text-xs font-extrabold text-slate-950 transition cursor-pointer shadow-2xs shrink-0 active:scale-95"
+                >
+                  Ver Catálogo (25 instrumentos) →
+                </button>
+              </div>
+
+              {/* Quick Instrument Chips */}
+              {templates.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1.5 pt-2.5 border-t border-amber-200/60">
+                  {templates.slice(0, 6).map((tmpl) => (
+                    <button
+                      key={tmpl.id}
+                      type="button"
+                      onClick={() => selectTemplate(tmpl)}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-800 hover:border-legal-gold hover:bg-amber-50 hover:text-slate-950 transition cursor-pointer shadow-2xs active:scale-95"
+                    >
+                      <span className="text-legal-gold text-xs">📄</span>
+                      <span>{tmpl.title}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Quick Format & Title Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3 mb-4">
