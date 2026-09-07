@@ -11,7 +11,7 @@
     "materia": "adquisiciones",
     "caracter": "nacional",
     "tipoProcedimiento": "licitacion_publica",
-    "estatus": "recepcion_propuestas",
+    "estatus": "evaluacion",
     "entidadFederativa": "Nacional / Federal",
     "fechaPublicacion": "2026-08-10",
     "fechaJuntaAclaraciones": "2026-08-20",
@@ -33,7 +33,15 @@
       "Anexo Técnico 1 (Catálogo de Claves)",
       "Modelo de Contrato",
       "Formato de Propuesta Económica"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-cfe-2026-002",
@@ -70,7 +78,15 @@
       "Especificación Técnica CFE G0100-05",
       "Catálogo de Conceptos",
       "Programa de Ejecución"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-sict-2026-003",
@@ -106,7 +122,15 @@
       "Bases de Licitación LOPSRM",
       "Proyecto Ejecutivo y Planos CAD",
       "Catálogo de Conceptos"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-sat-2026-004",
@@ -120,7 +144,7 @@
     "materia": "servicios",
     "caracter": "nacional",
     "tipoProcedimiento": "licitacion_publica",
-    "estatus": "recepcion_propuestas",
+    "estatus": "evaluacion",
     "entidadFederativa": "Ciudad de México",
     "fechaPublicacion": "2026-08-08",
     "fechaJuntaAclaraciones": "2026-08-18",
@@ -141,7 +165,15 @@
       "Convocatoria y Bases",
       "Términos de Referencia de Ciberseguridad",
       "Acuerdo de Niveles de Servicio (SLA)"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-pemex-2026-005",
@@ -175,7 +207,15 @@
       "Bases de Contratación Internacional",
       "Especificación Técnica PEP-ET-044",
       "Tabulador de Tarifas Diarias"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-issste-2026-006",
@@ -189,7 +229,7 @@
     "materia": "servicios",
     "caracter": "nacional",
     "tipoProcedimiento": "licitacion_publica",
-    "estatus": "recepcion_propuestas",
+    "estatus": "evaluacion",
     "entidadFederativa": "Estado de México",
     "fechaPublicacion": "2026-08-15",
     "fechaJuntaAclaraciones": "2026-08-24",
@@ -209,7 +249,15 @@
       "Bases Oficiales",
       "Catálogo de Pruebas y Volúmenes Estimados",
       "Términos de Referencia Hospitalarios"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-conagua-2026-007",
@@ -244,7 +292,15 @@
       "Convocatoria y Bases LOPSRM",
       "Planos de Ingeniería Hidráulica",
       "Especificaciones de Calidad OCAVM"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-sep-2026-008",
@@ -258,7 +314,7 @@
     "materia": "adquisiciones",
     "caracter": "nacional",
     "tipoProcedimiento": "licitacion_publica",
-    "estatus": "recepcion_propuestas",
+    "estatus": "evaluacion",
     "entidadFederativa": "Querétaro",
     "fechaPublicacion": "2026-08-17",
     "fechaJuntaAclaraciones": "2026-08-26",
@@ -278,7 +334,15 @@
       "Bases del Procedimiento",
       "Ficha Técnica de Gramaje y Tintas",
       "Distribución Logística por Entidad"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-bienestar-2026-009",
@@ -312,7 +376,15 @@
       "Convocatoria a la Licitación",
       "Especificaciones de Flotilla",
       "Convenio de Arrendamiento"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-guardia-2026-010",
@@ -326,7 +398,7 @@
     "materia": "adquisiciones",
     "caracter": "nacional",
     "tipoProcedimiento": "licitacion_publica",
-    "estatus": "recepcion_propuestas",
+    "estatus": "evaluacion",
     "entidadFederativa": "Nacional / Federal",
     "fechaPublicacion": "2026-08-13",
     "fechaJuntaAclaraciones": "2026-08-22",
@@ -346,7 +418,15 @@
       "Bases de Licitación",
       "Fichas Técnicas de Textiles",
       "Protocolo de Pruebas Destructivas"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-sct-puertos-2026-011",
@@ -381,7 +461,15 @@
       "Bases y Términos de Referencia",
       "Estudio Batimétrico Oficial",
       "Plan de Manejo Ambiental"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-cdmx-sobse-2026-012",
@@ -395,7 +483,7 @@
     "materia": "obra_publica",
     "caracter": "nacional",
     "tipoProcedimiento": "licitacion_publica",
-    "estatus": "recepcion_propuestas",
+    "estatus": "evaluacion",
     "entidadFederativa": "Ciudad de México",
     "fechaPublicacion": "2026-08-14",
     "fechaJuntaAclaraciones": "2026-08-23",
@@ -414,7 +502,15 @@
       "Bases Locales LPN",
       "Ficha Técnica de Luminarias",
       "Tramos Viales a Intervenir"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-inaoep-2026-013",
@@ -447,7 +543,15 @@
       "Bases Internacionales en Español e Inglés",
       "Especificaciones de Criogenia",
       "Protocolo de Pruebas en Laboratorio"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-jalisco-salud-2026-014",
@@ -461,7 +565,7 @@
     "materia": "servicios",
     "caracter": "nacional",
     "tipoProcedimiento": "licitacion_publica",
-    "estatus": "recepcion_propuestas",
+    "estatus": "evaluacion",
     "entidadFederativa": "Jalisco",
     "fechaPublicacion": "2026-08-12",
     "fechaJuntaAclaraciones": "2026-08-21",
@@ -481,7 +585,15 @@
       "Bases Estatales",
       "Catálogo de Hospitales y Metros Cuadrados",
       "Protocolos NOM-087"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-nl-movilidad-2026-015",
@@ -515,7 +627,15 @@
       "Convocatoria y Bases LPN",
       "Arquitectura Tecnológica Metrorrey",
       "Protocolos de Comunicación Segura"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-sonora-infra-2026-016",
@@ -548,7 +668,15 @@
       "Convocatoria LO",
       "Proyecto Geométrico",
       "Mecánica de Suelos"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-qroo-salud-2026-017",
@@ -581,7 +709,15 @@
       "Bases Licitación",
       "Especificaciones de Tomografía",
       "Criterios de Blindaje Radiológico"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-baja-desal-2026-018",
@@ -615,7 +751,15 @@
       "Bases Internacionales",
       "Proyecto Hidráulico y Marino",
       "Modelo Financiero"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-guanajuato-seg-2026-019",
@@ -648,7 +792,15 @@
       "Bases de Licitación",
       "Puntos Georreferenciados de Arcos",
       "Protocolo C5i"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   },
   {
     "id": "lic-tabasco-petro-2026-020",
@@ -681,6 +833,14 @@
       "Bases LOPSRM",
       "Planos Estructurales Marinos",
       "Estudio Geotécnico de Fondo Marino"
-    ]
+    ],
+    "fuenteOficial": {
+      "id": "compranet",
+      "nombre": "ComprasMX · CompraNet",
+      "url": "https://comprasmx.buengobierno.gob.mx",
+      "ambito": "federal",
+      "verificadaEl": "2026-09-07",
+      "integridad": "complete"
+    }
   }
 ]
