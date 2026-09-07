@@ -1,6 +1,7 @@
 import {
   BookOpenCheck,
   ExternalLink,
+  FilePenLine,
   Info,
   Landmark,
   ShieldCheck,
@@ -73,6 +74,16 @@ export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
               Corpus estructurado con {CORPUS_STATS.provisions.toLocaleString('es-MX')} disposiciones en{' '}
               {CORPUS_STATS.instruments} leyes y reglamentos federales (Laboral, Mercantil, Fiscal, Aduanal y Comercio Exterior),
               con motor SQLite WASM en sesión y enlaces directos a la Cámara de Diputados.
+            </p>
+          </div>
+
+          {/* Service 3: Estudio Jurídico */}
+          <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/80">
+            <div className="flex items-center gap-2 text-sm font-extrabold text-slate-950">
+              <FilePenLine size={18} className="text-amber-700" /> Estudio Jurídico Local
+            </div>
+            <p className="mt-2 text-xs leading-5 text-slate-600">
+              Redacción y generación de 25 instrumentos y contratos con plantillas profesionales, vinculación de citas del corpus federal, importación de documentos y guardado local en IndexedDB en tu navegador.
             </p>
           </div>
 

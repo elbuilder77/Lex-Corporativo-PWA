@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "targets": {
+    "/": {
+      "targetKind": "existing-ui",
+      "projectId": "61066bf0-cd85-413a-a881-ee8bf28dcb18",
+      "baselineDraftId": "7c34872c-6348-438e-a54c-091efa653c13",
+      "activeDraftId": "d0a21704-7d31-480a-b878-4da35eb0947b",
+      "currentVersion": 1,
+      "designSystemPath": ".superdesign/design-system.md",
+      "referenceIds": [
+        "lex-logo-mark",
+        "lex-logo-lockup"
+      ],
+      "brandAssets": {
+        "logo": {
+          "assetKey": "lex-logo-lockup",
+          "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/projects/61066bf0-cd85-413a-a881-ee8bf28dcb18/brand-assets/lex-logo-lockup/logo-lockup-transparent.png",
+          "sourcePath": "src/assets/logo-lockup-transparent.png"
+        }
+      },
+      "contextFiles": [
+        ".superdesign/design-system.md",
+        "src/index.css",
+        "src/components/Introduction.tsx",
+        "src/components/AppShell.tsx",
+        "src/components/BuscadorLegal.tsx",
+        "src/components/DraftingStudio.tsx",
+        "src/types.ts"
+      ],
+      "fingerprints": {
+        ".superdesign/design-system.md": "165ea38f65bee1f03a7e331d9aaf834ec56d1bd466ac3bae6453488f296a84b5",
+        "src/index.css": "50a38b2623815baceae54f71679d5450117d2dfa21538d64f7f34f13b573d74b",
+        "src/components/Introduction.tsx": "8c0af144f13bf87a9b760b2ac87e69d1f8444c2505ca72917a680221ef22a233",
+        "src/components/AppShell.tsx": "fb943aa4da51230cd6c72dd8557e043e89a310eba1e7063c407635c9ca191ed1",
+        "src/components/BuscadorLegal.tsx": "30ede3c04c114c1d1ea75a1071025c1cedf77367f08df52b61abb9e77d386a31",
+        "src/components/DraftingStudio.tsx": "1b7500323ab4df97b268caaf92c17e0b42e9668bc1249cecd81718674fca98c9",
+        "src/types.ts": "c8dba5767b1c24fafbd4c39a07097c8a91185680fd6421d7e81973b12f22d2da"
+      },
+      "components": [],
+      "drafts": {
+        "7c34872c-6348-438e-a54c-091efa653c13": {
+          "title": "Base fiel — Portada y shell actual",
+          "visualDirection": "faithful current UI baseline"
+        },
+        "d0a21704-7d31-480a-b878-4da35eb0947b": {
+          "title": "Dirección A — Institucional-operativa",
+          "visualDirection": "controlled density and operational scanability",
+          "parentDraftId": "7c34872c-6348-438e-a54c-091efa653c13"
+        },
+        "244e14a3-0e35-417a-a3d3-4d2d336a452b": {
+          "title": "Dirección B — Editorial-operativa",
+          "visualDirection": "legal-paper editorial hierarchy with operational clarity",
+          "parentDraftId": "7c34872c-6348-438e-a54c-091efa653c13"
+        }
+      },
+      "updatedAt": "2026-09-02T03:24:32.5485019Z"
+    }
+  }
+}

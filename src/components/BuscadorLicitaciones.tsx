@@ -405,6 +405,32 @@ export function BuscadorLicitaciones() {
               </div>
             </div>
 
+            {/* Quick 1-Touch Materia Pills */}
+            <div className="mt-3 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 shrink-0 mr-1">
+                Materia:
+              </span>
+              {(Object.entries(MATERIA_LABELS) as Array<['todas' | LicitacionMateria, string]>).map(
+                ([key, label]) => {
+                  const isActive = materia === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => handleFilterChange(key, caracter, convocante, entidad, estatus, sortBy)}
+                      className={`shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                        isActive
+                          ? 'bg-legal-gold text-slate-950 font-extrabold shadow-2xs'
+                          : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 hover:text-white'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                },
+              )}
+            </div>
+
             {/* Collapsible Structured Filters Bar */}
             {showFilters && (
               <div className="mt-3 grid gap-2.5 border-t border-slate-700/80 pt-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">

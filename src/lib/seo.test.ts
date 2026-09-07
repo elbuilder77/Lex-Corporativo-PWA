@@ -44,4 +44,12 @@ describe('SEO Dynamic Utility', () => {
     const metaDesc = document.querySelector('meta[name="description"]');
     expect(metaDesc?.getAttribute('content')).toBe(SEO_PAGES.desktop.description);
   });
+
+  it('actualiza el título y la descripción para la pestaña de estudio', () => {
+    updateSeoMeta('estudio');
+
+    expect(document.title).toBe(SEO_PAGES.estudio.title);
+    const metaDesc = document.querySelector('meta[name="description"]');
+    expect(metaDesc?.getAttribute('content')).toBe(SEO_PAGES.estudio.description);
+  });
 });

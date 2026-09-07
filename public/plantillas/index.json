@@ -1,0 +1,15 @@
+[
+  { "id": "mercantil-pagare", "file": "pagare_mercantil.hbs", "format": "hbs" },
+  { "id": "mercantil-compraventa", "file": "CONTRATO DE COMPRAVENTA MERCANTIL.md", "format": "md" },
+  { "id": "mercantil-comision", "file": "CONTRATO DE COMISIÓN MERCANTIL.md", "format": "md" },
+  { "id": "mercantil-distribucion", "file": "CONTRATO DE DISTRIBUCIÓN COMERCIAL.md", "format": "md" },
+  { "id": "mercantil-cesion-derechos", "file": "CESIÓN DE DERECHOS PATRIMONIALES-PROP INT.md", "format": "md" },
+  { "id": "mercantil-reconocimiento-adeudo", "file": "CONVENIO DE RECONOCIMIENTO DE ADEUD.md", "format": "md" },
+  { "id": "mercantil-convenio-modificatorio", "file": "CONVENIO MODIFICATORIO.md", "format": "md" },
+  { "id": "mercantil-nda-bilateral", "file": "CONVENIO DE CONFIDENCIALIDAD.md", "format": "md" },
+  { "id": "fiscal-prestacion-servicios", "file": "CONTRATO DE PRESTACIÓN DE SERVICIOS.md", "format": "md" },
+  { "id": "fiscal-escrito-sat", "file": "escrito_sat.hbs", "format": "hbs" },
+  { "id": "comercio_exterior-aviso-privacidad", "file": "AVISO DE PRIVACIDAD PARA OPERACIONE.md", "format": "md" },
+  { "id": "comercio_exterior-compraventa-cisg", "file": "CONTRATO DE COMPRAVENTA INTERNACIONAL DE MERCANCÍAS.md", "format": "md" },
+  { "id": "aduanal-poder-especial", "file": "PODER ESPECIAL PARA ACTOS DE COMERC.md", "format": "md" }
+]

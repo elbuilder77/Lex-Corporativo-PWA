@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { AlertCircle, CheckCircle2, Home, Info, Landmark, Map, MonitorDown, Scale, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, FilePenLine, HelpCircle, Home, Info, Landmark, Map, MonitorDown, Scale, ShieldCheck, X } from 'lucide-react';
 import logoMark from '../assets/logo-mark.png';
 import { clearRetiredSavedData } from '../lib/coverage-sources';
 import { CoverageSourcesSheet } from './CoverageSourcesSheet';
@@ -64,7 +64,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
     <div className="min-h-screen bg-slate-50 text-slate-900">
       {/* Top Global Navigation Bar */}
       <header className="sticky top-0 z-30 border-b border-slate-800 bg-legal-shell/95 backdrop-blur-md text-white shadow-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-3 px-4 sm:px-6">
           {/* Brand Logo and Title - Returns to Home */}
           <button
             type="button"
@@ -80,64 +80,93 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
               <strong className="block font-serif text-sm font-semibold tracking-wide text-white leading-none">
                 Lex Corporativo
               </strong>
+              <span className="mt-1 block text-[9px] font-semibold uppercase tracking-[0.16em] text-slate-400">Plataforma jurídica local</span>
             </span>
           </button>
 
           {/* Module Switcher Tabs */}
           <nav
-            aria-label="Módulos de consulta"
-            className="hidden sm:flex items-center rounded-xl bg-slate-900/90 p-1 border border-slate-800"
+            aria-label="Módulos de consulta e ingeniería jurídica"
+            className="hidden md:flex min-w-0 flex-1 items-center justify-center gap-1.5"
           >
             <button
               type="button"
               onClick={onGoHome}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition cursor-pointer"
-              title="Volver a la pantalla de inicio"
+              className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition cursor-pointer"
+              title="Volver a la portada de inicio"
             >
               <Home size={15} />
               <span>Inicio</span>
             </button>
+
+            <span className="mx-1 h-5 w-px bg-slate-800" aria-hidden="true" />
+
+            {/* Core 3 Work Modules */}
+            <button
+              type="button"
+              onClick={() => onTabChange('estudio')}
+              className={`flex min-h-9 items-center gap-1.5 rounded-xl px-3 text-xs font-bold transition cursor-pointer ${
+                activeTab === 'estudio'
+                  ? 'bg-legal-gold text-slate-950 shadow-sm font-extrabold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <FilePenLine size={15} />
+              <span>Ingeniería Jurídica</span>
+            </button>
+
             <button
               type="button"
               onClick={() => onTabChange('normativa')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
                 activeTab === 'normativa'
                   ? 'bg-legal-gold text-slate-950 shadow-sm font-extrabold'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
               }`}
             >
               <Scale size={15} />
-              <span className="hidden xs:inline">Legislación</span>
-              <span className="xs:hidden">Leyes</span>
+              <span className="hidden lg:inline">Fundamentador Jurídico</span>
+              <span className="lg:hidden">Fundamentos</span>
             </button>
+
             <button
               type="button"
               onClick={() => onTabChange('licitaciones')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
                 activeTab === 'licitaciones'
                   ? 'bg-legal-gold text-slate-950 shadow-sm font-extrabold'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
               }`}
             >
               <Landmark size={15} />
-              <span>Licitaciones</span>
+              <span className="hidden lg:inline">Radar Licitaciones</span>
+              <span className="lg:hidden">Licitaciones</span>
             </button>
+
+            <span className="mx-1.5 h-5 w-px bg-slate-800" aria-hidden="true" />
+
+            {/* Desktop Presentation & Installer Showcase */}
             <button
               type="button"
               onClick={() => onTabChange('desktop')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer border ${
                 activeTab === 'desktop'
-                  ? 'bg-legal-gold text-slate-950 shadow-sm font-extrabold'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-legal-gold text-slate-950 border-legal-gold shadow-sm font-extrabold'
+                  : 'border-slate-700/80 bg-slate-900/60 text-slate-300 hover:border-slate-600 hover:text-white hover:bg-slate-800/80'
               }`}
             >
-              <MonitorDown size={15} />
-              <span>Estación Desktop</span>
+              <MonitorDown size={14} className={activeTab === 'desktop' ? 'text-slate-950' : 'text-amber-400'} />
+              <span>Desktop Windows</span>
+              <span className="rounded-sm bg-legal-gold/20 px-1 py-0.2 text-[8px] font-extrabold uppercase text-amber-300">EXE</span>
             </button>
           </nav>
 
           {/* Action Buttons: Coverage & Info */}
           <div className="flex items-center gap-1">
+            <div className="hidden items-center gap-2 rounded-xl border border-emerald-800 bg-emerald-950 px-3 py-1.5 xl:flex">
+              <ShieldCheck size={14} className="text-emerald-400" />
+              <span className="text-[9px] font-bold leading-tight text-emerald-200">Datos en este dispositivo<br /><span className="font-medium text-emerald-400">Disponible sin conexión</span></span>
+            </div>
             <button
               type="button"
               onClick={() => setPanel('coverage')}
@@ -153,7 +182,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
               className="flex min-h-10 min-w-10 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition"
               aria-label="Información"
             >
-              <Info size={18} />
+              <HelpCircle size={18} />
             </button>
           </div>
         </div>
@@ -175,7 +204,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
         {notifications.map((notification) => (
           <div
             key={notification.id}
-            className="pointer-events-auto flex items-start gap-2.5 rounded-2xl border border-slate-700 bg-slate-950/95 p-3.5 text-xs text-white shadow-2xl backdrop-blur-md"
+            className="pointer-events-auto flex items-start gap-2.5 rounded-2xl border border-slate-700 bg-slate-950/95 p-3.5 text-xs text-white shadow-2xl backdrop-blur-md animate-fadeIn"
           >
             {notification.type === 'success' ? (
               <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-400" />
@@ -188,7 +217,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
             <button
               type="button"
               onClick={() => dismissNotification(notification.id)}
-              className="flex min-h-8 min-w-8 items-center justify-center text-slate-400 hover:text-white"
+              className="flex min-h-8 min-w-8 items-center justify-center text-slate-400 hover:text-white active:scale-95 transition"
               aria-label="Cerrar"
             >
               <X size={15} />
@@ -200,7 +229,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
       {/* PWA Install Prompt */}
       {installPrompt && (
         <div
-          className="fixed bottom-3 left-3 right-3 z-40 mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-slate-700 bg-slate-950 p-3 text-white shadow-2xl"
+          className="fixed bottom-20 sm:bottom-4 left-3 right-3 z-40 mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-slate-700 bg-slate-950 p-3.5 text-white shadow-2xl animate-slideUp"
           style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
         >
           <img
@@ -214,14 +243,14 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
           <button
             type="button"
             onClick={install}
-            className="min-h-10 rounded-xl bg-legal-gold px-4 text-xs font-extrabold text-slate-950 hover:bg-legal-goldhover"
+            className="min-h-10 rounded-xl bg-legal-gold px-4 text-xs font-extrabold text-slate-950 hover:bg-legal-goldhover active:scale-95 transition"
           >
             Instalar
           </button>
           <button
             type="button"
             onClick={() => setInstallPrompt(null)}
-            className="flex min-h-10 min-w-10 items-center justify-center text-slate-400"
+            className="flex min-h-10 min-w-10 items-center justify-center text-slate-400 active:scale-95 transition"
             aria-label="Cerrar"
           >
             <X size={17} />
@@ -231,23 +260,36 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
 
       {/* Mobile Bottom Navigation Bar */}
       <nav
-        aria-label="Módulos de consulta"
+        aria-label="Módulos de consulta e ingeniería jurídica"
         className="sm:hidden fixed bottom-0 left-0 right-0 z-30 flex border-t border-slate-800 bg-legal-shell/98 backdrop-blur-md"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         <button
           type="button"
           onClick={onGoHome}
-          className="relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 hover:text-slate-200 transition"
-          title="Volver a la pantalla de inicio"
+          className="relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 hover:text-slate-200 active:scale-95 transition"
+          title="Volver a la portada de inicio"
         >
           <Home size={18} />
           <span>Inicio</span>
         </button>
+
+        <button
+          type="button"
+          onClick={() => onTabChange('estudio')}
+          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[9px] font-extrabold uppercase tracking-wider active:scale-95 transition ${
+            activeTab === 'estudio' ? 'text-legal-gold' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <FilePenLine size={18} />
+          <span>Ingeniería</span>
+          {activeTab === 'estudio' && <span className="absolute top-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-b-full bg-legal-gold" />}
+        </button>
+
         <button
           type="button"
           onClick={() => onTabChange('normativa')}
-          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest transition ${
+          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest active:scale-95 transition ${
             activeTab === 'normativa'
               ? 'text-legal-gold'
               : 'text-slate-400 hover:text-slate-200'
@@ -259,25 +301,27 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
             <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-b-full bg-legal-gold" />
           )}
         </button>
+
         <button
           type="button"
           onClick={() => onTabChange('licitaciones')}
-          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest transition ${
+          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest active:scale-95 transition ${
             activeTab === 'licitaciones'
               ? 'text-legal-gold'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <Landmark size={18} />
-          <span>Licitaciones</span>
+          <span>Radar</span>
           {activeTab === 'licitaciones' && (
             <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-b-full bg-legal-gold" />
           )}
         </button>
+
         <button
           type="button"
           onClick={() => onTabChange('desktop')}
-          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest transition ${
+          className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest active:scale-95 transition ${
             activeTab === 'desktop'
               ? 'text-legal-gold'
               : 'text-slate-400 hover:text-slate-200'
@@ -288,14 +332,6 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
           {activeTab === 'desktop' && (
             <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-b-full bg-legal-gold" />
           )}
-        </button>
-        <button
-          type="button"
-          onClick={() => setPanel('coverage')}
-          className="relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 hover:text-slate-200 transition"
-        >
-          <Map size={18} />
-          <span>Cobertura</span>
         </button>
       </nav>
     </div>

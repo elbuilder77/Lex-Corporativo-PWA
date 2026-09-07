@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import 'fake-indexeddb/auto';
 import { vi } from 'vitest';
 
 // Mock localStorage with working in-memory store
@@ -39,6 +40,11 @@ Object.defineProperty(navigator, 'wakeLock', {
 
 // Mock navigator.onLine
 Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
+
+// Browser integration tests exercise actual Web Locks; jsdom has no lock manager.
+Object.defineProperty(navigator, 'locks', { configurable: true, value: {
+  request: vi.fn(async (_name: string, _options: unknown, callback: (lock: object) => Promise<void>) => callback({})),
+} });
 
 // Mock fetch for the local corpus files.
 global.fetch = vi.fn().mockResolvedValue({

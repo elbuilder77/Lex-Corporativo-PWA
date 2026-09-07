@@ -2,10 +2,12 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { legalTemplatePrecompiler } from './scripts/template-precompiler.ts';
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    legalTemplatePrecompiler(),
     react(),
     tailwindcss(),
     VitePWA({
@@ -39,7 +41,7 @@ export default defineConfig({
         screenshots: [],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,woff2}'],
+        globPatterns: ['**/*.{js,mjs,css,html,svg,woff2}'],
         cleanupOutdatedCaches: true,
         // Navegación fallback para SPA
         navigateFallback: '/index.html',

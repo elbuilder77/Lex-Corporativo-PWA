@@ -14,7 +14,7 @@ export const SEO_PAGES: Record<AppModuleTab | 'home', SeoConfig> = {
     canonicalUrl: 'https://lexcorporativo.com.mx/',
   },
   normativa: {
-    title: 'Consulta de Legislación Federal Mexicana (13 Leyes) | Lex Corporativo',
+    title: 'Fundamentador Jurídico Federal (13 Leyes) | Lex Corporativo',
     description:
       'Buscador normativo sobre 5,011 artículos y reglas federales de México (Código de Comercio, LFT, CFF, LGSM, LIVA, LISR y más) con motor SQLite WASM en sesión.',
     canonicalUrl: 'https://lexcorporativo.com.mx/?tab=normativa',
@@ -24,6 +24,12 @@ export const SEO_PAGES: Record<AppModuleTab | 'home', SeoConfig> = {
     description:
       'Consulta y filtro de contrataciones públicas federales de México, plazos de propuestas, convocatorias oficiales y expedientes de CompraNet.',
     canonicalUrl: 'https://lexcorporativo.com.mx/?tab=licitaciones',
+  },
+  estudio: {
+    title: 'Ingeniería Jurídica: Redacción y Contratos (Word/PDF) | Lex Corporativo',
+    description:
+      'Generador y redactor de 25 contratos, pagarés, actas de asamblea y documentos legales en México con exportación profesional a Word (.docx) y PDF.',
+    canonicalUrl: 'https://lexcorporativo.com.mx/?tab=estudio',
   },
   desktop: {
     title: 'Lex Corporativo Desktop | Estación de Auditoría Contractual para Windows',
