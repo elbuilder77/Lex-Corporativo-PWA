@@ -66,4 +66,28 @@ describe('Introduction Component', () => {
 
     expect(handleOpenStation).toHaveBeenCalledWith('desktop');
   });
+
+  it('muestra las especificaciones técnicas en las tarjetas y no incluye la frase redundante previa', () => {
+    const handleOpenStation = vi.fn();
+    render(<Introduction onOpenStation={handleOpenStation} />);
+
+    // Verifica que la frase redundante previa fue removida
+    expect(
+      screen.queryByText(/Redacta instrumentos corporativos, consulta legislación federal/i),
+    ).not.toBeInTheDocument();
+
+    // Verifica especificaciones de Ingeniería Jurídica
+    expect(screen.getByText(/25 documentos:/i)).toBeInTheDocument();
+    expect(screen.queryByText(/25 plantillas:/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Sin almacenamiento en la nube, sin rastreo ni telemetría/i)).toBeInTheDocument();
+
+    // Verifica especificaciones del Fundamentador Jurídico
+    expect(screen.getByText(/5 materias:/i)).toBeInTheDocument();
+    expect(screen.getByText(/Laboral, Mercantil, Fiscal, Aduanal y Comercio Exterior/i)).toBeInTheDocument();
+    expect(screen.getByText(/SQLite WASM determinista en navegador/i)).toBeInTheDocument();
+
+    // Verifica especificaciones del Radar de Licitaciones
+    expect(screen.getByText(/CompraNet federal \+ compras estatales \(Yucatán\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Convocatorias, bases, juntas de aclaraciones y plazos/i)).toBeInTheDocument();
+  });
 });

@@ -1,6 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import {
-  BookOpenCheck,
   Check,
   ChevronDown,
   ChevronUp,
@@ -19,7 +18,7 @@ import {
   WifiOff,
   X,
 } from 'lucide-react';
-import { AREA_LABELS, CORPUS_STATS, getLawsForScope } from '../lib/corpus-catalog';
+import { AREA_LABELS, getLawsForScope } from '../lib/corpus-catalog';
 import { executeCorpusSearch, type CorpusSearchResult } from '../services/corpus-search';
 import { useUiStore } from '../store/useUiStore';
 import { trackEvent } from '../lib/analytics';
@@ -196,14 +195,14 @@ export function BuscadorLegal() {
 
   return (
     <div className="min-h-screen bg-slate-50 pb-12">
-      {/* Compact Hero Section */}
+      {/* Clean Hero Section */}
       <section className="border-b border-slate-800 bg-legal-shell text-white">
-        <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-6">
-          {/* Header Bar */}
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 rounded-full border border-legal-gold/40 bg-legal-gold/10 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-legal-gold">
-              <BookOpenCheck size={13} /> {CORPUS_STATS.provisions.toLocaleString('es-MX')} Disposiciones · {CORPUS_STATS.instruments} Leyes
-            </div>
+        <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-5">
+          {/* Header: Title and SQLite Status */}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h1 className="font-serif text-xl font-bold leading-tight sm:text-2xl text-white">
+              Fundamentador Jurídico Federal
+            </h1>
 
             <div
               className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-bold ${
@@ -217,17 +216,10 @@ export function BuscadorLegal() {
             </div>
           </div>
 
-          <h1 className="mt-3 font-serif text-xl font-bold leading-tight sm:text-2xl text-white">
-            Fundamentador Jurídico Federal
-          </h1>
-          <p className="mt-1 text-xs text-slate-400 sm:text-sm">
-            Búsqueda normativa instantánea entre {CORPUS_STATS.provisions.toLocaleString('es-MX')} artículos de {CORPUS_STATS.instruments} leyes federales con motor local SQLite.
-          </p>
-
           {/* Integrated Search Box */}
           <form
             onSubmit={runSearch}
-            className="mt-4 rounded-2xl border border-slate-700 bg-slate-900/90 p-3 shadow-xl shadow-black/30"
+            className="mt-3.5 rounded-2xl border border-slate-700 bg-slate-900/90 p-3 shadow-xl shadow-black/30"
           >
             <label htmlFor="legal-query" className="sr-only">
               ¿Qué necesitas fundamentar?

@@ -11,6 +11,8 @@ import {
   Zap,
 } from 'lucide-react';
 import logoUrl from '../assets/logo-lockup-transparent.png';
+import { CORPUS_STATS } from '../lib/corpus-catalog';
+import { LICITACIONES_STATS } from '../lib/licitaciones-catalog';
 import type { AppModuleTab } from '../types';
 
 interface IntroductionProps {
@@ -44,26 +46,22 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
       >
         {/* Brand Header */}
         <div className="flex flex-col items-center gap-3.5 sm:gap-4">
-          <div className="w-full max-w-[290px] sm:max-w-[390px] md:max-w-[460px] flex justify-center">
+          <div className="w-full max-w-[360px] sm:max-w-[480px] md:max-w-[580px] flex justify-center">
             <img
               src={logoUrl}
               alt="Logotipo Lex Corporativo"
-              width={460}
-              height={363}
+              width={580}
+              height={458}
               loading="eager"
               fetchPriority="high"
               decoding="async"
-              className="w-full h-auto object-contain drop-shadow-[0_12px_30px_rgba(197,160,89,0.30)] transition-transform duration-300 hover:scale-[1.02]"
+              className="w-full h-auto object-contain drop-shadow-[0_14px_35px_rgba(197,160,89,0.32)] transition-transform duration-300 hover:scale-[1.02]"
             />
           </div>
 
           <span className="inline-flex items-center gap-1.5 rounded-full border border-legal-gold/30 bg-legal-gold/10 px-4 py-1 text-[11px] sm:text-xs font-extrabold uppercase tracking-[0.2em] text-legal-gold shadow-xs">
             <Sparkles size={13} /> Plataforma de Consulta e Ingeniería Jurídica
           </span>
-
-          <p className="max-w-xl text-xs sm:text-sm text-slate-300 font-normal leading-relaxed">
-            Redacta instrumentos corporativos, consulta legislación federal y monitorea oportunidades públicas en un entorno privado que opera en tu navegador.
-          </p>
         </div>
 
         {/* Primary Interactive Cards: Core Web Modules (3-Column Grid) */}
@@ -82,9 +80,23 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
               <h2 className="font-serif text-base font-bold text-white transition group-hover:text-legal-gold sm:text-lg">
                 Ingeniería Jurídica
               </h2>
-              <p className="mt-1.5 text-xs leading-relaxed text-slate-400">
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-300">
                 Redacta instrumentos corporativos con variables guiadas, importa DOCX/PDF y estructura contratos con autoguardado local.
               </p>
+              <ul className="mt-3 space-y-1.5 border-t border-slate-800/60 pt-2.5 text-[11px] text-slate-400">
+                <li className="flex items-start gap-1.5">
+                  <span className="font-bold text-legal-gold">•</span>
+                  <span><strong>25 documentos:</strong> Asambleas, poderes, contratos mercantiles y laborales.</span>
+                </li>
+                <li className="flex items-start gap-1.5">
+                  <span className="font-bold text-legal-gold">•</span>
+                  <span><strong>Importación:</strong> Procesamiento local de archivos DOCX y PDF.</span>
+                </li>
+                <li className="flex items-start gap-1.5">
+                  <span className="font-bold text-legal-gold">•</span>
+                  <span><strong>Privacidad:</strong> Sin almacenamiento en la nube, sin rastreo ni telemetría.</span>
+                </li>
+              </ul>
             </div>
             <div className="mt-5 border-t border-slate-800/80 pt-3">
               <button
@@ -99,22 +111,36 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
           </div>
 
           {/* Card 2: Fundamentador Jurídico (Federal Legal Corpus) */}
-          <div className="relative group rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg backdrop-blur-md transition-all duration-300 hover:border-slate-700 hover:bg-slate-900/90 flex flex-col justify-between">
+          <div className="relative group rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg backdrop-blur-md transition-all duration-300 hover:border-blue-500/40 hover:bg-slate-900/90 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between gap-2 mb-3">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
                   <BookOpenCheck size={20} />
                 </span>
                 <span className="rounded-md bg-blue-500/20 px-2 py-0.5 text-[10px] font-extrabold text-blue-300 uppercase tracking-wider">
-                  13 Leyes Federales
+                  {CORPUS_STATS.provisions.toLocaleString('es-MX')} disposiciones · {CORPUS_STATS.instruments} leyes
                 </span>
               </div>
               <h2 className="font-serif text-base sm:text-lg font-bold text-white group-hover:text-blue-300 transition">
                 Fundamentador Jurídico
               </h2>
-              <p className="mt-1.5 text-xs text-slate-400 leading-relaxed">
-                Búsqueda instantánea en 5,011 artículos y disposiciones federales con motor local SQLite.
+              <p className="mt-1.5 text-xs text-slate-300 leading-relaxed">
+                Búsqueda normativa instantánea entre {CORPUS_STATS.provisions.toLocaleString('es-MX')} artículos de {CORPUS_STATS.instruments} leyes federales con motor local SQLite.
               </p>
+              <ul className="mt-3 space-y-1.5 border-t border-slate-800/60 pt-2.5 text-[11px] text-slate-400">
+                <li className="flex items-start gap-1.5">
+                  <span className="font-bold text-blue-400">•</span>
+                  <span><strong>5 materias:</strong> Laboral, Mercantil, Fiscal, Aduanal y Comercio Exterior.</span>
+                </li>
+                <li className="flex items-start gap-1.5">
+                  <span className="font-bold text-blue-400">•</span>
+                  <span><strong>Fuentes:</strong> Textos vigentes del DOF y Cámara de Diputados.</span>
+                </li>
+                <li className="flex items-start gap-1.5">
+                  <span className="font-bold text-blue-400">•</span>
+                  <span><strong>Motor:</strong> SQLite WASM determinista en navegador, sin latencia de red.</span>
+                </li>
+              </ul>
             </div>
 
             <div className="mt-5 pt-3 border-t border-slate-800/80">
@@ -137,15 +163,29 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
                   <Landmark size={20} />
                 </span>
                 <span className="rounded-md bg-amber-500/20 px-2 py-0.5 text-[10px] font-extrabold text-amber-300 uppercase tracking-wider">
-                  CompraNet
+                  {LICITACIONES_STATS.total.toLocaleString('es-MX')} procedimientos oficiales
                 </span>
               </div>
               <h2 className="font-serif text-base sm:text-lg font-bold text-white group-hover:text-legal-gold transition">
                 Radar de Licitaciones
               </h2>
-              <p className="mt-1.5 text-xs text-slate-400 leading-relaxed">
-                Monitoreo de contrataciones públicas federales en CompraNet, seguimiento de plazos y convocatorias oficiales.
+              <p className="mt-1.5 text-xs text-slate-300 leading-relaxed">
+                Monitoreo oficial de contrataciones públicas federales (CompraNet) y estatales para proveedores y consultores.
               </p>
+              <ul className="mt-3 space-y-1.5 border-t border-slate-800/60 pt-2.5 text-[11px] text-slate-400">
+                <li className="flex items-start gap-1.5">
+                  <span className="font-bold text-amber-400">•</span>
+                  <span><strong>Cobertura:</strong> CompraNet federal + compras estatales (Yucatán).</span>
+                </li>
+                <li className="flex items-start gap-1.5">
+                  <span className="font-bold text-amber-400">•</span>
+                  <span><strong>Seguimiento:</strong> Convocatorias, bases, juntas de aclaraciones y plazos.</span>
+                </li>
+                <li className="flex items-start gap-1.5">
+                  <span className="font-bold text-amber-400">•</span>
+                  <span><strong>Filtros:</strong> Por dependencia, carácter nacional/internacional y estatus.</span>
+                </li>
+              </ul>
             </div>
 
             <div className="mt-5 pt-3 border-t border-slate-800/80">

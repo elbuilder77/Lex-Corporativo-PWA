@@ -37,7 +37,6 @@ import {
   getAvailableEntidades,
   getDaysRemaining,
   getLicitacionOfficialSource,
-  LICITACIONES_STATS,
   MATERIA_LABELS,
   TIPO_PROCEDIMIENTO_LABELS,
 } from '../lib/licitaciones-catalog';
@@ -626,15 +625,14 @@ export function BuscadorLicitaciones() {
 
   return (
     <div className="min-h-screen bg-slate-50 pb-12">
-      {/* Compact Hero & Search Area */}
+      {/* Clean Hero & Search Area */}
       <section className="border-b border-slate-800 bg-legal-shell text-white">
-        <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-6">
-          {/* Header Bar: Service Title + Live Status */}
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 rounded-full border border-blue-400/40 bg-blue-950/60 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-blue-300">
-              <Landmark size={13} />
-              <span>{LICITACIONES_STATS.total.toLocaleString('es-MX')} procedimientos oficiales</span>
-            </div>
+        <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-5">
+          {/* Header: Title + Live Status */}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h1 className="font-serif text-xl font-bold leading-tight sm:text-2xl text-white">
+              Radar de Licitaciones Públicas en México
+            </h1>
 
             <div
               role="status"
@@ -649,17 +647,10 @@ export function BuscadorLicitaciones() {
             </div>
           </div>
 
-          <h1 className="mt-3 font-serif text-xl font-bold leading-tight sm:text-2xl text-white">
-            Radar de Licitaciones Públicas en México
-          </h1>
-          <p className="mt-1 text-xs text-slate-400 sm:text-sm">
-            Monitoreo oficial de procedimientos de contratación pública federales (CompraNet) y estatales.
-          </p>
-
           {/* Integrated Search Box */}
           <form
             onSubmit={handleSearchSubmit}
-            className="mt-4 rounded-2xl border border-slate-700 bg-slate-900/90 p-3 shadow-xl shadow-black/30"
+            className="mt-3.5 rounded-2xl border border-slate-700 bg-slate-900/90 p-3 shadow-xl shadow-black/30"
           >
             <label htmlFor="licitacion-query" className="sr-only">
               ¿Qué licitación, insumo o servicio buscas?
