@@ -162,6 +162,7 @@ export interface LicitacionSearchFilter {
   entidadFederativa?: string;
   estatus?: 'todos' | LicitacionEstatus;
   sortBy?: 'cierre_proximo' | 'reciente' | 'monto_mayor' | 'relevancia';
+  limit?: number;
 }
 
 export interface LicitacionSearchResult {

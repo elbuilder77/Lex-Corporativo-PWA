@@ -54,6 +54,21 @@ export default defineConfig({
   ],
   build: {
     chunkSizeWarningLimit: 1200,
+    modulePreload: {
+      resolveDependencies(_filename, deps, { hostType }) {
+        if (hostType === 'html') {
+          return deps.filter(
+            (dep) =>
+              !dep.includes('vendor-editor') &&
+              !dep.includes('vendor-export') &&
+              !dep.includes('vendor-pdf') &&
+              !dep.includes('DraftingStudio') &&
+              !dep.includes('DesktopPresentation'),
+          );
+        }
+        return deps;
+      },
+    },
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -63,6 +78,21 @@ export default defineConfig({
             }
             if (id.includes('lucide-react')) {
               return 'vendor-lucide';
+            }
+            if (id.includes('@vercel')) {
+              return 'vendor-analytics';
+            }
+            if (id.includes('@tiptap')) {
+              return 'vendor-editor';
+            }
+            if (id.includes('docx') || id.includes('jspdf') || id.includes('jszip')) {
+              return 'vendor-export';
+            }
+            if (id.includes('pdfjs-dist')) {
+              return 'vendor-pdf';
+            }
+            if (id.includes('handlebars')) {
+              return 'vendor-templates';
             }
             if (id.includes('react') || id.includes('react-dom') || id.includes('zustand')) {
               return 'vendor-framework';

@@ -6,7 +6,7 @@ import { BuscadorLegal } from './components/BuscadorLegal';
 import { BuscadorLicitaciones } from './components/BuscadorLicitaciones';
 import { Introduction } from './components/Introduction';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { trackEvent } from './lib/analytics';
+import { trackEvent, sanitizeAnalyticsUrl } from './lib/analytics';
 import { updateSeoMeta } from './lib/seo';
 import type { AppModuleTab } from './types';
 
@@ -160,8 +160,28 @@ export function App() {
           )}
         </AppShell>
       )}
-      <Analytics />
-      <SpeedInsights />
+      <Analytics
+        beforeSend={(event) => {
+          if (event && event.url) {
+            return {
+              ...event,
+              url: sanitizeAnalyticsUrl(event.url),
+            };
+          }
+          return event;
+        }}
+      />
+      <SpeedInsights
+        beforeSend={(data) => {
+          if (data && data.url) {
+            return {
+              ...data,
+              url: sanitizeAnalyticsUrl(data.url),
+            };
+          }
+          return data;
+        }}
+      />
     </ErrorBoundary>
   );
 }

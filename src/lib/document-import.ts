@@ -10,6 +10,15 @@ export interface ImportedDocumentContent {
   sourceBuffer?: ArrayBuffer;
 }
 
+export const DOCUMENT_IMPORT_LIMITS = {
+  maxFileSizeBytes: 10 * 1024 * 1024, // 10 MB
+  maxDocxZipEntries: 250,
+  maxDocxUncompressedXmlBytes: 15 * 1024 * 1024, // 15 MB
+  maxDocxExpansionRatio: 100,
+  maxPdfPages: 150,
+  maxTextCharacters: 1_000_000,
+} as const;
+
 const safeTitle = (name: string) => name.replace(/\.[^.]+$/, '').trim() || 'Documento importado';
 
 function editableParagraphs(document: XMLDocument): Element[] {
@@ -33,11 +42,32 @@ function docxParagraphs(xml: string): string[] {
 }
 
 async function importDocx(file: File): Promise<ImportedDocumentContent> {
+  if (file.size > DOCUMENT_IMPORT_LIMITS.maxFileSizeBytes) {
+    throw new Error('El archivo DOCX excede el límite máximo permitido de 10 MB.');
+  }
   const sourceBuffer = await file.arrayBuffer();
   const zip = await JSZip.loadAsync(sourceBuffer);
+  const entryNames = Object.keys(zip.files);
+  if (entryNames.length > DOCUMENT_IMPORT_LIMITS.maxDocxZipEntries) {
+    throw new Error('El archivo DOCX contiene una estructura no admitida o demasiadas entradas.');
+  }
+
   const documentFile = zip.file('word/document.xml');
   if (!documentFile) throw new Error('El DOCX no contiene un documento editable compatible.');
-  const text = docxParagraphs(await documentFile.async('string')).join('\n\n');
+
+  const xml = await documentFile.async('string');
+  if (xml.length > DOCUMENT_IMPORT_LIMITS.maxDocxUncompressedXmlBytes) {
+    throw new Error('El contenido del documento DOCX excede el tamaño máximo procesable.');
+  }
+  if (file.size > 0 && xml.length / file.size > DOCUMENT_IMPORT_LIMITS.maxDocxExpansionRatio) {
+    throw new Error('El archivo DOCX excede el ratio de expansión seguro.');
+  }
+
+  const text = docxParagraphs(xml).join('\n\n');
+  if (text.length > DOCUMENT_IMPORT_LIMITS.maxTextCharacters) {
+    throw new Error('El texto extraído del DOCX excede el límite procesable.');
+  }
+
   return {
     title: safeTitle(file.name),
     text,
@@ -49,41 +79,68 @@ async function importDocx(file: File): Promise<ImportedDocumentContent> {
 }
 
 async function importPdf(file: File): Promise<ImportedDocumentContent> {
+  if (file.size > DOCUMENT_IMPORT_LIMITS.maxFileSizeBytes) {
+    throw new Error('El archivo PDF excede el límite máximo permitido de 10 MB.');
+  }
   const sourceBuffer = await file.arrayBuffer();
   const pdfjs = await import('pdfjs-dist');
   pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
-  const pdf = await pdfjs.getDocument({ data: sourceBuffer.slice(0) }).promise;
-  const pages: string[] = [];
-  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
-    const page = await pdf.getPage(pageNumber);
-    const content = await page.getTextContent();
-    pages.push(
-      content.items
+
+  const loadingTask = pdfjs.getDocument({ data: sourceBuffer.slice(0) });
+  try {
+    const pdf = await loadingTask.promise;
+    if (pdf.numPages > DOCUMENT_IMPORT_LIMITS.maxPdfPages) {
+      throw new Error(`El PDF contiene ${pdf.numPages} páginas, superando el límite de ${DOCUMENT_IMPORT_LIMITS.maxPdfPages} páginas.`);
+    }
+    const pages: string[] = [];
+    let totalChars = 0;
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+      const page = await pdf.getPage(pageNumber);
+      const content = await page.getTextContent();
+      const pageText = content.items
         .map((item) => ('str' in item ? item.str : ''))
         .join(' ')
         .replace(/\s+/g, ' ')
-        .trim(),
-    );
+        .trim();
+      pages.push(pageText);
+      totalChars += pageText.length;
+      if (totalChars > DOCUMENT_IMPORT_LIMITS.maxTextCharacters) {
+        throw new Error('El texto extraído del PDF excede el límite procesable.');
+      }
+    }
+    const text = pages.filter(Boolean).join('\n\n');
+    if (!text) throw new Error('El PDF no contiene texto seleccionable. La versión actual no incorpora OCR.');
+    return {
+      title: safeTitle(file.name),
+      text,
+      sourceKind: 'pdf',
+      sourceFileName: file.name,
+      sourceMimeType: file.type || 'application/pdf',
+    };
+  } finally {
+    try {
+      await loadingTask.destroy();
+    } catch {
+      /* noop */
+    }
   }
-  const text = pages.filter(Boolean).join('\n\n');
-  if (!text) throw new Error('El PDF no contiene texto seleccionable. La versión actual no incorpora OCR.');
-  return {
-    title: safeTitle(file.name),
-    text,
-    sourceKind: 'pdf',
-    sourceFileName: file.name,
-    sourceMimeType: file.type || 'application/pdf',
-  };
 }
 
 export async function importUserDocument(file: File): Promise<ImportedDocumentContent> {
+  if (file.size > DOCUMENT_IMPORT_LIMITS.maxFileSizeBytes) {
+    throw new Error('El archivo excede el tamaño máximo permitido de 10 MB.');
+  }
   const extension = file.name.split('.').pop()?.toLocaleLowerCase('es-MX');
   if (extension === 'docx') return importDocx(file);
   if (extension === 'pdf') return importPdf(file);
   if (extension === 'txt' || file.type.startsWith('text/')) {
+    const text = await file.text();
+    if (text.length > DOCUMENT_IMPORT_LIMITS.maxTextCharacters) {
+      throw new Error('El texto del archivo excede el límite procesable.');
+    }
     return {
       title: safeTitle(file.name),
-      text: await file.text(),
+      text,
       sourceKind: 'txt',
       sourceFileName: file.name,
       sourceMimeType: file.type || 'text/plain',
@@ -109,6 +166,9 @@ export async function exportPreservedDocxCopy(
   citations: LegalCitation[],
   fileName: string,
 ): Promise<void> {
+  if (sourceBuffer.byteLength > DOCUMENT_IMPORT_LIMITS.maxFileSizeBytes) {
+    throw new Error('El archivo DOCX original excede el tamaño máximo seguro para exportación.');
+  }
   const zip = await JSZip.loadAsync(sourceBuffer.slice(0));
   const documentFile = zip.file('word/document.xml');
   if (!documentFile) throw new Error('No se pudo abrir la copia DOCX.');
