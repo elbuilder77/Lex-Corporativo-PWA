@@ -135,7 +135,7 @@ test('variables generan una copia y el original conserva ediciones, con foco con
   await closeToasts(page);
   await title(page).fill('Original editado');
   await editor(page).fill('MI EDICIÓN MANUAL DEBE CONSERVARSE');
-  const varsBtn = page.getByRole('button', { name: 'Rellenar variables en lote' });
+  const varsBtn = page.getByRole('button', { name: /(Rellenar variables|Variables)/i }).first();
   await varsBtn.scrollIntoViewIfNeeded();
   await varsBtn.click();
   const variables = page.getByRole('dialog', { name: 'Variables de la plantilla' });
@@ -153,7 +153,7 @@ test('variables generan una copia y el original conserva ediciones, con foco con
   await expectSaved(page);
   await page.reload();
   await closeToasts(page);
-  const varsBtnAfter = page.getByRole('button', { name: 'Rellenar variables en lote' });
+  const varsBtnAfter = page.getByRole('button', { name: /(Rellenar variables|Variables)/i }).first();
   await varsBtnAfter.scrollIntoViewIfNeeded();
   await varsBtnAfter.click();
   await expect(page.getByRole('dialog').getByRole('textbox').first()).toHaveValue('Persona de prueba');
