@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { BookOpen, Check, FilePlus2, Search, X } from 'lucide-react';
 import { PWA_MODULE_CONFIG } from '../../lib/pwa-constants';
+import { AccessibleDialog } from '../ui/AccessibleDialog';
 import type { LegalModule, LegalTemplate } from '../../types';
 
 interface TemplateCatalogModalProps {
@@ -56,14 +57,11 @@ export function TemplateCatalogModal({
   if (!isOpen) return null;
 
   return (
-    <div
+    <AccessibleDialog
+      isOpen={isOpen}
+      onClose={onClose}
+      label="Catálogo de instrumentos y plantillas"
       className="fixed inset-0 z-[80] flex items-end justify-center bg-slate-950/60 p-0 sm:items-center sm:p-4 backdrop-blur-xs"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Catálogo de instrumentos y plantillas"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
     >
       <div className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-white shadow-dialog sm:rounded-2xl animate-slideUp sm:animate-fadeIn">
         {/* Mobile handle */}
@@ -104,8 +102,8 @@ export function TemplateCatalogModal({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar por contrato, pagaré, acta, materia o palabras clave…"
-              className="studio-input pl-10 text-base sm:text-xs"
-              autoFocus
+              className="studio-input studio-input-with-leading-icon text-base sm:text-xs"
+              data-autofocus
             />
           </label>
           <button
@@ -207,6 +205,6 @@ export function TemplateCatalogModal({
           )}
         </div>
       </div>
-    </div>
+    </AccessibleDialog>
   );
 }

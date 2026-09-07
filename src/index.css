@@ -280,6 +280,10 @@ body {
   font-size: 1rem;
 }
 
+.studio-input-with-leading-icon {
+  padding-left: 2.5rem;
+}
+
 @media (min-width: 640px) {
   .studio-input {
     font-size: 0.875rem;

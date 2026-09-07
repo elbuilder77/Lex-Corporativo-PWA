@@ -1,5 +1,7 @@
 import { PWA_LEGAL_TEMPLATES } from './pwa-constants';
 import type { FormFieldDefinition, LegalTemplate } from '../types';
+import { hasTemplateRenderer } from './template-renderer';
+import { convertMarkdownTemplate, templateFieldId as fieldId } from './template-source';
 
 interface PublicTemplateEntry {
   id: string;
@@ -13,23 +15,11 @@ const humanize = (value: string) =>
     .toLocaleLowerCase('es-MX')
     .replace(/(^|\s)\p{L}/gu, (letter) => letter.toLocaleUpperCase('es-MX'));
 
-const fieldId = (value: string) =>
-  value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLocaleLowerCase('es-MX')
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_|_$/g, '');
-
 function variablesFrom(source: string, format: PublicTemplateEntry['format']): string[] {
   const matches = format === 'md'
     ? [...source.matchAll(/\[([^\]\n]{2,90})\]/g)].map((match) => match[1])
     : [...source.matchAll(/{{{?\s*([a-zA-Z0-9_]+)\s*}?}}/g)].map((match) => match[1]);
   return [...new Set(matches)].filter((name) => !name.startsWith('#') && name !== 'else');
-}
-
-function convertMarkdownTemplate(source: string): string {
-  return source.replace(/\[([^\]\n]{2,90})\]/g, (_match, token: string) => `{{${fieldId(token)}}}`);
 }
 
 function fieldsFor(source: string, format: PublicTemplateEntry['format'], base: LegalTemplate): FormFieldDefinition[] {
@@ -60,11 +50,15 @@ export async function loadTemplateRegistry(): Promise<LegalTemplate[]> {
         const response = await fetch(`/plantillas/${encodeURIComponent(entry.file)}`);
         if (!response.ok) return;
         const source = await response.text();
+        const templateHandlebars = entry.format === 'md' ? convertMarkdownTemplate(source) : source;
+        // A stale server/cache must not replace a usable embedded template with
+        // a source that this release cannot render under its Content Security Policy.
+        if (!hasTemplateRenderer(templateHandlebars)) return;
         baseById.set(entry.id, {
           ...base,
           fields: fieldsFor(source, entry.format, base),
           toggles: undefined,
-          templateHandlebars: entry.format === 'md' ? convertMarkdownTemplate(source) : source,
+          templateHandlebars,
         });
       }),
     );

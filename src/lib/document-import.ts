@@ -12,9 +12,18 @@ export interface ImportedDocumentContent {
 
 const safeTitle = (name: string) => name.replace(/\.[^.]+$/, '').trim() || 'Documento importado';
 
+function editableParagraphs(document: XMLDocument): Element[] {
+  // Match exactly the text-bearing paragraphs presented by the importer. Empty
+  // layout paragraphs must not consume an edited paragraph during export.
+  return Array.from(document.getElementsByTagNameNS('*', 'p')).filter((paragraph) =>
+    Array.from(paragraph.getElementsByTagNameNS('*', 't'))
+      .some((node) => (node.textContent ?? '').trim().length > 0),
+  );
+}
+
 function docxParagraphs(xml: string): string[] {
   const document = new DOMParser().parseFromString(xml, 'application/xml');
-  return Array.from(document.getElementsByTagNameNS('*', 'p'))
+  return editableParagraphs(document)
     .map((paragraph) =>
       Array.from(paragraph.getElementsByTagNameNS('*', 't'))
         .map((node) => node.textContent ?? '')
@@ -83,9 +92,6 @@ export async function importUserDocument(file: File): Promise<ImportedDocumentCo
   throw new Error('Formato no compatible. Importa un archivo DOCX, TXT o PDF.');
 }
 
-const escapeXml = (value: string) =>
-  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
 function download(blob: Blob, fileName: string) {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
@@ -108,18 +114,21 @@ export async function exportPreservedDocxCopy(
   if (!documentFile) throw new Error('No se pudo abrir la copia DOCX.');
   const xml = await documentFile.async('string');
   const parsed = new DOMParser().parseFromString(xml, 'application/xml');
-  const paragraphs = Array.from(parsed.getElementsByTagNameNS('*', 'p'));
+  const paragraphs = editableParagraphs(parsed);
   const editedParagraphs = editedText.split(/\n{2,}|\n/).map((value) => value.trim()).filter(Boolean);
 
   paragraphs.forEach((paragraph, index) => {
     const textNodes = Array.from(paragraph.getElementsByTagNameNS('*', 't'));
-    if (index >= editedParagraphs.length || textNodes.length === 0) return;
-    textNodes[0].textContent = editedParagraphs[index];
+    // Clear removed text as well. Keep the paragraph container, formatting and
+    // non-text content intact (table cells must retain their paragraph).
+    textNodes[0].textContent = editedParagraphs[index] ?? '';
+    textNodes[0].setAttributeNS('http://www.w3.org/XML/1998/namespace', 'xml:space', 'preserve');
     textNodes.slice(1).forEach((node) => { node.textContent = ''; });
   });
 
   const body = parsed.getElementsByTagNameNS('*', 'body')[0];
-  const sectionProperties = body?.getElementsByTagNameNS('*', 'sectPr')[0];
+  if (!body) throw new Error('El DOCX no contiene un cuerpo de documento compatible.');
+  const sectionProperties = Array.from(body.children).find((node) => node.localName === 'sectPr');
   const namespace = body?.namespaceURI || 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
   const appendParagraph = (value: string) => {
     if (!body) return;
@@ -143,7 +152,7 @@ export async function exportPreservedDocxCopy(
   }
 
   const serialized = new XMLSerializer().serializeToString(parsed);
-  zip.file('word/document.xml', serialized || escapeXml(xml));
+  zip.file('word/document.xml', serialized);
   download(await zip.generateAsync({ type: 'blob' }), fileName.replace(/\.docx$/i, '') + '-editado.docx');
 }
 

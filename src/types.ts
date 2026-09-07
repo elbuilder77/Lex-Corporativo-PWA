@@ -77,6 +77,7 @@ export interface StudioDocument {
   title: string;
   sourceKind: DocumentSourceKind;
   templateId?: string;
+  templateValues?: Record<string, string>;
   sourceFileName?: string;
   sourceMimeType?: string;
   sourceBuffer?: ArrayBuffer;

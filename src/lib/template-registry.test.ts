@@ -1,8 +1,10 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { loadTemplateRegistry } from './template-registry';
 import { PWA_LEGAL_TEMPLATES } from './pwa-constants';
 
 describe('Template Registry', () => {
+  afterEach(() => vi.unstubAllGlobals());
   it('retorna el catálogo base de plantillas embebidas cuando no hay red', async () => {
     // Mock global fetch to fail
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('Network offline')));
@@ -23,7 +25,7 @@ describe('Template Registry', () => {
     const mockManifest = [
       { id: 'mercantil-pagare', file: 'pagare_mercantil.hbs', format: 'hbs' },
     ];
-    const mockHbs = 'PAGARÉ POR {{monto}} EN {{lugar}}';
+    const mockHbs = readFileSync('public/plantillas/pagare_mercantil.hbs', 'utf8');
 
     vi.stubGlobal(
       'fetch',
@@ -48,7 +50,19 @@ describe('Template Registry', () => {
     const pagare = templates.find((t) => t.id === 'mercantil-pagare');
     expect(pagare).toBeDefined();
     expect(pagare?.templateHandlebars).toBe(mockHbs);
+    expect(pagare?.fields.some((field) => field.id === 'nombre_acreedor')).toBe(true);
 
     vi.unstubAllGlobals();
+  });
+
+  it('conserva la plantilla embebida cuando el servidor devuelve una versión no incluida en el build', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => Promise.resolve(
+      url.endsWith('index.json')
+        ? { ok: true, json: async () => [{ id: 'mercantil-pagare', file: 'pagare_mercantil.hbs', format: 'hbs' }] }
+        : { ok: true, text: async () => 'Nueva versión {{campo_nuevo}}' },
+    )));
+    const templates = await loadTemplateRegistry();
+    expect(templates.find((template) => template.id === 'mercantil-pagare'))
+      .toEqual(PWA_LEGAL_TEMPLATES.find((template) => template.id === 'mercantil-pagare'));
   });
 });

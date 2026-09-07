@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import Handlebars from 'handlebars';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { renderLegalTemplate } from '../lib/template-renderer';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import {
@@ -29,7 +29,9 @@ import {
 } from 'lucide-react';
 import logoMark from '../assets/logo-mark.png';
 import { loadTemplateRegistry } from '../lib/template-registry';
-import { deleteStudioDocument, listStudioDocuments, saveStudioDocument } from '../lib/studio-storage';
+import { createStudioDocument as createDocument, getStudioSession, isUntouchedStudioDocument, type StudioSession } from '../lib/studio-session';
+import { documentExportText } from '../lib/document-export-content';
+import { AccessibleDialog } from './ui/AccessibleDialog';
 import { downloadTextCopy, exportPreservedDocxCopy, importUserDocument } from '../lib/document-import';
 import { exportDocumentDocx } from '../lib/docx-export';
 import { exportDocumentPdf } from '../lib/pdf-export';
@@ -44,20 +46,9 @@ import { DesktopFeatureLockModal, type LockedFeatureType } from './studio/Deskto
 import type {
   CorpusSearchScope,
   LegalArticle,
-  LegalCitation,
   LegalTemplate,
   StudioDocument,
 } from '../types';
-
-const EMPTY_DOCUMENT: StudioDocument = {
-  id: 'new-document',
-  title: 'Documento Jurídico sin Título',
-  sourceKind: 'blank',
-  editorHtml: '<h2>INSTRUMENTO JURÍDICO</h2><p>Comienza a redactar tu contrato, convenio o escrito aquí…</p>',
-  citations: [],
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-};
 
 const escapeHtml = (value: string) =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -68,50 +59,28 @@ const textToHtml = (value: string) =>
     .map((paragraph) => `<p>${escapeHtml(paragraph.trim()).replace(/\n/g, '<br>')}</p>`)
     .join('');
 
-const citationFromArticle = (article: LegalArticle): LegalCitation => ({
-  id: crypto.randomUUID(),
-  articleId: article.id,
-  lawCode: article.lawCode,
-  lawName: article.lawName,
-  articleNumber: article.articleNumber,
-  title: article.title,
-  content: article.content,
-  sourceName: article.sourceName,
-  sourceUrl: article.sourceUrl,
-  createdAt: new Date().toISOString(),
-});
-
-function createDocument(partial: Partial<StudioDocument>): StudioDocument {
-  const now = new Date().toISOString();
-  return {
-    ...EMPTY_DOCUMENT,
-    id: crypto.randomUUID(),
-    createdAt: now,
-    updatedAt: now,
-    ...partial,
-  };
-}
-
 export interface DraftingStudioProps {
   onNavigateToDesktop?: () => void;
+  registerBeforeLeave?: (guard: (() => Promise<boolean>) | null) => void;
+  session?: StudioSession;
 }
 
-export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}) {
+export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, session = getStudioSession() }: DraftingStudioProps = {}) {
   const { notify } = useUiStore();
   const fileInput = useRef<HTMLInputElement>(null);
   const exportDetailsRef = useRef<HTMLDetailsElement>(null);
 
   // States
   const [templates, setTemplates] = useState<LegalTemplate[]>([]);
-  const [selectedTemplate, setSelectedTemplate] = useState<LegalTemplate | null>(null);
   const [formData, setFormData] = useState<Record<string, string>>({});
-  const [currentDocument, setCurrentDocument] = useState<StudioDocument>(() => createDocument({}));
-  const [documents, setDocuments] = useState<StudioDocument[]>([]);
-  const [saveState, setSaveState] = useState<'saved' | 'saving' | 'error'>('saved');
+  const sessionState = useSyncExternalStore(session.subscribe, session.getSnapshot);
+  const { document: currentDocument, documents, status: saveState } = sessionState;
+  const selectedTemplate = templates.find((item) => item.id === currentDocument.templateId) ?? null;
+  const setCurrentDocument = session.update;
 
   // Modals and Drawers
   const [showWelcomeHub, setShowWelcomeHub] = useState(false);
-  const [showCatalogModal, setShowCatalogModal] = useState(true);
+  const [showCatalogModal, setShowCatalogModal] = useState(false);
   const [showAuditorDrawer, setShowAuditorDrawer] = useState(false);
   const [showAssistantDrawer, setShowAssistantDrawer] = useState(false);
   const [showVariablesModal, setShowVariablesModal] = useState(false);
@@ -140,75 +109,36 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
         editorHtml: activeEditor.getHTML(),
         updatedAt: new Date().toISOString(),
       }));
-      setSaveState('saving');
     },
   });
 
-  const checkPendingCitation = () => {
-    const pending = sessionStorage.getItem('lex_studio_pending_citation');
-    if (pending) {
-      try {
-        const pendingArticle = JSON.parse(pending) as LegalArticle;
-        addCitation(pendingArticle);
-        sessionStorage.removeItem('lex_studio_pending_citation');
-        notify('Fundamento recibido desde Legislación.', 'success');
-      } catch {
-        sessionStorage.removeItem('lex_studio_pending_citation');
-      }
-    }
-  };
-
   useEffect(() => {
     let active = true;
-    checkPendingCitation();
     loadTemplateRegistry().then((registry) => {
       if (!active) return;
       setTemplates(registry);
     });
-    listStudioDocuments().then((storedDocs) => {
-      if (!active) return;
-      const validDocs = storedDocs.filter(
-        (doc) =>
-          !(
-            doc.sourceKind === 'blank' &&
-            doc.title === EMPTY_DOCUMENT.title &&
-            doc.editorHtml === EMPTY_DOCUMENT.editorHtml
-          ),
-      );
-      setDocuments(validDocs);
-      if (validDocs.length > 0) {
-        const latest = validDocs[0];
-        setCurrentDocument(latest);
-        editor?.commands.setContent(latest.editorHtml, { emitUpdate: false });
-        setShowCatalogModal(false);
-      } else {
-        setShowCatalogModal(true);
-      }
-    }).catch(() => {
-      setShowCatalogModal(true);
+    session.initialize().then(async (ready) => {
+      if (ready) await session.receivePendingCitation();
+      if (active) setShowCatalogModal(ready && !session.getSnapshot().error && isUntouchedStudioDocument(session.getSnapshot().document));
     });
-
+    const checkPendingCitation = () => { void session.receivePendingCitation(); };
     window.addEventListener('focus', checkPendingCitation);
     return () => {
       active = false;
       window.removeEventListener('focus', checkPendingCitation);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [session]);
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setShowCatalogModal(false);
-        setShowAuditorDrawer(false);
-        setShowAssistantDrawer(false);
-        setShowVariablesModal(false);
-        setShowDraftsModal(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+    registerBeforeLeave?.(session.prepareToLeave);
+    return () => registerBeforeLeave?.(null);
+  }, [registerBeforeLeave, session]);
+
+  function openVariables() {
+    setFormData(currentDocument.templateValues ?? {});
+    setShowVariablesModal(true);
+  }
 
   useEffect(() => {
     if (!editor || editor.isDestroyed || editor.getHTML() === currentDocument.editorHtml) return;
@@ -216,26 +146,9 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
   }, [currentDocument.editorHtml, currentDocument.id, editor]);
 
   useEffect(() => {
-    // Avoid saving untouched empty initial document so local storage isn't polluted with blank documents
-    if (
-      currentDocument.sourceKind === 'blank' &&
-      currentDocument.title === EMPTY_DOCUMENT.title &&
-      currentDocument.editorHtml === EMPTY_DOCUMENT.editorHtml
-    ) {
-      return;
-    }
-
-    const timer = window.setTimeout(async () => {
-      try {
-        await saveStudioDocument(currentDocument);
-        setSaveState('saved');
-        setDocuments(await listStudioDocuments());
-      } catch {
-        setSaveState('error');
-      }
-    }, 650);
-    return () => window.clearTimeout(timer);
-  }, [currentDocument]);
+    // Changing interactivity is not a document edit, especially during recovery.
+    editor?.setEditable(!sessionState.transitioning && !sessionState.locked, false);
+  }, [editor, sessionState.transitioning, sessionState.locked]);
 
   useEffect(() => {
     let wakeLock: { release?: () => Promise<void> } | null = null;
@@ -273,12 +186,12 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
 
       if (isModifier && e.key.toLowerCase() === 's') {
         e.preventDefault();
-        saveStudioDocument(currentDocument).then(() => {
-          setSaveState('saved');
+        session.flush().then((saved) => {
+          if (!saved) return;
           if (typeof navigator !== 'undefined' && navigator.vibrate) {
             navigator.vibrate(15);
           }
-          notify('Borrador guardado localmente (Ctrl+S).', 'success');
+          notify(session.getSnapshot().status === 'saved' ? 'Borrador guardado localmente (Ctrl+S).' : 'No hay cambios pendientes.', 'success');
         });
       } else if (isModifier && e.key.toLowerCase() === 'k') {
         e.preventDefault();
@@ -292,24 +205,16 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
       } else if (isModifier && e.shiftKey && e.key.toLowerCase() === 't') {
         e.preventDefault();
         setShowCatalogModal((prev) => !prev);
-      } else if (e.key === 'Escape') {
-        setLockedFeatureModal(null);
-        setShowAssistantDrawer(false);
-        setShowAuditorDrawer(false);
-        setShowCatalogModal(false);
-        setShowVariablesModal(false);
-        setShowDraftsModal(false);
-        setShowWelcomeHub(false);
       }
     }
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentDocument, notify]);
+  }, [session, notify]);
 
-  function applyTemplateVariables(template: LegalTemplate, data: Record<string, string>) {
+  async function applyTemplateVariables(template: LegalTemplate, data: Record<string, string>, copy = false) {
     try {
-      const generated = Handlebars.compile(template.templateHandlebars)({
+      const generated = renderLegalTemplate(template.templateHandlebars, {
         ...data,
         ...(template.toggles ?? []).reduce<Record<string, string>>((values, toggle) => {
           values[`toggle_${toggle.id}`] = toggle.defaultActive ? toggle.content : '';
@@ -317,52 +222,44 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
         }, {}),
       });
       const editorHtml = textToHtml(generated);
-      editor?.commands.setContent(editorHtml, { emitUpdate: false });
-      setCurrentDocument(createDocument({
-        title: template.title,
+      if (!await session.replace(createDocument({
+        title: copy ? `${template.title} — copia` : template.title,
         sourceKind: 'template',
         templateId: template.id,
+        templateValues: { ...data },
         editorHtml,
-      }));
-      setSaveState('saving');
+        citations: copy ? [...currentDocument.citations] : [],
+      }))) return;
       setShowVariablesModal(false);
       setShowWelcomeHub(false);
-      notify('Instrumento cargado en el editor con éxito.', 'success');
+      setShowCatalogModal(false);
+      notify(copy ? 'Copia generada. El borrador anterior conserva tus ediciones.' : 'Instrumento cargado en el editor con éxito.', 'success');
     } catch {
       notify('La plantilla no pudo compilarse. Revisa los datos capturados.', 'error');
     }
   }
 
-  function selectTemplate(template: LegalTemplate) {
+  async function selectTemplate(template: LegalTemplate) {
     const values = Object.fromEntries(
       template.fields.map((field) => [
         field.id,
         field.defaultValue ?? (field.type === 'date' ? '' : `[${field.label.toLocaleUpperCase('es-MX')}]`),
       ]),
     );
-    setSelectedTemplate(template);
-    setFormData(values);
-    setShowCatalogModal(false);
-    setShowWelcomeHub(false);
-    setShowVariablesModal(false);
-
-    applyTemplateVariables(template, values);
+    await applyTemplateVariables(template, values);
   }
 
-  function selectBlank() {
-    setSelectedTemplate(null);
+  async function selectBlank() {
     const blank = createDocument({});
-    setCurrentDocument(blank);
-    editor?.commands.setContent(blank.editorHtml, { emitUpdate: false });
+    if (!await session.replace(blank)) return;
+    setShowCatalogModal(false);
     setShowVariablesModal(false);
     setShowWelcomeHub(false);
     notify('Lienzo en blanco iniciado.', 'info');
   }
 
-  function openDocument(document: StudioDocument) {
-    setSelectedTemplate(null);
-    setCurrentDocument(document);
-    editor?.commands.setContent(document.editorHtml, { emitUpdate: false });
+  async function openDocument(document: StudioDocument) {
+    if (!await session.replace(document)) return;
     setShowDraftsModal(false);
     setShowVariablesModal(false);
   }
@@ -379,9 +276,8 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
         sourceBuffer: imported.sourceBuffer,
         editorHtml: textToHtml(imported.text),
       });
-      setSelectedTemplate(null);
-      setCurrentDocument(document);
-      editor?.commands.setContent(document.editorHtml, { emitUpdate: false });
+      if (!await session.replace(document)) return;
+      setShowCatalogModal(false);
       notify(
         imported.sourceKind === 'docx'
           ? 'DOCX abierto. El original permanece intacto; exportaremos una copia editada.'
@@ -409,7 +305,7 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
           currentDocument.sourceFileName,
         );
       } else {
-        await exportDocumentDocx(currentDocument.title, editor.getText({ blockSeparator: '\n\n' }));
+        await exportDocumentDocx(currentDocument.title, documentExportText(editor.getText({ blockSeparator: '\n\n' }), currentDocument.citations));
       }
       notify('Copia DOCX exportada.', 'success');
     } catch {
@@ -420,19 +316,21 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
   async function exportPdf() {
     exportDetailsRef.current?.removeAttribute('open');
     if (!editor) return;
-    await exportDocumentPdf(currentDocument.title, editor.getText({ blockSeparator: '\n\n' }));
-    notify('Copia PDF exportada.', 'success');
+    try {
+      await exportDocumentPdf(currentDocument.title, documentExportText(editor.getText({ blockSeparator: '\n\n' }), currentDocument.citations));
+      notify('Copia PDF exportada.', 'success');
+    } catch { notify('No fue posible exportar la copia PDF.', 'error'); }
   }
 
   async function exportTxt() {
     exportDetailsRef.current?.removeAttribute('open');
     if (!editor) return;
-    downloadTextCopy(editor.getText({ blockSeparator: '\n\n' }), currentDocument.sourceFileName ?? currentDocument.title);
+    downloadTextCopy(documentExportText(editor.getText({ blockSeparator: '\n\n' }), currentDocument.citations), currentDocument.sourceFileName ?? currentDocument.title);
   }
 
   async function shareDocument() {
     if (!editor) return;
-    const text = editor.getText({ blockSeparator: '\n\n' });
+    const text = documentExportText(editor.getText({ blockSeparator: '\n\n' }), currentDocument.citations);
     const shareData = {
       title: currentDocument.title,
       text: `${currentDocument.title}\n\n${text}\n\n---\nGenerado en Lex Corporativo · Ingeniería Jurídica`,
@@ -478,14 +376,7 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
     if (typeof navigator !== 'undefined' && navigator.vibrate) {
       navigator.vibrate(10);
     }
-    setCurrentDocument((document) => {
-      if (document.citations.some((citation) => citation.articleId === article.id)) return document;
-      return {
-        ...document,
-        citations: [...document.citations, citationFromArticle(article)],
-        updatedAt: new Date().toISOString(),
-      };
-    });
+    session.addCitation(article);
   }
 
   // Opción C: Insert Footnote with Superscript [N] linked to Appendix
@@ -495,13 +386,8 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
     }
     let citationIndex = currentDocument.citations.findIndex((c) => c.articleId === article.id);
     if (citationIndex === -1) {
-      const newCitation = citationFromArticle(article);
       citationIndex = currentDocument.citations.length;
-      setCurrentDocument((doc) => ({
-        ...doc,
-        citations: [...doc.citations, newCitation],
-        updatedAt: new Date().toISOString(),
-      }));
+      session.addCitation(article);
     }
 
     const footnoteNumber = citationIndex + 1;
@@ -555,22 +441,21 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
                   Ingeniería Jurídica
                 </h1>
                 <span
+                  role="status"
+                  aria-live="polite"
+                  aria-label="Estado del borrador"
                   className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-bold ${
                     saveState === 'error'
                       ? 'border-red-200 bg-red-50 text-red-700'
                       : 'border-emerald-200 bg-emerald-50 text-emerald-700'
                   }`}
                 >
-                  {saveState === 'saving' ? (
+                  {saveState === 'saving' || saveState === 'loading' ? (
                     <LoaderCircle size={11} className="animate-spin" />
                   ) : (
                     <CheckCircle2 size={11} />
                   )}
-                  {saveState === 'saving'
-                    ? 'Guardando…'
-                    : saveState === 'error'
-                      ? 'Error al guardar'
-                      : 'Bóveda local'}
+                  {{ loading: 'Recuperando…', empty: 'Sin cambios', pending: 'Cambios pendientes', saving: 'Guardando…', saved: 'Guardado en este dispositivo', error: 'Requiere atención' }[saveState]}
                 </span>
               </div>
               <p className="hidden sm:block text-[11px] text-slate-500">
@@ -610,7 +495,7 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
             {selectedTemplate && (
               <button
                 type="button"
-                onClick={() => setShowVariablesModal(true)}
+                onClick={openVariables}
                 className="studio-action text-amber-800 border-amber-300 bg-amber-50/70 hover:bg-amber-100"
                 title="Configurar variables de la plantilla activa"
               >
@@ -717,6 +602,14 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
         </div>
       </section>
 
+      {sessionState.error && (
+        <div role="alert" className="mx-auto mt-4 flex w-full max-w-4xl flex-wrap items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
+          <p className="min-w-0 flex-1">{sessionState.error}</p>
+          <button type="button" className="studio-action" onClick={() => { void session.retry(); }}>Reintentar</button>
+          {!sessionState.locked && <button type="button" className="studio-action" onClick={exportTxt}>Descargar copia TXT</button>}
+        </div>
+      )}
+
       {/* Main Workspace: Clean Centered Canvas */}
       <main className="mx-auto w-full max-w-4xl flex-1 px-3 py-4 sm:px-6 sm:py-8 pb-28 sm:pb-12">
         {/* Paper Sheet */}
@@ -809,7 +702,7 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
               <div className="flex items-center gap-2 self-end sm:self-auto">
                 <button
                   type="button"
-                  onClick={() => setShowVariablesModal(true)}
+                  onClick={openVariables}
                   className="inline-flex items-center gap-1.5 rounded-lg bg-amber-800 hover:bg-amber-900 px-3 py-1.5 text-[11px] font-extrabold text-white transition cursor-pointer shadow-2xs active:scale-95"
                 >
                   <SlidersHorizontal size={12} />
@@ -833,6 +726,7 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
               <input
                 type="text"
                 aria-label="Título del documento"
+                disabled={sessionState.transitioning || sessionState.locked}
                 value={currentDocument.title}
                 onChange={(event) =>
                   setCurrentDocument((doc) => ({ ...doc, title: event.target.value, updatedAt: new Date().toISOString() }))
@@ -907,9 +801,9 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
 
           {/* Institutional Letterhead Footer */}
           <footer className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-slate-200 pt-4 text-[9px] text-slate-400">
-            <span>Lex Corporativo PWA · Bóveda local cifrada en navegador · Cero telemetría externa</span>
+            <span>Lex Corporativo PWA · Borradores guardados en este navegador</span>
             <span className="font-extrabold uppercase text-slate-500">
-              Hoja 1 de 1 · Revisión legal requerida
+              Vista de edición · La paginación depende del formato exportado
             </span>
           </footer>
         </article>
@@ -1143,14 +1037,11 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
 
       {/* Template Variables Modal */}
       {showVariablesModal && selectedTemplate && (
-        <div
+        <AccessibleDialog
+          isOpen={showVariablesModal}
+          onClose={() => setShowVariablesModal(false)}
+          label="Variables de la plantilla"
           className="fixed inset-0 z-[80] flex items-end justify-center bg-slate-950/60 p-0 sm:items-center sm:p-4 backdrop-blur-xs"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Variables de la plantilla"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowVariablesModal(false);
-          }}
         >
           <div className="flex max-h-[85vh] w-full max-w-xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-white shadow-dialog sm:rounded-2xl">
             <div className="flex justify-center pb-0 pt-2.5 sm:hidden">
@@ -1171,14 +1062,17 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
               </button>
             </div>
             <div className="max-h-[60vh] overflow-y-auto p-4 space-y-3">
+              <p className="text-sm text-slate-600">Generaremos una copia con estos valores. El borrador anterior conservará tus ediciones y notas.</p>
               {selectedTemplate.fields.map((field) => (
                 <div key={field.id} className="space-y-1">
-                  <label className="block text-xs font-bold text-slate-700">
+                  <label htmlFor={`template-field-${field.id}`} className="block text-xs font-bold text-slate-700">
                     {field.label}
                     {field.required && <span className="text-red-500 ml-0.5">*</span>}
                   </label>
                   {field.type === 'textarea' ? (
                     <textarea
+                      id={`template-field-${field.id}`}
+                      aria-required={field.required || undefined}
                       rows={3}
                       value={formData[field.id] ?? ''}
                       onChange={(e) => setFormData((prev) => ({ ...prev, [field.id]: e.target.value }))}
@@ -1187,6 +1081,8 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
                     />
                   ) : (
                     <input
+                      id={`template-field-${field.id}`}
+                      aria-required={field.required || undefined}
                       type={field.type === 'date' ? 'date' : 'text'}
                       value={formData[field.id] ?? ''}
                       onChange={(e) => setFormData((prev) => ({ ...prev, [field.id]: e.target.value }))}
@@ -1207,26 +1103,24 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
               </button>
               <button
                 type="button"
-                onClick={() => applyTemplateVariables(selectedTemplate, formData)}
+                disabled={sessionState.transitioning || sessionState.locked}
+                onClick={() => { void applyTemplateVariables(selectedTemplate, formData, true); }}
                 className="studio-primary px-5 py-2 text-xs font-bold"
               >
-                Generar Documento en Editor →
+                Generar copia con variables
               </button>
             </div>
           </div>
-        </div>
+        </AccessibleDialog>
       )}
 
       {/* Local Drafts Modal */}
       {showDraftsModal && (
-        <div
+        <AccessibleDialog
+          isOpen={showDraftsModal}
+          onClose={() => setShowDraftsModal(false)}
+          label="Borradores locales"
           className="fixed inset-0 z-[80] flex items-end justify-center bg-slate-950/60 p-0 sm:items-center sm:p-4 backdrop-blur-xs"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Borradores locales"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowDraftsModal(false);
-          }}
         >
           <div className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-white shadow-dialog sm:rounded-2xl">
             <div className="flex justify-center pb-0 pt-2.5 sm:hidden">
@@ -1264,10 +1158,8 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
                       </button>
                       <button
                         type="button"
-                        onClick={async () => {
-                          await deleteStudioDocument(doc.id);
-                          setDocuments(await listStudioDocuments());
-                        }}
+                        disabled={sessionState.transitioning || sessionState.locked}
+                        onClick={() => { void session.remove(doc.id); }}
                         className="studio-icon-button text-red-600"
                         aria-label={`Eliminar ${doc.title}`}
                       >
@@ -1279,7 +1171,7 @@ export function DraftingStudio({ onNavigateToDesktop }: DraftingStudioProps = {}
               )}
             </div>
           </div>
-        </div>
+        </AccessibleDialog>
       )}
     </div>
   );

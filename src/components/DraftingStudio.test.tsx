@@ -28,7 +28,7 @@ describe('DraftingStudio Component', () => {
     });
 
     // Catálogo modal se abre de inicio para reducir clics
-    const dialog = screen.getByRole('dialog', { name: 'Catálogo de instrumentos y plantillas' });
+    const dialog = await screen.findByRole('dialog', { name: 'Catálogo de instrumentos y plantillas' });
     expect(dialog).toBeInTheDocument();
     expect(within(dialog).getByRole('heading', { name: 'Biblioteca de Instrumentos' })).toBeInTheDocument();
     expect(within(dialog).getByPlaceholderText(/Buscar por contrato, pagaré/i)).toBeInTheDocument();
@@ -89,7 +89,7 @@ describe('DraftingStudio Component', () => {
     });
 
     // Modal de catálogo abierto de inicio
-    const dialog = screen.getByRole('dialog', { name: 'Catálogo de instrumentos y plantillas' });
+    const dialog = await screen.findByRole('dialog', { name: 'Catálogo de instrumentos y plantillas' });
     expect(dialog).toBeInTheDocument();
 
     // Seleccionar el primer instrumento disponible
@@ -101,6 +101,9 @@ describe('DraftingStudio Component', () => {
     await act(async () => {
       fireEvent.click(firstCard!);
     });
+
+    // Changing documents now waits for the previous revision to be persisted.
+    expect(await screen.findByText(/Instrumento activo:/i)).toBeInTheDocument();
 
     // El catálogo se cierra y el modal de variables NO bloquea la pantalla
     expect(screen.queryByRole('dialog', { name: 'Catálogo de instrumentos y plantillas' })).not.toBeInTheDocument();
