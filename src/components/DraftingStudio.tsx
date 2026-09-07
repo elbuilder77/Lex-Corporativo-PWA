@@ -663,45 +663,6 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
             </div>
           </header>
 
-          {/* Quick Instrument Selector for Instant 1-Click Start (Desktop/Tablet only; on mobile the top toolbar provides direct access) */}
-          {currentDocument.sourceKind === 'blank' && (
-            <div className="mb-3 sm:mb-5 hidden sm:block rounded-xl sm:rounded-2xl border border-legal-gold/40 bg-gradient-to-r from-amber-50/80 via-white to-amber-50/50 p-3 sm:p-4 shadow-2xs">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
-                <div>
-                  <h3 className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-legal-golddark flex items-center gap-1.5">
-                    <Sparkles size={13} /> <span>Comienza con una plantilla:</span>
-                  </h3>
-                  <p className="hidden sm:block text-xs text-slate-600 mt-0.5">
-                    Selecciona una plantilla para rellenar variables guiadas o redactar en blanco.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowCatalogModal(true)}
-                  className="rounded-xl bg-legal-gold hover:bg-legal-goldhover px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs font-extrabold text-slate-950 transition cursor-pointer shadow-2xs shrink-0 active:scale-95 w-full sm:w-auto text-center"
-                >
-                  Explorar catálogo ({templates.length}) →
-                </button>
-              </div>
-
-              {/* Quick Instrument Chips: Hidden on mobile to avoid row of buttons cluttering the screen */}
-              {templates.length > 0 && (
-                <div className="mt-2 sm:mt-3 hidden sm:flex overflow-x-auto pb-1 sm:flex-wrap gap-1.5 pt-2 sm:pt-2.5 border-t border-amber-200/60 no-scrollbar">
-                  {templates.slice(0, 6).map((tmpl) => (
-                    <button
-                      key={tmpl.id}
-                      type="button"
-                      onClick={() => selectTemplate(tmpl)}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 py-1 sm:px-3 sm:py-1.5 text-xs font-bold text-slate-800 hover:border-legal-gold hover:bg-amber-50 hover:text-slate-950 transition cursor-pointer shadow-2xs shrink-0 active:scale-95 whitespace-nowrap"
-                    >
-                      <FileText size={12} className="text-legal-gold" />
-                      <span>{tmpl.title}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
 
           {/* Active Template Quick Banner (Desktop/Tablet only; on mobile the toolbar provides clear access) */}
           {selectedTemplate && (
