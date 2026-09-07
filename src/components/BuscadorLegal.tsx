@@ -9,6 +9,7 @@ import {
   FilePenLine,
   FileSearch,
   Filter,
+  HardDrive,
   LoaderCircle,
   RotateCcw,
   Search,
@@ -220,7 +221,7 @@ export function BuscadorLegal() {
             Fundamentador Jurídico Federal
           </h1>
           <p className="mt-1 text-xs text-slate-400 sm:text-sm">
-            Búsqueda determinista entre {CORPUS_STATS.provisions.toLocaleString('es-MX')} artículos de {CORPUS_STATS.instruments} leyes y reglamentos federales con motor SQLite WASM local.
+            Búsqueda normativa instantánea entre {CORPUS_STATS.provisions.toLocaleString('es-MX')} artículos de {CORPUS_STATS.instruments} leyes federales con motor local SQLite.
           </p>
 
           {/* Integrated Search Box */}
@@ -244,7 +245,7 @@ export function BuscadorLegal() {
                   enterKeyHint="search"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Buscar por concepto, supuesto jurídico o número de artículo (ej. rescisión laboral, artículo 47)"
+                  placeholder="Buscar concepto, supuesto jurídico o artículo (ej. rescisión, art. 47 LFT)..."
                   autoComplete="off"
                   className="min-h-11 w-full rounded-xl border border-slate-600 bg-slate-950 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-500 focus:border-legal-gold focus:outline-none"
                 />
@@ -329,7 +330,7 @@ export function BuscadorLegal() {
                   </select>
                 </label>
                 <label className="text-xs font-bold text-slate-300">
-                  Ley o reglamento <span className="font-normal text-slate-500">(opcional)</span>
+                  Ley o reglamento
                   <select
                     value={activeLawCode}
                     onChange={(event) => setLawCode(event.target.value)}
@@ -572,10 +573,10 @@ export function BuscadorLegal() {
             <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 p-4 text-white flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
               <div className="text-center sm:text-left">
                 <p className="text-xs font-bold text-legal-gold flex items-center justify-center sm:justify-start gap-1.5">
-                  <span>💻</span> ¿Necesitas auditar un contrato o redactar con estos fundamentos?
+                  <HardDrive size={15} /> ¿Necesitas auditar o redactar contratos con estos fundamentos?
                 </p>
                 <p className="text-[11px] text-slate-400 mt-0.5">
-                  Usa <strong>Lex Corporativo Desktop</strong> para redacción en Word/PDF, auditoría de riesgos y expedientes locales 100% offline con BYOK.
+                  Lex Corporativo Desktop incluye auditoría de cláusulas, exportación Word/PDF y expedientes locales con clave propia (BYOK).
                 </p>
               </div>
               <button
@@ -593,7 +594,7 @@ export function BuscadorLegal() {
             </div>
 
             <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs leading-5 text-slate-600">
-              Confirma la reforma, vigencia y publicación en la fuente oficial antes de citar o tomar decisiones.
+              Coteja siempre la vigencia y última reforma en la fuente oficial enlazada antes de emitir opinión legal.
             </p>
           </div>
         )}

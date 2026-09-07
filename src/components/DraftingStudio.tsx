@@ -22,6 +22,7 @@ import {
   Search,
   Share2,
   SlidersHorizontal,
+  Sparkles,
   Trash2,
   Undo2,
   Upload,
@@ -668,10 +669,10 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
                 <div>
                   <h3 className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-legal-golddark flex items-center gap-1.5">
-                    <span>⚡</span> <span>Comienza con una plantilla:</span>
+                    <Sparkles size={13} /> <span>Comienza con una plantilla:</span>
                   </h3>
                   <p className="hidden sm:block text-xs text-slate-600 mt-0.5">
-                    Selecciona una plantilla para rellenar variables interactivas sin redactar desde cero.
+                    Selecciona una plantilla para rellenar variables guiadas o redactar en blanco.
                   </p>
                 </div>
                 <button
@@ -679,7 +680,7 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                   onClick={() => setShowCatalogModal(true)}
                   className="rounded-xl bg-legal-gold hover:bg-legal-goldhover px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs font-extrabold text-slate-950 transition cursor-pointer shadow-2xs shrink-0 active:scale-95 w-full sm:w-auto text-center"
                 >
-                  Ver Catálogo (25) →
+                  Explorar catálogo ({templates.length}) →
                 </button>
               </div>
 
@@ -693,7 +694,7 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                       onClick={() => selectTemplate(tmpl)}
                       className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 py-1 sm:px-3 sm:py-1.5 text-xs font-bold text-slate-800 hover:border-legal-gold hover:bg-amber-50 hover:text-slate-950 transition cursor-pointer shadow-2xs shrink-0 active:scale-95 whitespace-nowrap"
                     >
-                      <span className="text-legal-gold text-xs">📄</span>
+                      <FileText size={12} className="text-legal-gold" />
                       <span>{tmpl.title}</span>
                     </button>
                   ))}
@@ -706,8 +707,8 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
           {selectedTemplate && (
             <div className="mb-3 sm:mb-5 hidden sm:flex items-center justify-between gap-2 rounded-xl border border-amber-200/80 bg-gradient-to-r from-amber-50/90 via-amber-50/50 to-white px-3.5 py-2.5 text-xs text-amber-950 shadow-2xs">
               <div className="flex items-center gap-2 min-w-0">
-                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-amber-200/80 text-amber-800 text-[11px] font-black shrink-0">
-                  ⚡
+                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-amber-200/80 text-amber-800 shrink-0">
+                  <Sparkles size={13} />
                 </span>
                 <div className="truncate">
                   <span className="font-bold text-slate-800">Instrumento activo: </span>
@@ -1006,10 +1007,10 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
             {/* Footer Info */}
             <div className="border-t border-slate-200 p-3 bg-slate-50 flex items-center justify-between text-[10px] font-bold">
               <span className="flex items-center gap-1.5 text-emerald-700">
-                <CheckCircle2 size={13} className="text-emerald-600" /> Motor Local SQLite WASM Activo
+                <CheckCircle2 size={13} className="text-emerald-600" /> Motor local SQLite activo
               </span>
               <span className="flex items-center gap-1.5 text-slate-500">
-                <Database size={12} className="text-slate-400" /> Corpus Federal en Memoria
+                <Database size={12} className="text-slate-400" /> Corpus federal en memoria
               </span>
             </div>
           </aside>
