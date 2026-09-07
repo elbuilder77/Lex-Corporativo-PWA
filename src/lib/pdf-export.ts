@@ -12,7 +12,7 @@ async function getLogoDataUri(): Promise<string | null> {
     await new Promise<void>((resolve, reject) => {
       img.onload = () => resolve();
       img.onerror = () => reject(new Error('Logo no disponible'));
-      img.src = '/logo.png';
+      img.src = '/favicon.png';
     });
 
     const canvas = document.createElement('canvas');

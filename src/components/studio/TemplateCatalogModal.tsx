@@ -70,14 +70,14 @@ export function TemplateCatalogModal({
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-          <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-legal-gold">
-              <BookOpen size={20} />
+        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 sm:px-6 sm:py-4">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <span className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-amber-50 text-legal-gold shrink-0">
+              <BookOpen size={18} className="sm:w-5 sm:h-5" />
             </span>
             <div>
-              <h2 className="font-serif text-lg font-bold text-slate-950">Biblioteca de Instrumentos</h2>
-              <p className="text-xs text-slate-500">
+              <h2 className="font-serif text-base sm:text-lg font-bold text-slate-950">Biblioteca de Instrumentos</h2>
+              <p className="hidden sm:block text-xs text-slate-500">
                 Selecciona una plantilla o instrumento estructurado para tu redacción jurídica.
               </p>
             </div>
@@ -93,7 +93,7 @@ export function TemplateCatalogModal({
         </div>
 
         {/* Search and Blank Option */}
-        <div className="flex flex-col sm:flex-row gap-3 border-b border-slate-100 bg-slate-50/70 p-4 sm:px-6 sm:py-3">
+        <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 border-b border-slate-100 bg-slate-50/70 p-3 sm:px-6 sm:py-3">
           <label className="relative flex-1">
             <span className="sr-only">Buscar plantilla</span>
             <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -119,7 +119,7 @@ export function TemplateCatalogModal({
         </div>
 
         {/* Module Filter Tabs */}
-        <div className="flex overflow-x-auto border-b border-slate-200 px-6 py-2 gap-1.5 scrollbar-none">
+        <div className="flex overflow-x-auto border-b border-slate-200 px-3 sm:px-6 py-2 gap-1.5 scrollbar-none">
           <button
             type="button"
             onClick={() => setActiveModule('all')}
