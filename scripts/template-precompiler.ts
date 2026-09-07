@@ -1,9 +1,18 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import Handlebars from 'handlebars';
 import ts from 'typescript';
 import type { Plugin } from 'vite';
 import { convertMarkdownTemplate, normalizeTemplateSource } from '../src/lib/template-source.ts';
+
+const localTmp = path.resolve(process.cwd(), '.tmp');
+if (!existsSync(localTmp)) {
+  mkdirSync(localTmp, { recursive: true });
+}
+process.env.TEMP = localTmp;
+process.env.TMP = localTmp;
+process.env.TMPDIR = localTmp;
+
 
 const virtualId = 'virtual:legal-template-renderers';
 const resolvedId = `\0${virtualId}`;
