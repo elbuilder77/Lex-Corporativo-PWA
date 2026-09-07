@@ -86,7 +86,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
               <ul className="mt-3 space-y-1.5 border-t border-slate-800/60 pt-2.5 text-[11px] text-slate-400">
                 <li className="flex items-start gap-1.5">
                   <span className="font-bold text-legal-gold">•</span>
-                  <span><strong>25 plantillas:</strong> Asambleas, poderes, contratos mercantiles y laborales.</span>
+                  <span><strong>25 documentos:</strong> Asambleas, poderes, contratos mercantiles y laborales.</span>
                 </li>
                 <li className="flex items-start gap-1.5">
                   <span className="font-bold text-legal-gold">•</span>
@@ -94,7 +94,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
                 </li>
                 <li className="flex items-start gap-1.5">
                   <span className="font-bold text-legal-gold">•</span>
-                  <span><strong>Privacidad:</strong> Almacenamiento seguro en IndexedDB sin telemetría.</span>
+                  <span><strong>Privacidad:</strong> Sin almacenamiento en la nube, sin rastreo ni telemetría.</span>
                 </li>
               </ul>
             </div>

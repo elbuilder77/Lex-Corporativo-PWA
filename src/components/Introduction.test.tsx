@@ -76,6 +76,11 @@ describe('Introduction Component', () => {
       screen.queryByText(/Redacta instrumentos corporativos, consulta legislación federal/i),
     ).not.toBeInTheDocument();
 
+    // Verifica especificaciones de Ingeniería Jurídica
+    expect(screen.getByText(/25 documentos:/i)).toBeInTheDocument();
+    expect(screen.queryByText(/25 plantillas:/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Sin almacenamiento en la nube, sin rastreo ni telemetría/i)).toBeInTheDocument();
+
     // Verifica especificaciones del Fundamentador Jurídico
     expect(screen.getByText(/5 materias:/i)).toBeInTheDocument();
     expect(screen.getByText(/Laboral, Mercantil, Fiscal, Aduanal y Comercio Exterior/i)).toBeInTheDocument();
