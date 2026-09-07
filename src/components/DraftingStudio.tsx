@@ -444,6 +444,7 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                   role="status"
                   aria-live="polite"
                   aria-label="Estado del borrador"
+                  data-status={saveState}
                   className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold ${
                     saveState === 'error'
                       ? 'border-red-200 bg-red-50 text-red-700'
