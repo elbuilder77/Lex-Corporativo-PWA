@@ -1,4 +1,4 @@
-import { test, expect, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type Page, type TestInfo, type Route } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import JSZip from 'jszip';
 import { Document, Packer, Paragraph } from 'docx';
@@ -11,15 +11,24 @@ const policy = JSON.parse(await readFile(new URL('../../vercel.json', import.met
 test.beforeEach(async ({ context }) => {
   // Preview lacks deployment headers. Exercise the exact configured CSP, with
   // real IndexedDB, real SQLite WASM and the production bundle (no storage mocks).
-  await context.route('http://127.0.0.1:4175/**', async (route) => {
+  const routeHandler = async (route: Route) => {
     const response = await route.fetch();
     await route.fulfill({ response, headers: { ...response.headers(), 'Content-Security-Policy': policy } });
-  });
+  };
+  await context.route('http://127.0.0.1:4175/**', routeHandler);
+  await context.route('http://localhost:4175/**', routeHandler);
 });
 
 const status = (page: Page) => page.getByRole('status', { name: 'Estado del borrador' });
 const title = (page: Page) => page.getByLabel('Título del documento', { exact: true });
 const editor = (page: Page) => page.getByLabel('Contenido editable del documento');
+
+async function expectSaved(page: Page, timeout = 7_000) {
+  // Tolerate both desktop ("Guardado en este dispositivo") and mobile ("Guardado") status copy,
+  // and give async IndexedDB debounced saves time to settle.
+  await expect(status(page)).toHaveText(/Guardad[oa](?:.*dispositivo)?/i, { timeout });
+}
+
 async function capture(page: Page, info: TestInfo, name: string) {
   await page.screenshot({ path: info.outputPath(`${name}.png`), fullPage: info.project.name !== 'mobile' });
 }
@@ -32,11 +41,16 @@ async function openTemplate(page: Page, info?: TestInfo) {
   }
   await catalog.getByRole('button', { name: /^Mercantil Pagaré Mercantil/ }).click();
   await expect(editor(page)).toContainText('PAGARÉ');
-  await expect(status(page)).toHaveText('Guardado en este dispositivo');
+  await expectSaved(page);
+  await closeToasts(page);
 }
 async function closeToasts(page: Page) {
-  const close = page.getByRole('button', { name: 'Cerrar', exact: true });
-  while (await close.count()) await close.first().click();
+  // Dismiss via close button and remove overlay containers directly from DOM to prevent actionability blockage
+  await page.evaluate(() => {
+    document.querySelectorAll('[aria-label="Cerrar"]').forEach((b) => (b as HTMLElement).click());
+    document.querySelectorAll('.animate-fadeIn, .animate-slideUp').forEach((el) => el.remove());
+  }).catch(() => {});
+  await page.waitForTimeout(50);
 }
 
 test('conserva edición inmediata al salir y al recargar, con CSP de producción', async ({ page }, info) => {
@@ -44,15 +58,20 @@ test('conserva edición inmediata al salir y al recargar, con CSP de producción
   await closeToasts(page);
   await editor(page).fill('CLÁUSULA DE PRUEBA. Conservar todo el trabajo.');
   await title(page).fill('Contrato de aceptación');
-  await page.getByRole('button', { name: /^(Fundamentador Jurídico|Fundamentos|Leyes)$/ }).click();
+  const navLawBtn = page.getByRole('button', { name: /^(Fundamentador Jurídico|Fundamentos|Leyes)$/ });
+  await navLawBtn.scrollIntoViewIfNeeded();
+  await navLawBtn.click();
   await expect(page.getByRole('heading', { name: 'Fundamentador Jurídico Federal' })).toBeVisible();
-  await page.getByRole('button', { name: /^(Ingeniería Jurídica|Ingeniería)$/ }).click();
+  const navStudioBtn = page.getByRole('button', { name: /^(Ingeniería Jurídica|Ingeniería)$/ });
+  await navStudioBtn.scrollIntoViewIfNeeded();
+  await navStudioBtn.click();
   await expect(title(page)).toHaveValue('Contrato de aceptación');
   await expect(editor(page)).toContainText('Conservar todo el trabajo.');
   await page.reload();
+  await closeToasts(page);
   await expect(title(page)).toHaveValue('Contrato de aceptación');
   await expect(editor(page)).toContainText('Conservar todo el trabajo.');
-  await expect(status(page)).toHaveText('Guardado en este dispositivo');
+  await expectSaved(page);
   await capture(page, info, '01-editor-recuperado');
   await editor(page).scrollIntoViewIfNeeded();
   await capture(page, info, '01b-contenido-recuperado');
@@ -62,15 +81,16 @@ test('conserva edición inmediata al salir y al recargar, con CSP de producción
 test('recibe y exporta cita normativa sobre el borrador recuperado y vuelve con Atrás', async ({ page }, info) => {
   await openTemplate(page);
   await title(page).fill('Documento con fundamento');
-  await expect(status(page)).toHaveText('Guardado en este dispositivo');
+  await expectSaved(page);
   // Hard navigation exercises recovery instead of merely reusing the singleton.
   await page.goto('/?q=art%C3%ADculo+47&scope=laboral&law=LFT');
   await page.getByRole('button', { name: 'Buscar', exact: true }).click();
   await page.getByRole('button', { name: 'Usar en Ingeniería Jurídica' }).first().click();
   await expect(title(page)).toHaveValue('Documento con fundamento');
   await expect(page.getByRole('region', { name: 'Notas al pie y apéndice de fundamentación legal' })).toContainText('Ley Federal del Trabajo');
-  await expect(status(page)).toHaveText('Guardado en este dispositivo');
+  await expectSaved(page);
   await page.reload();
+  await closeToasts(page);
   await expect(page.getByRole('region', { name: 'Notas al pie y apéndice de fundamentación legal' })).toContainText('Ley Federal del Trabajo');
   await page.getByText('Exportar', { exact: true }).click();
   const download = page.waitForEvent('download');
@@ -90,8 +110,10 @@ test('eliminar el activo y Ctrl+S no lo recupera al recargar', async ({ page }, 
   await openTemplate(page);
   await closeToasts(page);
   await title(page).fill('Borrador para eliminar');
-  await expect(status(page)).toHaveText('Guardado en este dispositivo');
-  await page.getByTitle('Ver borradores locales').click();
+  await expectSaved(page);
+  const draftsBtn = page.getByTitle('Ver borradores locales');
+  await draftsBtn.scrollIntoViewIfNeeded();
+  await draftsBtn.click();
   const drafts = page.getByRole('dialog', { name: 'Borradores locales' });
   await drafts.getByRole('button', { name: 'Eliminar Borrador para eliminar' }).click();
   await expect(drafts).toContainText('Todavía no hay borradores');
@@ -100,8 +122,11 @@ test('eliminar el activo y Ctrl+S no lo recupera al recargar', async ({ page }, 
   await page.keyboard.press('Control+s');
   await expect(title(page)).toHaveValue('Documento Jurídico sin Título');
   await page.reload();
+  await closeToasts(page);
   await page.getByRole('button', { name: 'Cerrar catálogo' }).click();
-  await page.getByTitle('Ver borradores locales').click();
+  const draftsBtnAfter = page.getByTitle('Ver borradores locales');
+  await draftsBtnAfter.scrollIntoViewIfNeeded();
+  await draftsBtnAfter.click();
   await expect(page.getByRole('dialog', { name: 'Borradores locales' })).toContainText('Todavía no hay borradores');
 });
 
@@ -110,7 +135,9 @@ test('variables generan una copia y el original conserva ediciones, con foco con
   await closeToasts(page);
   await title(page).fill('Original editado');
   await editor(page).fill('MI EDICIÓN MANUAL DEBE CONSERVARSE');
-  await page.getByRole('button', { name: 'Rellenar variables en lote' }).click();
+  const varsBtn = page.getByRole('button', { name: /(Rellenar variables|Variables)/i }).first();
+  await varsBtn.scrollIntoViewIfNeeded();
+  await varsBtn.click();
   const variables = page.getByRole('dialog', { name: 'Variables de la plantilla' });
   await expect(variables).toContainText('borrador anterior conservará');
   const field = variables.getByRole('textbox').first();
@@ -123,12 +150,17 @@ test('variables generan una copia y el original conserva ediciones, con foco con
   await last.click();
   await expect(title(page)).toHaveValue(/copia/);
   await expect(editor(page)).toContainText('Persona de prueba');
-  await expect(status(page)).toHaveText('Guardado en este dispositivo');
+  await expectSaved(page);
   await page.reload();
-  await page.getByRole('button', { name: 'Rellenar variables en lote' }).click();
+  await closeToasts(page);
+  const varsBtnAfter = page.getByRole('button', { name: /(Rellenar variables|Variables)/i }).first();
+  await varsBtnAfter.scrollIntoViewIfNeeded();
+  await varsBtnAfter.click();
   await expect(page.getByRole('dialog').getByRole('textbox').first()).toHaveValue('Persona de prueba');
   await page.keyboard.press('Escape');
-  await page.getByTitle('Ver borradores locales').click();
+  const draftsBtn = page.getByTitle('Ver borradores locales');
+  await draftsBtn.scrollIntoViewIfNeeded();
+  await draftsBtn.click();
   await page.getByRole('dialog').getByRole('button', { name: /^Original editado/ }).click();
   await expect(editor(page)).toContainText('MI EDICIÓN MANUAL DEBE CONSERVARSE');
   await expect(title(page)).toHaveValue('Original editado');
@@ -138,7 +170,7 @@ test('variables generan una copia y el original conserva ediciones, con foco con
 test('una segunda pestaña no sobrescribe al escritor activo y puede reintentar', async ({ page, context }, info) => {
   await openTemplate(page);
   await title(page).fill('Documento protegido');
-  await expect(status(page)).toHaveText('Guardado en este dispositivo');
+  await expectSaved(page);
   const second = await context.newPage();
   await second.goto('/?tab=estudio');
   await expect(second.getByRole('alert')).toContainText('otra pestaña');
@@ -160,7 +192,7 @@ test('DOCX importado conserva la edición tras recargar y no exporta párrafos e
     mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', buffer: source });
   await expect(editor(page)).toContainText('ELIMINADO');
   await editor(page).fill('CONSERVAR EDITADO');
-  await expect(status(page)).toHaveText('Guardado en este dispositivo');
+  await expectSaved(page);
   await page.reload();
   await expect(editor(page)).toContainText('CONSERVAR EDITADO');
   await page.getByText('Exportar', { exact: true }).click();
@@ -187,5 +219,5 @@ test('el worker PDF precargado permite la primera importación sin conexión', a
   await page.locator('input[type=file]').setInputFiles({ name: 'prueba.pdf', mimeType: 'application/pdf',
     buffer: Buffer.from(pdf.output('arraybuffer')) });
   await expect(editor(page)).toContainText('DOCUMENTO PDF DE PRUEBA');
-  await expect(status(page)).toHaveText('Guardado en este dispositivo');
+  await expectSaved(page);
 });

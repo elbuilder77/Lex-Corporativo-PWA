@@ -444,6 +444,7 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                   role="status"
                   aria-live="polite"
                   aria-label="Estado del borrador"
+                  data-status={saveState}
                   className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold ${
                     saveState === 'error'
                       ? 'border-red-200 bg-red-50 text-red-700'
@@ -475,11 +476,11 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
             <button
               type="button"
               onClick={() => setShowCatalogModal(true)}
-              className="studio-action gap-1 font-extrabold text-slate-900 border-slate-300 hover:border-legal-gold cursor-pointer shrink-0"
+              className="studio-action gap-1 font-extrabold text-slate-900 border-slate-300 hover:border-legal-gold cursor-pointer shrink-0 hidden sm:inline-flex"
               title="Iniciar nuevo documento desde el catálogo de instrumentos"
             >
               <Plus size={14} className="text-legal-gold" />
-              <span className="hidden sm:inline">Nuevo</span>
+              <span>Nuevo</span>
             </button>
 
             {/* Catalog Button */}
@@ -574,11 +575,11 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
               <span className="hidden md:inline">Importar</span>
             </button>
 
-            {/* Share Button */}
+            {/* Share Button (Desktop/Tablet) */}
             <button
               type="button"
               onClick={shareDocument}
-              className="studio-action shrink-0"
+              className="studio-action hidden sm:inline-flex shrink-0"
               title="Compartir documento o copiar texto"
             >
               <Share2 size={14} />
@@ -592,6 +593,17 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                 <ChevronDown size={12} />
               </summary>
               <div className="absolute right-0 z-50 mt-2 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-dialog">
+                <button
+                  type="button"
+                  onClick={() => {
+                    exportDetailsRef.current?.removeAttribute('open');
+                    void shareDocument();
+                  }}
+                  className="studio-menu-item sm:hidden text-amber-900 font-bold border-b border-slate-100 pb-1.5 mb-1"
+                >
+                  <Share2 size={13} className="inline mr-1.5 text-amber-700" />
+                  <span>Compartir documento</span>
+                </button>
                 <button type="button" onClick={exportDocx} className="studio-menu-item">
                   Copia Word (.docx)
                 </button>
@@ -620,9 +632,9 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
         {/* Paper Sheet */}
         <article className="legal-letterhead mx-auto flex w-full flex-col justify-between rounded-xl sm:rounded-2xl bg-white px-3.5 py-4 sm:px-12 sm:py-10 shadow-xs sm:shadow-sm transition-all border border-slate-200/90">
           {/* Institutional Letterhead Header */}
-          <header className="border-t-2 border-legal-gold border-b border-slate-900/80 sm:border-b-2 pb-2.5 sm:pb-4 pt-1 mb-3 sm:mb-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
-              <div className="flex items-center gap-2.5 sm:gap-3">
+          <header className="border-t-2 border-legal-gold border-b border-slate-900/80 sm:border-b-2 pb-1.5 sm:pb-4 pt-1 mb-2.5 sm:mb-6">
+            <div className="flex items-center justify-between gap-2 sm:gap-4">
+              <div className="hidden sm:flex items-center gap-2.5 sm:gap-3">
                 <div className="flex h-8 w-8 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-950 p-1 sm:p-1.5 shadow-xs">
                   <img src={logoMark} alt="Lex Corporativo" className="h-full w-full object-contain" />
                 </div>
@@ -630,12 +642,12 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                   <span className="font-serif text-xs sm:text-sm font-extrabold tracking-[0.16em] sm:tracking-[0.2em] text-slate-950 block">
                     LEX CORPORATIVO
                   </span>
-                  <span className="hidden sm:block text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                     Estudio de Ingeniería y Redacción Jurídica
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap text-left sm:text-right text-[9px] sm:text-[10px] font-bold text-slate-400">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap text-left sm:text-right text-[9px] sm:text-[10px] font-bold text-slate-400 w-full sm:w-auto justify-between sm:justify-end">
                 <span className="text-slate-900 font-extrabold tracking-wide">
                   FOLIO · {currentDocument.id.slice(0, 8).toUpperCase()}
                 </span>
@@ -650,9 +662,9 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
             </div>
           </header>
 
-          {/* Quick Instrument Selector for Instant 1-Click Start */}
+          {/* Quick Instrument Selector for Instant 1-Click Start (Desktop/Tablet only; on mobile the top toolbar provides direct access) */}
           {currentDocument.sourceKind === 'blank' && (
-            <div className="mb-3 sm:mb-5 rounded-xl sm:rounded-2xl border border-legal-gold/40 bg-gradient-to-r from-amber-50/80 via-white to-amber-50/50 p-3 sm:p-4 shadow-2xs">
+            <div className="mb-3 sm:mb-5 hidden sm:block rounded-xl sm:rounded-2xl border border-legal-gold/40 bg-gradient-to-r from-amber-50/80 via-white to-amber-50/50 p-3 sm:p-4 shadow-2xs">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
                 <div>
                   <h3 className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-legal-golddark flex items-center gap-1.5">
@@ -665,15 +677,15 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                 <button
                   type="button"
                   onClick={() => setShowCatalogModal(true)}
-                  className="rounded-xl bg-legal-gold hover:bg-legal-goldhover px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs font-extrabold text-slate-950 transition cursor-pointer shadow-2xs shrink-0 active:scale-95"
+                  className="rounded-xl bg-legal-gold hover:bg-legal-goldhover px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs font-extrabold text-slate-950 transition cursor-pointer shadow-2xs shrink-0 active:scale-95 w-full sm:w-auto text-center"
                 >
                   Ver Catálogo (25) →
                 </button>
               </div>
 
-              {/* Quick Instrument Chips: Horizontally scrollable on mobile */}
+              {/* Quick Instrument Chips: Hidden on mobile to avoid row of buttons cluttering the screen */}
               {templates.length > 0 && (
-                <div className="mt-2 sm:mt-3 flex overflow-x-auto pb-1 sm:flex-wrap gap-1.5 pt-2 sm:pt-2.5 border-t border-amber-200/60 no-scrollbar">
+                <div className="mt-2 sm:mt-3 hidden sm:flex overflow-x-auto pb-1 sm:flex-wrap gap-1.5 pt-2 sm:pt-2.5 border-t border-amber-200/60 no-scrollbar">
                   {templates.slice(0, 6).map((tmpl) => (
                     <button
                       key={tmpl.id}
@@ -690,31 +702,30 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
             </div>
           )}
 
-          {/* Active Template Quick Banner */}
+          {/* Active Template Quick Banner (Desktop/Tablet only; on mobile the toolbar provides clear access) */}
           {selectedTemplate && (
-            <div className="mb-3 sm:mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 rounded-xl border border-amber-200/80 bg-gradient-to-r from-amber-50/90 via-amber-50/50 to-white px-3 py-2 sm:px-3.5 sm:py-2.5 text-xs text-amber-950 shadow-2xs">
+            <div className="mb-3 sm:mb-5 hidden sm:flex items-center justify-between gap-2 rounded-xl border border-amber-200/80 bg-gradient-to-r from-amber-50/90 via-amber-50/50 to-white px-3.5 py-2.5 text-xs text-amber-950 shadow-2xs">
               <div className="flex items-center gap-2 min-w-0">
-                <span className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-md bg-amber-200/80 text-amber-800 text-[10px] sm:text-[11px] font-black shrink-0">
+                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-amber-200/80 text-amber-800 text-[11px] font-black shrink-0">
                   ⚡
                 </span>
                 <div className="truncate">
                   <span className="font-bold text-slate-800">Instrumento activo: </span>
                   <span className="font-extrabold text-amber-900">{selectedTemplate.title}</span>
-                  <span className="text-slate-500 ml-1.5 text-[11px] hidden sm:inline">
+                  <span className="text-slate-500 ml-1.5 text-[11px]">
                     ({selectedTemplate.fields.length} variables disponibles)
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+              <div className="flex items-center gap-2 shrink-0">
                 <button
                   type="button"
                   onClick={openVariables}
                   aria-label="Rellenar variables en lote"
-                  className="inline-flex items-center gap-1 rounded-lg bg-amber-800 hover:bg-amber-900 px-2.5 py-1 sm:px-3 sm:py-1.5 text-[11px] font-extrabold text-white transition cursor-pointer shadow-2xs active:scale-95"
+                  className="inline-flex items-center gap-1 rounded-lg bg-amber-800 hover:bg-amber-900 px-3 py-1.5 text-[11px] font-extrabold text-white transition cursor-pointer shadow-2xs active:scale-95"
                 >
                   <SlidersHorizontal size={12} />
-                  <span className="hidden sm:inline">Rellenar variables en lote</span>
-                  <span className="sm:hidden">Variables ({selectedTemplate.fields.length})</span>
+                  <span>Rellenar variables en lote</span>
                 </button>
                 <button
                   type="button"
@@ -728,7 +739,7 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
           )}
 
           {/* Quick Format & Title Header */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3 border-b border-slate-100 pb-2.5 sm:pb-3 mb-3 sm:mb-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3 border-b border-slate-100 pb-2 sm:pb-3 mb-2 sm:mb-4">
             {/* Document Title Input */}
             <div className="flex-1 min-w-0">
               <input
@@ -744,8 +755,8 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
               />
             </div>
 
-            {/* In-Editor Quick Toolbar */}
-            <div className="flex items-center justify-end gap-1 rounded-xl bg-slate-50 border border-slate-200/70 p-1 self-end sm:self-auto">
+            {/* In-Editor Quick Toolbar (Desktop/Tablet only; mobile uses native selection menu) */}
+            <div className="hidden sm:flex items-center justify-end gap-1 rounded-xl bg-slate-50 border border-slate-200/70 p-1 self-end sm:self-auto">
               <button
                 type="button"
                 onClick={() => editor?.chain().focus().undo().run()}
