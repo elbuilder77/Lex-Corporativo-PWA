@@ -2,6 +2,7 @@ import {
   BookOpenCheck,
   ExternalLink,
   FilePenLine,
+  HardDrive,
   Info,
   Landmark,
   ShieldCheck,
@@ -91,7 +92,7 @@ export function SearchInfoSheet({ open, onClose }: SearchInfoSheetProps) {
           <div className="rounded-2xl bg-slate-950 p-4 border border-legal-gold/40 text-white">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm font-extrabold text-legal-gold">
-                <span>💻</span> Estación Desktop para Windows
+                <HardDrive size={16} /> Estación Desktop para Windows
               </div>
               <span className="rounded-md bg-legal-gold/20 px-2 py-0.5 text-[10px] font-extrabold text-legal-gold">
                 v{DESKTOP_SPECS.version}

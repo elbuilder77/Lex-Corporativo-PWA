@@ -1,0 +1,94 @@
+name: Radar CompraNet Sync
+
+on:
+  schedule:
+    # Lunes a Viernes a las 12:00 UTC (06:00 AM hora del centro de México)
+    - cron: '0 12 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Ejecutar en modo de prueba (dry-run, no guarda cambios en Git)'
+        required: false
+        default: false
+        type: boolean
+      create_pr:
+        description: 'Abrir un Pull Request en lugar de hacer commit directo a desarrollo'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  NODE_VERSION: '24.x'
+
+jobs:
+  sync:
+    name: Sincronizar CompraNet y Radar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repositorio
+        uses: actions/checkout@v4
+        with:
+          ref: desarrollo
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar sincronización de CompraNet
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            npm run sync:licitaciones:check
+          else
+            npm run sync:licitaciones
+          fi
+
+      - name: Validar tipado y pruebas unitarias
+        run: |
+          npx tsc -b --noEmit
+          npm run test:run
+
+      - name: Evaluar cambios en el dataset
+        id: git_diff
+        run: |
+          if git diff --quiet src/data/federal-licitaciones.json; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "Sin cambios detectados en el dataset de licitaciones."
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Se detectaron cambios en el dataset de licitaciones."
+          fi
+
+      - name: Guardar cambios y sincronizar
+        if: steps.git_diff.outputs.has_changes == 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TODAY=$(date +'%Y-%m-%d')
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data/federal-licitaciones.json
+
+          if [ "${{ github.event.inputs.create_pr }}" = "true" ]; then
+            BRANCH_NAME="radar-sync-${TODAY}"
+            git checkout -b "$BRANCH_NAME"
+            git commit -m "chore(radar): actualización automática CompraNet [${TODAY}]"
+            git push origin "$BRANCH_NAME" --force
+            gh pr create \
+              --base desarrollo \
+              --head "$BRANCH_NAME" \
+              --title "chore(radar): sincronización automática CompraNet [${TODAY}]" \
+              --body "Actualización automática periódica del feed de licitaciones públicas de CompraNet y ciclo de vida de procedimientos en el Radar de Lex Corporativo."
+          else
+            git commit -m "chore(radar): actualización automática CompraNet [${TODAY}]"
+            git push origin desarrollo
+          fi

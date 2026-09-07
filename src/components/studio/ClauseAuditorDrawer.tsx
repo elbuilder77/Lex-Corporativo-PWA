@@ -289,7 +289,9 @@ export function ClauseAuditorDrawer({
                   </span>
 
                   {rule.isFundamented ? (
-                    <span className="text-[10px] font-bold text-emerald-700">Fundamentada en notas ✅</span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700">
+                      <CheckCircle2 size={12} /> Fundamentada en notas
+                    </span>
                   ) : (
                     <button
                       type="button"

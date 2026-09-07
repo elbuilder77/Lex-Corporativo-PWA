@@ -156,7 +156,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
               }`}
             >
               <MonitorDown size={14} className={activeTab === 'desktop' ? 'text-slate-950' : 'text-amber-400'} />
-              <span>Desktop Windows</span>
+              <span>Desktop</span>
               <span className="rounded-sm bg-legal-gold/20 px-1 py-0.2 text-[8px] font-extrabold uppercase text-amber-300">EXE</span>
             </button>
           </nav>
@@ -165,7 +165,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
           <div className="flex items-center gap-1">
             <div className="hidden items-center gap-2 rounded-xl border border-emerald-800 bg-emerald-950 px-3 py-1.5 xl:flex">
               <ShieldCheck size={14} className="text-emerald-400" />
-              <span className="text-[9px] font-bold leading-tight text-emerald-200">Datos en este dispositivo<br /><span className="font-medium text-emerald-400">Disponible sin conexión</span></span>
+              <span className="text-[10px] font-bold leading-tight text-emerald-300">100% Local y Privado<br /><span className="font-normal text-emerald-400">Disponible sin conexión</span></span>
             </div>
             <button
               type="button"
@@ -238,7 +238,7 @@ export function AppShell({ activeTab, onTabChange, onGoHome, children }: AppShel
             className="h-10 w-10 shrink-0 rounded-xl border border-legal-gold/20 object-cover"
           />
           <p className="flex-1 text-xs font-semibold leading-5">
-            Lleva Lex Corporativo contigo. Acceso directo a legislación federal y radar de licitaciones públicas.
+            Instala Lex Corporativo para acceder sin conexión a legislación federal y licitaciones.
           </p>
           <button
             type="button"

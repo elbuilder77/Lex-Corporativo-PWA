@@ -78,7 +78,7 @@ export function TemplateCatalogModal({
             <div>
               <h2 className="font-serif text-base sm:text-lg font-bold text-slate-950">Biblioteca de Instrumentos</h2>
               <p className="hidden sm:block text-xs text-slate-500">
-                Selecciona una plantilla o instrumento estructurado para tu redacción jurídica.
+                Selecciona una plantilla o instrumento para comenzar a redactar.
               </p>
             </div>
           </div>
@@ -101,7 +101,7 @@ export function TemplateCatalogModal({
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por contrato, pagaré, acta, materia o palabras clave…"
+              placeholder="Buscar por contrato, pagaré, acta o palabras clave…"
               className="studio-input studio-input-with-leading-icon text-base sm:text-xs"
               data-autofocus
             />

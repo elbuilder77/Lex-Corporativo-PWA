@@ -11,8 +11,10 @@ import {
   ExternalLink,
   FileCheck2,
   FileSearch,
+  FileText,
   Filter,
   Flame,
+  HardDrive,
   Landmark,
   LoaderCircle,
   MapPin,
@@ -38,7 +40,6 @@ import {
   LICITACIONES_STATS,
   MATERIA_LABELS,
   TIPO_PROCEDIMIENTO_LABELS,
-  ENTIDADES_FEDERATIVAS_MEXICO,
 } from '../lib/licitaciones-catalog';
 import { executeLicitacionesSearch } from '../services/licitaciones-search';
 import { useUiStore } from '../store/useUiStore';
@@ -370,7 +371,10 @@ const LicitacionCard = memo(function LicitacionCard({
                       key={i}
                       className="rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-700 border border-slate-200"
                     >
-                      📄 {anexo}
+                      <span className="inline-flex items-center gap-1">
+                        <FileText size={12} className="text-slate-400" />
+                        <span>{anexo}</span>
+                      </span>
                     </span>
                   ))}
                 </div>
@@ -629,14 +633,7 @@ export function BuscadorLicitaciones() {
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 rounded-full border border-blue-400/40 bg-blue-950/60 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-blue-300">
               <Landmark size={13} />
-              <span>Fuentes oficiales · {LICITACIONES_STATS.total.toLocaleString('es-MX')} publicaciones</span>
-            </div>
-            <div className="text-[11px] text-slate-400">
-              <span>Actualizado: {new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-            </div>
-
-            <div className="text-[11px] text-slate-400">
-              <span>Cobertura: {LICITACIONES_STATS.coberturaEntidades().size} de {ENTIDADES_FEDERATIVAS_MEXICO.length} entidades</span>
+              <span>{LICITACIONES_STATS.total.toLocaleString('es-MX')} procedimientos oficiales</span>
             </div>
 
             <div
@@ -656,7 +653,7 @@ export function BuscadorLicitaciones() {
             Radar de Licitaciones Públicas en México
           </h1>
           <p className="mt-1 text-xs text-slate-400 sm:text-sm">
-            Consulta publicaciones federales y la primera cobertura estatal de Yucatán, siempre con procedencia y campos pendientes visibles.
+            Monitoreo oficial de procedimientos de contratación pública federales (CompraNet) y estatales.
           </p>
 
           {/* Integrated Search Box */}
@@ -681,7 +678,7 @@ export function BuscadorLicitaciones() {
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   aria-label="Buscar licitación por título, descripción, número de procedimiento o convocante"
-                  placeholder="Ingrese una palabra clave"
+                  placeholder="Buscar por objeto, insumo, número de procedimiento o convocante..."
                   autoComplete="off"
                   className="min-h-11 w-full rounded-xl border border-slate-600 bg-slate-950 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-500 focus:border-legal-gold focus:outline-none"
                 />
@@ -998,10 +995,10 @@ export function BuscadorLicitaciones() {
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
             <Landmark className="mx-auto text-slate-400" size={36} />
             <h2 className="mt-3 text-sm font-extrabold text-slate-900">
-              Consulta convocatorias y publicaciones verificables
+              Explora convocatorias y procedimientos de contratación
             </h2>
             <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-slate-500">
-              Ingresa una palabra clave, dependencia convocante, materia o número de procedimiento para explorar los procedimientos de contratación pública.
+              Busca por objeto del contrato, institución convocante o número de expediente oficial.
             </p>
           </div>
         )}
@@ -1081,10 +1078,10 @@ export function BuscadorLicitaciones() {
             <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 p-4 text-white flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
               <div className="text-center sm:text-left">
                 <p className="text-xs font-bold text-legal-gold flex items-center justify-center sm:justify-start gap-1.5">
-                  <span>💻</span> ¿Necesitas auditar contratos de proveedores o redactar convenios de licitación?
+                  <HardDrive size={15} /> ¿Necesitas auditar contratos de proveedores o redactar convenios de licitación?
                 </p>
                 <p className="text-[11px] text-slate-400 mt-0.5">
-                  Descarga <strong>Lex Corporativo Desktop</strong> con auditoría contractual multi-materia, redactor en Word/PDF y bóveda de asuntos 100% offline con BYOK.
+                  Lex Corporativo Desktop incluye auditoría contractual, expedientes locales y exportación Word/PDF 100% offline.
                 </p>
               </div>
               <button
@@ -1097,7 +1094,7 @@ export function BuscadorLicitaciones() {
                 }}
                 className="inline-flex items-center gap-1.5 rounded-xl bg-legal-gold hover:bg-legal-goldhover text-slate-950 px-3.5 py-1.5 text-xs font-extrabold transition cursor-pointer shrink-0"
               >
-                <span>Descargar Estación Desktop</span>
+                <span>Ficha Técnica Desktop</span>
               </button>
             </div>
 

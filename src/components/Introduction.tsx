@@ -83,7 +83,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
                 Ingeniería Jurídica
               </h2>
               <p className="mt-1.5 text-xs leading-relaxed text-slate-400">
-                Redacta instrumentos corporativos, aplica variables guiadas con wizard, importa DOCX/PDF y estructura contratos en este dispositivo.
+                Redacta instrumentos corporativos con variables guiadas, importa DOCX/PDF y estructura contratos con autoguardado local.
               </p>
             </div>
             <div className="mt-5 border-t border-slate-800/80 pt-3">
@@ -113,7 +113,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
                 Fundamentador Jurídico
               </h2>
               <p className="mt-1.5 text-xs text-slate-400 leading-relaxed">
-                Buscador normativo instantáneo sobre 5,011 artículos y disposiciones federales con motor SQLite WASM en sesión.
+                Búsqueda instantánea en 5,011 artículos y disposiciones federales con motor local SQLite.
               </p>
             </div>
 
@@ -144,7 +144,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
                 Radar de Licitaciones
               </h2>
               <p className="mt-1.5 text-xs text-slate-400 leading-relaxed">
-                Monitoreo estratégico de contrataciones públicas federales de CompraNet, plazos y convocatorias oficiales.
+                Monitoreo de contrataciones públicas federales en CompraNet, seguimiento de plazos y convocatorias oficiales.
               </p>
             </div>
 
@@ -188,7 +188,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
               onClick={() => handleStart('desktop')}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-legal-gold/40 bg-legal-gold/10 hover:bg-legal-gold text-legal-gold hover:text-slate-950 px-5 py-2.5 text-xs font-extrabold transition shrink-0 cursor-pointer shadow-xs active:scale-95"
             >
-              <span>Ficha Técnica Desktop (Windows)</span>
+              <span>Ficha Técnica Desktop</span>
               <ArrowRight size={14} />
             </button>
           </div>
@@ -201,11 +201,11 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
           </span>
           <span className="text-slate-700">•</span>
           <span className="flex items-center gap-1.5">
-            <Scale size={13} className="text-blue-400" /> Respaldo oficial federal
+            <Scale size={13} className="text-blue-400" /> Legislación federal oficial
           </span>
           <span className="text-slate-700">•</span>
           <span className="flex items-center gap-1.5">
-            <ShieldCheck size={13} className="text-emerald-400" /> Procesamiento Local en Navegador
+            <ShieldCheck size={13} className="text-emerald-400" /> 100% privado en navegador
           </span>
         </div>
       </main>

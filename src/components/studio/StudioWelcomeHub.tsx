@@ -49,7 +49,7 @@ export function StudioWelcomeHub({
                 Ingeniería Jurídica & Redacción
               </h2>
               <p className="text-xs text-slate-500">
-                Selecciona cómo deseas iniciar tu instrumento legal en este dispositivo.
+                Selecciona cómo deseas iniciar tu documento legal.
               </p>
             </div>
           </div>
@@ -139,7 +139,7 @@ export function StudioWelcomeHub({
                   Subir Documento
                 </h3>
                 <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
-                  Importa un archivo .docx, .pdf o .txt para continuar la redacción y edición local.
+                  Importa archivos .docx, .pdf o .txt para continuar redactando.
                 </p>
               </div>
               <span className="mt-4 inline-flex items-center text-xs font-extrabold text-blue-600 group-hover:underline">
@@ -164,7 +164,7 @@ export function StudioWelcomeHub({
                   Lienzo en Blanco
                 </h3>
                 <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
-                  Comienza desde cero en hoja membretada institucional con guardado local seguro.
+                  Comienza desde cero en documento membretado institucional.
                 </p>
               </div>
               <span className="mt-4 inline-flex items-center text-xs font-extrabold text-slate-700 group-hover:underline">
