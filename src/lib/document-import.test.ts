@@ -65,4 +65,30 @@ describe('Document Import Utility', () => {
     expect(result.text).toBe('');
     expect(result.xml).not.toContain('ELIMINADO');
   });
+
+  it('rechaza archivos que exceden el tamaño máximo permitido', async () => {
+    const hugeBuffer = new Uint8Array(11 * 1024 * 1024);
+    const file = new File([hugeBuffer], 'grande.txt', { type: 'text/plain' });
+    await expect(importUserDocument(file)).rejects.toThrow(/excede el tamaño máximo permitido/i);
+  });
+
+  it('rechaza archivos DOCX con demasiadas entradas en el ZIP', async () => {
+    const zip = new JSZip();
+    zip.file('word/document.xml', '<w:document><w:body><w:p/></w:body></w:document>');
+    for (let i = 0; i < 260; i++) {
+      zip.file(`entry_${i}.xml`, '<x/>');
+    }
+    const buf = await zip.generateAsync({ type: 'arraybuffer' });
+    const file = new File([buf], 'bomb.docx', {
+      type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    });
+    await expect(importUserDocument(file)).rejects.toThrow(/demasiadas entradas/i);
+  });
+
+  it('rechaza exportar copias DOCX cuyo buffer excede el límite máximo', async () => {
+    const hugeBuffer = new ArrayBuffer(11 * 1024 * 1024);
+    await expect(exportPreservedDocxCopy(hugeBuffer, 'texto', [], 'test.docx')).rejects.toThrow(
+      /excede el tamaño máximo seguro/i,
+    );
+  });
 });

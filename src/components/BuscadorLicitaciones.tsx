@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import {
   Building2,
   Calendar,
@@ -104,6 +104,307 @@ Fuente oficial: ${source.nombre}
 Verificada por Lex: ${formatDate(source.verificadaEl)}
 ${source.url}`;
 }
+
+interface LicitacionCardProps {
+  licitacion: LicitacionPublica;
+  isExpanded: boolean;
+  isCopied: boolean;
+  onToggleExpanded: (id: string) => void;
+  onCopy: (licitacion: LicitacionPublica) => void;
+  onShare: (licitacion: LicitacionPublica) => void;
+}
+
+const LicitacionCard = memo(function LicitacionCard({
+  licitacion,
+  isExpanded,
+  isCopied,
+  onToggleExpanded,
+  onCopy,
+  onShare,
+}: LicitacionCardProps) {
+  const daysInfo = useMemo(() => getDaysRemaining(licitacion.fechaLimitePropuestas), [licitacion.fechaLimitePropuestas]);
+  const source = useMemo(() => getLicitacionOfficialSource(licitacion), [licitacion]);
+  const formattedPublicacion = useMemo(() => formatDate(licitacion.fechaPublicacion), [licitacion.fechaPublicacion]);
+  const formattedVerificada = useMemo(() => formatDate(source.verificadaEl), [source.verificadaEl]);
+  const formattedCurrency = useMemo(
+    () => (licitacion.montoEstimado ? formatCurrency(licitacion.montoEstimado, licitacion.moneda) : 'No especificado'),
+    [licitacion.montoEstimado, licitacion.moneda],
+  );
+  const formattedLimite = useMemo(
+    () => (licitacion.fechaLimitePropuestas ? formatDate(licitacion.fechaLimitePropuestas) : 'Por verificar'),
+    [licitacion.fechaLimitePropuestas],
+  );
+
+  return (
+    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition hover:border-slate-300 hover:shadow-md">
+      <div className="p-4 sm:p-5">
+        {/* Header Row: Badges + Action Buttons */}
+        <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+          {/* Left: Tags and Deadline */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-extrabold text-slate-800">
+              {licitacion.numeroProcedimiento}
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700">
+              <MapPin size={11} className="text-slate-500" /> {licitacion.entidadFederativa}
+            </span>
+            <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">
+              {CARACTER_LABELS[licitacion.caracter]}
+            </span>
+            <span className="rounded-md bg-violet-50 px-2 py-0.5 text-[10px] font-bold capitalize text-violet-700">
+              {source.ambito}
+            </span>
+            {source.integridad === 'publication_only' && (
+              <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 ring-1 ring-blue-200">
+                Datos parciales
+              </span>
+            )}
+          </div>
+
+          {/* Deadline Countdown Badge (Right Aligned) */}
+          <div
+            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-extrabold ${
+              daysInfo.badgeStyle === 'urgent'
+                ? 'bg-red-50 text-red-700 border border-red-200'
+                : daysInfo.badgeStyle === 'warning'
+                  ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                  : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+            }`}
+          >
+            {daysInfo.badgeStyle === 'urgent' ? (
+              <Flame size={13} className="text-red-600 animate-pulse" />
+            ) : (
+              <Clock3 size={13} />
+            )}
+            <span>{daysInfo.label}</span>
+          </div>
+        </div>
+
+        {/* Middle Row: Title & Convocante Subtitle */}
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-base font-extrabold leading-snug text-slate-950 sm:text-lg">
+              {licitacion.titulo}
+            </h2>
+            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs font-semibold text-slate-600">
+              <Building2 size={13} className="text-slate-400 shrink-0" />
+              <span>{licitacion.convocante}</span>
+              <span className="text-slate-300">·</span>
+              <span className="text-slate-500">{licitacion.unidadCompradora}</span>
+            </p>
+            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-blue-700">
+              <ShieldCheck size={12} className="shrink-0" />
+              Fuente: {source.nombre} · verificada {formattedVerificada}
+            </p>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex shrink-0 items-center gap-1 self-start">
+            <button
+              type="button"
+              onClick={() => onCopy(licitacion)}
+              className="flex min-h-9 min-w-9 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 cursor-pointer"
+              title="Copiar ficha técnica"
+              aria-label="Copiar ficha técnica de licitación"
+            >
+              {isCopied ? (
+                <Check size={16} className="text-emerald-600" />
+              ) : (
+                <Copy size={16} />
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => onShare(licitacion)}
+              className="flex min-h-9 min-w-9 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 cursor-pointer"
+              title="Compartir licitación"
+              aria-label="Compartir licitación"
+            >
+              <Share2 size={16} />
+            </button>
+          </div>
+        </div>
+
+        {/* Key Metrics Grid (4 items) */}
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2">
+            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              <DollarSign size={11} className="text-slate-400" /> Presupuesto
+            </span>
+            <p className="mt-0.5 font-mono text-xs font-extrabold text-slate-900 truncate">
+              {formattedCurrency}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2">
+            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              <Scale size={11} className="text-slate-400" /> Materia
+            </span>
+            <p className="mt-0.5 text-xs font-extrabold text-slate-900 truncate">
+              {MATERIA_LABELS[licitacion.materia]}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2">
+            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              <Calendar size={11} className="text-slate-400" /> Límite
+            </span>
+            <p className="mt-0.5 text-xs font-extrabold text-slate-900">
+              {formattedLimite}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2">
+            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              <Check size={11} className="text-slate-400" /> Estatus
+            </span>
+            <p className="mt-0.5 text-xs font-extrabold text-slate-900 truncate">
+              {ESTATUS_LABELS[licitacion.estatus]}
+            </p>
+          </div>
+        </div>
+
+        {/* Description Paragraph */}
+        <p
+          className={`mt-2.5 text-xs leading-5 text-slate-700 sm:text-sm ${
+            isExpanded ? '' : 'line-clamp-2'
+          }`}
+        >
+          {licitacion.descripcion}
+        </p>
+
+        {/* Expanded Content Drawer */}
+        {isExpanded && (
+          <div
+            id={`licitacion-detalle-${licitacion.id}`}
+            className="mt-3.5 space-y-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5 sm:p-4"
+          >
+            {/* Timeline */}
+            <div>
+              <h3 className="text-[11px] font-extrabold uppercase tracking-wider text-slate-900">
+                Cronograma del Procedimiento
+              </h3>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2 md:grid-cols-4">
+                <div className="rounded-lg bg-white p-2 border border-slate-200/80">
+                  <span className="text-[10px] font-semibold text-slate-500">Publicación</span>
+                  <p className="text-xs font-bold text-slate-900">
+                    {formattedPublicacion}
+                  </p>
+                </div>
+                {licitacion.fechaVisitaSitio && (
+                  <div className="rounded-lg bg-white p-2 border border-slate-200/80">
+                    <span className="text-[10px] font-semibold text-slate-500">Visita al Sitio</span>
+                    <p className="text-xs font-bold text-slate-900">
+                      {formatDate(licitacion.fechaVisitaSitio)}
+                    </p>
+                  </div>
+                )}
+                {licitacion.fechaJuntaAclaraciones && (
+                  <div className="rounded-lg bg-white p-2 border border-slate-200/80">
+                    <span className="text-[10px] font-semibold text-slate-500">Junta de Aclaraciones</span>
+                    <p className="text-xs font-bold text-slate-900">
+                      {formatDate(licitacion.fechaJuntaAclaraciones)}
+                    </p>
+                  </div>
+                )}
+                <div className="rounded-lg bg-white p-2 border border-slate-200/80">
+                  <span className="text-[10px] font-semibold text-slate-500">Límite de Propuestas</span>
+                  <p className="text-xs font-bold text-slate-900">
+                    {licitacion.fechaLimitePropuestas
+                      ? formatDateTime(licitacion.fechaLimitePropuestas)
+                      : 'Por verificar en la fuente oficial'}
+                  </p>
+                </div>
+                {licitacion.fechaFallo && (
+                  <div className="rounded-lg bg-white p-2 border border-slate-200/80">
+                    <span className="text-[10px] font-semibold text-slate-500">Fallo Estimado</span>
+                    <p className="text-xs font-bold text-slate-900">
+                      {formatDate(licitacion.fechaFallo)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Legal Basis & Requirements */}
+            <div className="grid gap-2.5 sm:grid-cols-2">
+              <div className="rounded-xl bg-white p-3 border border-slate-200/80">
+                <span className="flex items-center gap-1.5 text-xs font-extrabold text-slate-900">
+                  <Scale size={13} className="text-legal-golddark" /> Fundamento Jurídico
+                </span>
+                <p className="mt-1 text-xs text-slate-700 leading-5">
+                  {licitacion.marcoLegal}
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-white p-3 border border-slate-200/80">
+                <span className="flex items-center gap-1.5 text-xs font-extrabold text-slate-900">
+                  <FileCheck2 size={13} className="text-emerald-700" /> Requisitos Clave
+                </span>
+                {licitacion.requisitosClave.length > 0 ? (
+                  <ul className="mt-1 space-y-1 text-xs text-slate-600">
+                    {licitacion.requisitosClave.map((req, i) => (
+                      <li key={i} className="flex items-start gap-1.5">
+                        <span className="text-emerald-600 font-bold">•</span>
+                        <span>{req}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-1 text-xs leading-5 text-blue-700">
+                    Pendientes de verificación en las bases oficiales.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Attachments */}
+            {licitacion.anexosDisponibles.length > 0 && (
+              <div className="pt-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  Documentos y anexos en {source.nombre}:
+                </span>
+                <div className="mt-1 flex flex-wrap gap-1.5">
+                  {licitacion.anexosDisponibles.map((anexo, i) => (
+                    <span
+                      key={i}
+                      className="rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-700 border border-slate-200"
+                    >
+                      📄 {anexo}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Bottom Actions Bar */}
+        <div className="mt-3.5 flex flex-col gap-2 border-t border-slate-100 pt-3 sm:flex-row sm:items-center sm:justify-between">
+          <button
+            type="button"
+            onClick={() => onToggleExpanded(licitacion.id)}
+            className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-legal-gold hover:bg-legal-goldhover px-4 text-xs font-bold text-slate-950 shadow-xs transition active:scale-95 cursor-pointer"
+            aria-expanded={isExpanded}
+            aria-controls={`licitacion-detalle-${licitacion.id}`}
+          >
+            {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            {isExpanded ? 'Contraer ficha' : 'Ver requisitos y cronograma completo'}
+          </button>
+
+          <a
+            href={source.url}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 px-4 text-xs font-bold text-slate-800 transition active:scale-95"
+          >
+            <ExternalLink size={14} /> Ver fuente oficial
+          </a>
+        </div>
+      </div>
+    </article>
+  );
+});
 
 export function BuscadorLicitaciones() {
   const searchParams = useMemo(() => new URLSearchParams(window.location.search), []);
@@ -277,7 +578,16 @@ export function BuscadorLicitaciones() {
     window.history.replaceState(null, '', url);
   };
 
-  const copyLicitacion = async (licitacion: LicitacionPublica) => {
+  const handleToggleExpanded = useCallback((id: string) => {
+    setExpanded((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const copyLicitacion = useCallback(async (licitacion: LicitacionPublica) => {
     try {
       await navigator.clipboard.writeText(licitacionPlainText(licitacion));
       setCopiedId(licitacion.id);
@@ -286,9 +596,9 @@ export function BuscadorLicitaciones() {
     } catch {
       notify('El navegador no permitió copiar el texto.', 'error');
     }
-  };
+  }, [notify]);
 
-  const shareLicitacion = async (licitacion: LicitacionPublica) => {
+  const shareLicitacion = useCallback(async (licitacion: LicitacionPublica) => {
     try {
       if (navigator.share) {
         const source = getLicitacionOfficialSource(licitacion);
@@ -308,7 +618,7 @@ export function BuscadorLicitaciones() {
         notify('No fue posible compartir la licitación.', 'error');
       }
     }
-  };
+  }, [copyLicitacion, notify]);
 
   return (
     <div className="min-h-screen bg-slate-50 pb-12">
@@ -755,297 +1065,17 @@ export function BuscadorLicitaciones() {
         {/* Tender Cards List */}
         {result && result.licitaciones.length > 0 && (
           <div className="space-y-3.5" aria-live="polite">
-            {result.licitaciones.map((licitacion) => {
-              const isExpanded = expanded.has(licitacion.id);
-              const daysInfo = getDaysRemaining(licitacion.fechaLimitePropuestas);
-              const source = getLicitacionOfficialSource(licitacion);
-
-              return (
-                <article
-                  key={licitacion.id}
-                  className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition hover:border-slate-300 hover:shadow-md"
-                >
-                  <div className="p-4 sm:p-5">
-                    {/* Header Row: Badges + Action Buttons */}
-                    <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
-                      {/* Left: Tags and Deadline */}
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-extrabold text-slate-800">
-                          {licitacion.numeroProcedimiento}
-                        </span>
-                        <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700">
-                          <MapPin size={11} className="text-slate-500" /> {licitacion.entidadFederativa}
-                        </span>
-                        <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">
-                          {CARACTER_LABELS[licitacion.caracter]}
-                        </span>
-                        <span className="rounded-md bg-violet-50 px-2 py-0.5 text-[10px] font-bold capitalize text-violet-700">
-                          {source.ambito}
-                        </span>
-                        {source.integridad === 'publication_only' && (
-                          <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 ring-1 ring-blue-200">
-                            Datos parciales
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Deadline Countdown Badge (Right Aligned) */}
-                      <div
-                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-extrabold ${
-                          daysInfo.badgeStyle === 'urgent'
-                            ? 'bg-red-50 text-red-700 border border-red-200'
-                            : daysInfo.badgeStyle === 'warning'
-                              ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                              : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                        }`}
-                      >
-                        {daysInfo.badgeStyle === 'urgent' ? (
-                          <Flame size={13} className="text-red-600 animate-pulse" />
-                        ) : (
-                          <Clock3 size={13} />
-                        )}
-                        <span>{daysInfo.label}</span>
-                      </div>
-                    </div>
-
-                    {/* Middle Row: Title & Convocante Subtitle */}
-                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="min-w-0 flex-1">
-                        <h2 className="text-base font-extrabold leading-snug text-slate-950 sm:text-lg">
-                          {licitacion.titulo}
-                        </h2>
-                        <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs font-semibold text-slate-600">
-                          <Building2 size={13} className="text-slate-400 shrink-0" />
-                          <span>{licitacion.convocante}</span>
-                          <span className="text-slate-300">·</span>
-                          <span className="text-slate-500">{licitacion.unidadCompradora}</span>
-                        </p>
-                        <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-blue-700">
-                          <ShieldCheck size={12} className="shrink-0" />
-                          Fuente: {source.nombre} · verificada {formatDate(source.verificadaEl)}
-                        </p>
-                      </div>
-
-                      {/* Action buttons */}
-                      <div className="flex shrink-0 items-center gap-1 self-start">
-                        <button
-                          type="button"
-                          onClick={() => copyLicitacion(licitacion)}
-                          className="flex min-h-9 min-w-9 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-                          title="Copiar ficha técnica"
-                          aria-label="Copiar ficha técnica de licitación"
-                        >
-                          {copiedId === licitacion.id ? (
-                            <Check size={16} className="text-emerald-600" />
-                          ) : (
-                            <Copy size={16} />
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => shareLicitacion(licitacion)}
-                          className="flex min-h-9 min-w-9 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-                          title="Compartir licitación"
-                          aria-label="Compartir licitación"
-                        >
-                          <Share2 size={16} />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Key Metrics Grid (4 items) */}
-                    <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                      <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2">
-                        <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                          <DollarSign size={11} className="text-slate-400" /> Presupuesto
-                        </span>
-                        <p className="mt-0.5 font-mono text-xs font-extrabold text-slate-900 truncate">
-                          {licitacion.montoEstimado
-                            ? formatCurrency(licitacion.montoEstimado, licitacion.moneda)
-                            : 'No especificado'}
-                        </p>
-                      </div>
-
-                      <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2">
-                        <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                          <Scale size={11} className="text-slate-400" /> Materia
-                        </span>
-                        <p className="mt-0.5 text-xs font-extrabold text-slate-900 truncate">
-                          {MATERIA_LABELS[licitacion.materia]}
-                        </p>
-                      </div>
-
-                      <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2">
-                        <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                          <Calendar size={11} className="text-slate-400" /> Límite
-                        </span>
-                        <p className="mt-0.5 text-xs font-extrabold text-slate-900">
-                          {licitacion.fechaLimitePropuestas
-                            ? formatDate(licitacion.fechaLimitePropuestas)
-                            : 'Por verificar'}
-                        </p>
-                      </div>
-
-                      <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2">
-                        <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                          <Check size={11} className="text-slate-400" /> Estatus
-                        </span>
-                        <p className="mt-0.5 text-xs font-extrabold text-slate-900 truncate">
-                          {ESTATUS_LABELS[licitacion.estatus]}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Description Paragraph */}
-                    <p
-                      className={`mt-2.5 text-xs leading-5 text-slate-700 sm:text-sm ${
-                        isExpanded ? '' : 'line-clamp-2'
-                      }`}
-                    >
-                      {licitacion.descripcion}
-                    </p>
-
-                    {/* Expanded Content Drawer */}
-                    {isExpanded && (
-                      <div
-                        id={`licitacion-detalle-${licitacion.id}`}
-                        className="mt-3.5 space-y-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5 sm:p-4"
-                      >
-                        {/* Timeline */}
-                        <div>
-                          <h3 className="text-[11px] font-extrabold uppercase tracking-wider text-slate-900">
-                            Cronograma del Procedimiento
-                          </h3>
-                          <div className="mt-2 grid gap-2 sm:grid-cols-2 md:grid-cols-4">
-                            <div className="rounded-lg bg-white p-2 border border-slate-200/80">
-                              <span className="text-[10px] font-semibold text-slate-500">Publicación</span>
-                              <p className="text-xs font-bold text-slate-900">
-                                {formatDate(licitacion.fechaPublicacion)}
-                              </p>
-                            </div>
-                            {licitacion.fechaVisitaSitio && (
-                              <div className="rounded-lg bg-white p-2 border border-slate-200/80">
-                                <span className="text-[10px] font-semibold text-slate-500">Visita al Sitio</span>
-                                <p className="text-xs font-bold text-slate-900">
-                                  {formatDate(licitacion.fechaVisitaSitio)}
-                                </p>
-                              </div>
-                            )}
-                            {licitacion.fechaJuntaAclaraciones && (
-                              <div className="rounded-lg bg-white p-2 border border-slate-200/80">
-                                <span className="text-[10px] font-semibold text-slate-500">Junta de Aclaraciones</span>
-                                <p className="text-xs font-bold text-slate-900">
-                                  {formatDate(licitacion.fechaJuntaAclaraciones)}
-                                </p>
-                              </div>
-                            )}
-                            <div className="rounded-lg bg-white p-2 border border-slate-200/80">
-                              <span className="text-[10px] font-semibold text-slate-500">Límite de Propuestas</span>
-                              <p className="text-xs font-bold text-slate-900">
-                                {licitacion.fechaLimitePropuestas
-                                  ? formatDateTime(licitacion.fechaLimitePropuestas)
-                                  : 'Por verificar en la fuente oficial'}
-                              </p>
-                            </div>
-                            {licitacion.fechaFallo && (
-                              <div className="rounded-lg bg-white p-2 border border-slate-200/80">
-                                <span className="text-[10px] font-semibold text-slate-500">Fallo Estimado</span>
-                                <p className="text-xs font-bold text-slate-900">
-                                  {formatDate(licitacion.fechaFallo)}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Legal Basis & Requirements */}
-                        <div className="grid gap-2.5 sm:grid-cols-2">
-                          <div className="rounded-xl bg-white p-3 border border-slate-200/80">
-                            <span className="flex items-center gap-1.5 text-xs font-extrabold text-slate-900">
-                              <Scale size={13} className="text-legal-golddark" /> Fundamento Jurídico
-                            </span>
-                            <p className="mt-1 text-xs text-slate-700 leading-5">
-                              {licitacion.marcoLegal}
-                            </p>
-                          </div>
-
-                          <div className="rounded-xl bg-white p-3 border border-slate-200/80">
-                            <span className="flex items-center gap-1.5 text-xs font-extrabold text-slate-900">
-                              <FileCheck2 size={13} className="text-emerald-700" /> Requisitos Clave
-                            </span>
-                            {licitacion.requisitosClave.length > 0 ? (
-                              <ul className="mt-1 space-y-1 text-xs text-slate-600">
-                                {licitacion.requisitosClave.map((req, i) => (
-                                  <li key={i} className="flex items-start gap-1.5">
-                                    <span className="text-emerald-600 font-bold">•</span>
-                                    <span>{req}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : (
-                              <p className="mt-1 text-xs leading-5 text-blue-700">
-                                Pendientes de verificación en las bases oficiales.
-                              </p>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Attachments */}
-                        {licitacion.anexosDisponibles.length > 0 && (
-                          <div className="pt-1">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                              Documentos y anexos en {source.nombre}:
-                            </span>
-                            <div className="mt-1 flex flex-wrap gap-1.5">
-                              {licitacion.anexosDisponibles.map((anexo, i) => (
-                                <span
-                                  key={i}
-                                  className="rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-700 border border-slate-200"
-                                >
-                                  📄 {anexo}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Bottom Actions Bar */}
-                    <div className="mt-3.5 flex flex-col gap-2 border-t border-slate-100 pt-3 sm:flex-row sm:items-center sm:justify-between">
-                      {/* Primary Button: Ver requisitos y cronograma completo */}
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setExpanded((current) => {
-                            const next = new Set(current);
-                            if (next.has(licitacion.id)) next.delete(licitacion.id);
-                            else next.add(licitacion.id);
-                            return next;
-                          })
-                        }
-                        className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-legal-gold hover:bg-legal-goldhover px-4 text-xs font-bold text-slate-950 shadow-xs transition active:scale-95 cursor-pointer"
-                        aria-expanded={isExpanded}
-                        aria-controls={`licitacion-detalle-${licitacion.id}`}
-                      >
-                        {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-                        {isExpanded ? 'Contraer ficha' : 'Ver requisitos y cronograma completo'}
-                      </button>
-
-                      {/* Secondary Button: ComprasMX sin relleno amarillo */}
-                      <a
-                        href={source.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 px-4 text-xs font-bold text-slate-800 transition active:scale-95"
-                      >
-                        <ExternalLink size={14} /> Ver fuente oficial
-                      </a>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+            {result.licitaciones.map((licitacion) => (
+              <LicitacionCard
+                key={licitacion.id}
+                licitacion={licitacion}
+                isExpanded={expanded.has(licitacion.id)}
+                isCopied={copiedId === licitacion.id}
+                onToggleExpanded={handleToggleExpanded}
+                onCopy={copyLicitacion}
+                onShare={shareLicitacion}
+              />
+            ))}
 
             {/* Desktop Complementary Banner */}
             <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 p-4 text-white flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
