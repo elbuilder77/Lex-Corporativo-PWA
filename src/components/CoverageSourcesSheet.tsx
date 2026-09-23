@@ -65,7 +65,7 @@ export function CoverageSourcesSheet({ open, onClose }: CoverageSourcesSheetProp
           <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-emerald-800">
-                <CheckCircle2 size={13} /> {COVERAGE_SUMMARY.available} fuente consultable
+                <CheckCircle2 size={13} /> {COVERAGE_SUMMARY.available} {COVERAGE_SUMMARY.available === 1 ? 'fuente consultable' : 'fuentes consultables'}
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-blue-800">
                 <Landmark size={13} /> {COVERAGE_SUMMARY.partial} cobertura parcial
