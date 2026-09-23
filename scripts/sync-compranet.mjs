@@ -189,7 +189,7 @@ export async function fetchRemoteFeed(url, timeoutMs = 8000) {
       signal: controller.signal,
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        Accept: 'application/json, text/plain, */*',
+        Accept: 'application/json, text/html;q=0.9, */*;q=0.8',
       },
     });
 
@@ -197,8 +197,13 @@ export async function fetchRemoteFeed(url, timeoutMs = 8000) {
       throw new Error(`HTTP ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
-    return { ok: true, data };
+    const contentType = response.headers?.get ? (response.headers.get('content-type') || '') : '';
+    if (contentType.includes('application/json')) {
+      const data = await response.json();
+      return { ok: true, isJson: true, data };
+    }
+
+    return { ok: true, isJson: false, status: response.status };
   } catch (error) {
     return { ok: false, error: error.message };
   } finally {
@@ -237,9 +242,13 @@ export async function syncCompranet(options = {}) {
     try {
       const probe = await fetchRemoteFeed(src.url, 5000);
       if (probe.ok) {
-        console.log(`[Radar Sync] Conectividad con ${src.name}: ACTIVA (200 OK)`);
+        if (probe.isJson && probe.data) {
+          console.log(`[Radar Sync] Conectividad con ${src.name}: FEED JSON RECIBIDO (${Array.isArray(probe.data) ? probe.data.length : 'OK'})`);
+        } else {
+          console.log(`[Radar Sync] Conectividad con ${src.name}: ACTIVA (${probe.status || 200} OK)`);
+        }
       } else {
-        console.log(`[Radar Sync] Aviso: ${src.name} no respondió JSON (${probe.error}). Se aplicará resiliencia local.`);
+        console.log(`[Radar Sync] Aviso: ${src.name} no respondió (${probe.error}). Se aplicará resiliencia local.`);
       }
     } catch {
       console.log(`[Radar Sync] Aviso: Conexión con ${src.name} omitida o en timeout.`);

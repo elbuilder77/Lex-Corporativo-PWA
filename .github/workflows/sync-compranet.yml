@@ -12,9 +12,9 @@ on:
         default: false
         type: boolean
       create_pr:
-        description: 'Abrir un Pull Request en lugar de hacer commit directo a desarrollo'
+        description: 'Abrir un Pull Request hacia master en lugar de hacer commit directo'
         required: false
-        default: false
+        default: true
         type: boolean
 
 permissions:
@@ -32,7 +32,7 @@ jobs:
       - name: Checkout repositorio
         uses: actions/checkout@v4
         with:
-          ref: desarrollo
+          ref: master
           fetch-depth: 0
 
       - name: Setup Node.js
@@ -78,17 +78,24 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add src/data/federal-licitaciones.json
 
-          if [ "${{ github.event.inputs.create_pr }}" = "true" ]; then
+          IS_SCHEDULE="${{ github.event_name == 'schedule' }}"
+          CREATE_PR="${{ github.event.inputs.create_pr }}"
+
+          if [ "$IS_SCHEDULE" = "true" ] || [ "$CREATE_PR" != "false" ]; then
             BRANCH_NAME="radar-sync-${TODAY}"
             git checkout -b "$BRANCH_NAME"
             git commit -m "chore(radar): actualización automática CompraNet [${TODAY}]"
             git push origin "$BRANCH_NAME" --force
-            gh pr create \
-              --base desarrollo \
-              --head "$BRANCH_NAME" \
-              --title "chore(radar): sincronización automática CompraNet [${TODAY}]" \
-              --body "Actualización automática periódica del feed de licitaciones públicas de CompraNet y ciclo de vida de procedimientos en el Radar de Lex Corporativo."
+            if gh pr view "$BRANCH_NAME" > /dev/null 2>&1; then
+              echo "Pull request para $BRANCH_NAME ya existe. Rama actualizada."
+            else
+              gh pr create \
+                --base master \
+                --head "$BRANCH_NAME" \
+                --title "chore(radar): sincronización automática CompraNet [${TODAY}]" \
+                --body "Actualización automática periódica del feed de licitaciones públicas de CompraNet y ciclo de vida de procedimientos en el Radar de Lex Corporativo hacia producción (master)."
+            fi
           else
             git commit -m "chore(radar): actualización automática CompraNet [${TODAY}]"
-            git push origin desarrollo
+            git push origin master
           fi
