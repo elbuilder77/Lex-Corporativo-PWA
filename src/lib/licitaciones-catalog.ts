@@ -19,7 +19,7 @@ const COMPRANET_SOURCE: LicitacionOfficialSource = {
   nombre: 'ComprasMX · CompraNet',
   url: COMPRANET_PORTAL_URL,
   ambito: 'federal',
-  verificadaEl: '2026-08-24',
+  verificadaEl: '2026-09-23',
   integridad: 'complete',
 };
 
