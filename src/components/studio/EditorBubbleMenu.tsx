@@ -19,18 +19,19 @@ export function EditorBubbleMenu({ editor, onFundamentar }: EditorBubbleMenuProp
         const text = doc.textBetween(from, to, ' ').trim();
         return isTextSelection && text.length > 1;
       }}
-      className="flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-950/95 px-1.5 py-1 text-white shadow-2xl backdrop-blur-md"
+      className="flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-950/95 p-1 text-white shadow-2xl backdrop-blur-md"
     >
       <button
         type="button"
         onClick={() => {
+          if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
           const { from, to } = editor.state.selection;
           const selectedText = editor.state.doc.textBetween(from, to, ' ').trim();
           if (selectedText) {
             onFundamentar(selectedText);
           }
         }}
-        className="flex items-center gap-1.5 rounded-lg bg-legal-gold/25 px-2.5 py-1 text-xs font-bold text-amber-300 transition hover:bg-legal-gold/35 active:scale-95"
+        className="flex min-h-[36px] items-center gap-1.5 rounded-lg bg-legal-gold/25 px-2.5 py-1 text-xs font-bold text-amber-300 transition hover:bg-legal-gold/35 active:scale-95"
         title="Fundamentación y Citas (Exclusivo de Lex Corporativo Desktop)"
       >
         <Lock size={12} className="text-amber-400" />
@@ -44,8 +45,11 @@ export function EditorBubbleMenu({ editor, onFundamentar }: EditorBubbleMenuProp
 
       <button
         type="button"
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        className={`rounded-lg p-1.5 text-xs transition active:scale-95 ${
+        onClick={() => {
+          if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
+          editor.chain().focus().toggleBold().run();
+        }}
+        className={`flex min-h-[36px] min-w-[36px] items-center justify-center rounded-lg p-2 text-xs transition active:scale-95 ${
           editor.isActive('bold') ? 'bg-slate-800 text-amber-300' : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
         }`}
         aria-label="Negrita"
@@ -55,8 +59,11 @@ export function EditorBubbleMenu({ editor, onFundamentar }: EditorBubbleMenuProp
 
       <button
         type="button"
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        className={`rounded-lg p-1.5 text-xs transition active:scale-95 ${
+        onClick={() => {
+          if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
+          editor.chain().focus().toggleItalic().run();
+        }}
+        className={`flex min-h-[36px] min-w-[36px] items-center justify-center rounded-lg p-2 text-xs transition active:scale-95 ${
           editor.isActive('italic') ? 'bg-slate-800 text-amber-300' : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
         }`}
         aria-label="Cursiva"
@@ -66,8 +73,11 @@ export function EditorBubbleMenu({ editor, onFundamentar }: EditorBubbleMenuProp
 
       <button
         type="button"
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-        className={`rounded-lg p-1.5 text-xs transition active:scale-95 ${
+        onClick={() => {
+          if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
+          editor.chain().focus().toggleBulletList().run();
+        }}
+        className={`flex min-h-[36px] min-w-[36px] items-center justify-center rounded-lg p-2 text-xs transition active:scale-95 ${
           editor.isActive('bulletList') ? 'bg-slate-800 text-amber-300' : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
         }`}
         aria-label="Lista con viñetas"
