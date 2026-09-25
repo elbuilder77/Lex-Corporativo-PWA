@@ -429,16 +429,16 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
   return (
     <div className="flex min-h-[calc(100vh-64px)] flex-col bg-slate-100/70 text-slate-950">
       {/* Top Main Navigation Bar */}
-      <section className="sticky top-0 z-40 border-b border-slate-200/90 bg-white shadow-xs">
-        <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-2 px-3 py-2 sm:gap-3 sm:px-6 sm:py-2.5 lg:flex-row lg:items-center lg:justify-between">
+      <section className="sticky top-0 z-40 border-b border-slate-200/90 bg-white shadow-card">
+        <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-2 px-3 py-2 sm:gap-3 sm:px-6 sm:py-2 lg:flex-row lg:items-center lg:justify-between">
           {/* Title and Module Brand */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
-            <span className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl border border-legal-gold/30 bg-legal-gold/10 text-legal-golddark shrink-0">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-slate-900 text-legal-gold shadow-card shrink-0">
               <FilePenLine size={18} className="sm:w-5 sm:h-5" />
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-serif text-base font-bold tracking-tight text-slate-950 sm:text-xl">
+                <h1 className="font-serif text-base font-bold tracking-tight text-slate-950 sm:text-lg">
                   Ingeniería Jurídica
                 </h1>
                 <span
@@ -446,16 +446,20 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                   aria-live="polite"
                   aria-label="Estado del borrador"
                   data-status={saveState}
-                  className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold ${
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-medium transition-colors ${
                     saveState === 'error'
-                      ? 'border-red-200 bg-red-50 text-red-700'
-                      : 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                      ? 'border border-red-200 bg-red-50 text-red-700'
+                      : saveState === 'saving' || saveState === 'loading'
+                      ? 'border border-amber-200 bg-amber-50 text-amber-800'
+                      : 'border border-slate-200 bg-slate-50 text-slate-600'
                   }`}
                 >
                   {saveState === 'saving' || saveState === 'loading' ? (
-                    <LoaderCircle size={11} className="animate-spin" />
+                    <LoaderCircle size={11} className="animate-spin text-legal-golddark" />
+                  ) : saveState === 'error' ? (
+                    <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
                   ) : (
-                    <CheckCircle2 size={11} />
+                    <CheckCircle2 size={11} className="text-emerald-600" />
                   )}
                   <span className="hidden sm:inline">
                     {{ loading: 'Recuperando…', empty: 'Sin cambios', pending: 'Cambios pendientes', saving: 'Guardando…', saved: 'Guardado en este dispositivo', error: 'Requiere atención' }[saveState]}
@@ -471,127 +475,133 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
             </div>
           </div>
 
-          {/* Action Toolbar */}
-          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5 sm:py-0 sm:flex-wrap">
-            {/* Nuevo Documento Trigger */}
-            <button
-              type="button"
-              onClick={() => setShowCatalogModal(true)}
-              className="studio-action gap-1 font-extrabold text-slate-900 border-slate-300 hover:border-legal-gold cursor-pointer shrink-0 hidden sm:inline-flex"
-              title="Iniciar nuevo documento desde el catálogo de instrumentos"
-            >
-              <Plus size={14} className="text-legal-gold" />
-              <span>Nuevo</span>
-            </button>
+          {/* Action Toolbar with Harmonized Hierarchy */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 sm:py-0 sm:flex-wrap">
+            {/* 1. Primary Instrument Group (The Focal Action) */}
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowCatalogModal(true)}
+                className="studio-action gap-1 font-bold text-slate-800 hover:border-legal-gold cursor-pointer hidden sm:inline-flex"
+                title="Iniciar nuevo documento desde el catálogo de instrumentos"
+              >
+                <Plus size={14} className="text-legal-golddark" />
+                <span>Nuevo</span>
+              </button>
 
-            {/* Catalog Button */}
-            <button
-              type="button"
-              onClick={() => setShowCatalogModal(true)}
-              className="studio-primary gap-1 sm:gap-1.5 shrink-0"
-              title="Abrir catálogo de plantillas e instrumentos"
-            >
-              <BookOpen size={14} />
-              <span className="truncate max-w-[120px] sm:max-w-[200px]">
-                {selectedTemplate ? selectedTemplate.title : 'Instrumentos'}
-              </span>
-              <ChevronDown size={12} className="opacity-70" />
-            </button>
+              <button
+                type="button"
+                onClick={() => setShowCatalogModal(true)}
+                className="studio-primary gap-1 sm:gap-2"
+                title="Abrir catálogo de plantillas e instrumentos"
+              >
+                <BookOpen size={14} />
+                <span className="truncate max-w-[120px] sm:max-w-[180px]">
+                  {selectedTemplate ? selectedTemplate.title : 'Instrumentos'}
+                </span>
+                <ChevronDown size={12} className="opacity-75" />
+              </button>
+            </div>
 
-            {/* Template Variables Trigger (if active) */}
+            {/* Template Variables Trigger (Contextual when template is active) */}
             {selectedTemplate && (
               <button
                 type="button"
                 onClick={openVariables}
-                className="studio-action text-amber-800 border-amber-300 bg-amber-50/70 hover:bg-amber-100 shrink-0"
+                className="studio-action text-slate-800 hover:border-legal-gold gap-1.5 shrink-0"
                 title="Configurar variables de la plantilla activa"
               >
-                <SlidersHorizontal size={14} />
+                <SlidersHorizontal size={13} className="text-legal-golddark" />
                 <span>Variables</span>
-                <span className="rounded-full bg-amber-200/80 px-1.5 py-0.2 text-[9px] font-black text-amber-900">
+                <span className="rounded-full bg-slate-100 border border-slate-200 px-1.5 py-0.5 text-[9px] font-bold text-slate-700">
                   {selectedTemplate.fields.length}
                 </span>
               </button>
             )}
 
-            {/* Opción D: Auditor de Fundamentación Trigger (Locked for Desktop) */}
-            <button
-              type="button"
-              onClick={() => setLockedFeatureModal('auditar')}
-              className="studio-action text-slate-800 hover:border-amber-400 gap-1.5 hidden md:inline-flex shrink-0"
-              title="Auditoría Contractual (Exclusivo de Lex Corporativo Desktop)"
-            >
-              <Lock size={13} className="text-amber-500" />
-              <span>Auditar</span>
-              <span className="rounded bg-amber-100 px-1.5 py-0.2 text-[9px] font-extrabold text-amber-900 uppercase">
-                Desktop
-              </span>
-            </button>
+            <span className="h-5 w-px bg-slate-200 hidden sm:block shrink-0" aria-hidden="true" />
 
-            {/* Opción A & C: Assistant Trigger (Locked for Desktop) */}
-            <button
-              type="button"
-              onClick={() => setLockedFeatureModal('fundamentar')}
-              className="studio-action text-slate-800 hover:border-slate-400 gap-1.5 hidden md:inline-flex shrink-0"
-              title="Fundamentación y Citas (Exclusivo de Lex Corporativo Desktop)"
-            >
-              <Lock size={13} className="text-slate-400" />
-              <span>Fundamentar</span>
-              <span className="rounded bg-slate-100 px-1.5 py-0.2 text-[9px] font-extrabold text-slate-600 uppercase">
-                Desktop
-              </span>
-            </button>
+            {/* 2. Document Management Group (Secondary Utilities) */}
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowDraftsModal(true)}
+                className="studio-action gap-1.5"
+                title="Ver borradores locales"
+              >
+                <FolderOpen size={14} className="text-slate-500" />
+                <span className="hidden sm:inline">Borradores</span>
+                {documents.length > 0 && (
+                  <span className="rounded-full bg-slate-100 border border-slate-200 px-1.5 py-0.5 text-[9px] font-bold text-slate-600">
+                    {documents.length}
+                  </span>
+                )}
+              </button>
 
-            {/* Borradores */}
-            <button
-              type="button"
-              onClick={() => setShowDraftsModal(true)}
-              className="studio-action shrink-0"
-              title="Ver borradores locales"
-            >
-              <FolderOpen size={14} />
-              <span className="hidden sm:inline">Borradores</span>
-              {documents.length > 0 && (
-                <span className="rounded-full bg-slate-100 px-1.5 py-0.2 text-[9px] font-bold text-slate-600">
-                  {documents.length}
+              <input
+                ref={fileInput}
+                className="hidden"
+                type="file"
+                accept=".docx,.txt,.pdf,text/plain,application/pdf"
+                onChange={(event) => handleImport(event.target.files?.[0])}
+              />
+              <button
+                type="button"
+                onClick={() => fileInput.current?.click()}
+                className="studio-action hidden sm:inline-flex gap-1.5"
+                title="Importar DOCX, PDF o TXT"
+              >
+                <Upload size={14} className="text-slate-500" />
+                <span className="hidden md:inline">Importar</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={shareDocument}
+                className="studio-action hidden sm:inline-flex"
+                title="Compartir documento o copiar texto"
+              >
+                <Share2 size={14} className="text-slate-500" />
+              </button>
+            </div>
+
+            <span className="h-5 w-px bg-slate-200 hidden md:block shrink-0" aria-hidden="true" />
+
+            {/* 3. Desktop Tools (Discreet Integrations) */}
+            <div className="hidden md:flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={() => setLockedFeatureModal('auditar')}
+                className="studio-action text-slate-600 hover:text-slate-900 border-slate-200 gap-1.5"
+                title="Auditoría Contractual (Exclusivo de Lex Corporativo Desktop)"
+              >
+                <Lock size={12} className="text-slate-400" />
+                <span>Auditar</span>
+                <span className="rounded bg-slate-100 px-1 py-0.5 text-[8px] font-mono font-medium text-slate-500">
+                  EXE
                 </span>
-              )}
-            </button>
+              </button>
 
-            {/* Import Button */}
-            <input
-              ref={fileInput}
-              className="hidden"
-              type="file"
-              accept=".docx,.txt,.pdf,text/plain,application/pdf"
-              onChange={(event) => handleImport(event.target.files?.[0])}
-            />
-            <button
-              type="button"
-              onClick={() => fileInput.current?.click()}
-              className="studio-action hidden sm:inline-flex shrink-0"
-              title="Importar DOCX, PDF o TXT"
-            >
-              <Upload size={14} />
-              <span className="hidden md:inline">Importar</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => setLockedFeatureModal('fundamentar')}
+                className="studio-action text-slate-600 hover:text-slate-900 border-slate-200 gap-1.5"
+                title="Fundamentación y Citas (Exclusivo de Lex Corporativo Desktop)"
+              >
+                <Lock size={12} className="text-slate-400" />
+                <span>Fundamentar</span>
+                <span className="rounded bg-slate-100 px-1 py-0.5 text-[8px] font-mono font-medium text-slate-500">
+                  EXE
+                </span>
+              </button>
+            </div>
 
-            {/* Share Button (Desktop/Tablet) */}
-            <button
-              type="button"
-              onClick={shareDocument}
-              className="studio-action hidden sm:inline-flex shrink-0"
-              title="Compartir documento o copiar texto"
-            >
-              <Share2 size={14} />
-            </button>
-
-            {/* Export Dropdown */}
+            {/* 4. Export Menu (Secondary Structured Action) */}
             <details ref={exportDetailsRef} className="relative shrink-0">
-              <summary className="studio-action cursor-pointer list-none gap-1 bg-slate-900 text-white border-slate-900 hover:bg-slate-800">
-                <Download size={14} />
+              <summary className="studio-action cursor-pointer list-none gap-1.5 border-slate-300 bg-white text-slate-800 hover:bg-slate-50 hover:border-slate-400 shadow-card">
+                <Download size={14} className="text-slate-600" />
                 <span>Exportar</span>
-                <ChevronDown size={12} />
+                <ChevronDown size={12} className="text-slate-400" />
               </summary>
               <div className="absolute right-0 z-50 mt-2 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-dialog">
                 <button
@@ -600,9 +610,9 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                     exportDetailsRef.current?.removeAttribute('open');
                     void shareDocument();
                   }}
-                  className="studio-menu-item sm:hidden text-amber-900 font-bold border-b border-slate-100 pb-1.5 mb-1"
+                  className="studio-menu-item sm:hidden text-amber-900 font-bold border-b border-slate-100 pb-2 mb-1"
                 >
-                  <Share2 size={13} className="inline mr-1.5 text-amber-700" />
+                  <Share2 size={13} className="inline mr-2 text-amber-700" />
                   <span>Compartir documento</span>
                 </button>
                 <button type="button" onClick={exportDocx} className="studio-menu-item">
@@ -629,52 +639,51 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
       )}
 
       {/* Main Workspace: Clean Centered Canvas */}
-      <main className="mx-auto w-full max-w-4xl flex-1 px-2.5 py-2.5 sm:px-6 sm:py-8 pb-24 sm:pb-12">
+      <main className="mx-auto w-full max-w-4xl flex-1 px-3 py-2 sm:px-6 sm:py-8 pb-24 sm:pb-12">
         {/* Paper Sheet */}
-        <article className="legal-letterhead mx-auto flex w-full flex-col justify-between rounded-xl sm:rounded-2xl bg-white px-3.5 py-4 sm:px-12 sm:py-10 shadow-xs sm:shadow-sm transition-all border border-slate-200/90">
+        <article className="legal-letterhead mx-auto flex w-full flex-col justify-between rounded-xl sm:rounded-2xl bg-white px-4 py-4 sm:px-12 sm:py-10 shadow-card sm:shadow-card transition-all border border-slate-200/90">
           {/* Institutional Letterhead Header */}
-          <header className="border-t-2 border-legal-gold border-b border-slate-900/80 sm:border-b-2 pb-1.5 sm:pb-4 pt-1 mb-2.5 sm:mb-6">
+          <header className="border-t-2 border-legal-gold border-b border-slate-200 pb-3 mb-4 sm:mb-6">
             <div className="flex items-center justify-between gap-2 sm:gap-4">
-              <div className="hidden sm:flex items-center gap-2.5 sm:gap-3">
-                <div className="flex h-8 w-8 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-950 p-1 sm:p-1.5 shadow-xs">
+              <div className="hidden sm:flex items-center gap-2 sm:gap-3">
+                <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-900 p-1 sm:p-1.5 shadow-card">
                   <img src={logoMark} alt="Lex Corporativo" className="h-full w-full object-contain" />
                 </div>
                 <div>
-                  <span className="font-serif text-xs sm:text-sm font-extrabold tracking-[0.16em] sm:tracking-[0.2em] text-slate-950 block">
+                  <span className="font-serif text-xs sm:text-sm font-bold tracking-[0.16em] sm:tracking-[0.2em] text-slate-950 block">
                     LEX CORPORATIVO
                   </span>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
                     Estudio de Ingeniería y Redacción Jurídica
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap text-left sm:text-right text-[9px] sm:text-[10px] font-bold text-slate-400 w-full sm:w-auto justify-between sm:justify-end">
-                <span className="text-slate-900 font-extrabold tracking-wide">
+              <div className="flex items-center gap-2 flex-wrap text-left sm:text-right text-[10px] font-medium text-slate-400 w-full sm:w-auto justify-between sm:justify-end">
+                <span className="font-mono text-slate-700 font-bold tracking-tight">
                   FOLIO · {currentDocument.id.slice(0, 8).toUpperCase()}
                 </span>
                 <span className="text-slate-300">·</span>
                 <span className="uppercase text-slate-500">
                   {new Date(currentDocument.updatedAt).toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric' })}
                 </span>
-                <span className="inline-block rounded bg-amber-50 border border-amber-200/60 px-1.5 py-0.2 text-[8px] sm:text-[9px] font-black text-amber-900 uppercase">
+                <span className="inline-block rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 text-[9px] font-medium text-slate-600 uppercase tracking-wide">
                   Borrador
                 </span>
               </div>
             </div>
           </header>
 
-
-          {/* Active Template Quick Banner (Desktop/Tablet only; on mobile the toolbar provides clear access) */}
+          {/* Active Template Banner (Harmonized Institutional Style) */}
           {selectedTemplate && (
-            <div className="mb-3 sm:mb-5 hidden sm:flex items-center justify-between gap-2 rounded-xl border border-amber-200/80 bg-gradient-to-r from-amber-50/90 via-amber-50/50 to-white px-3.5 py-2.5 text-xs text-amber-950 shadow-2xs">
+            <div className="mb-4 hidden sm:flex items-center justify-between gap-3 rounded-xl border border-slate-200/90 bg-slate-50/80 px-4 py-2.5 text-xs text-slate-700 shadow-card">
               <div className="flex items-center gap-2 min-w-0">
-                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-amber-200/80 text-amber-800 shrink-0">
+                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-legal-gold/15 text-legal-golddark shrink-0">
                   <Sparkles size={13} />
                 </span>
                 <div className="truncate">
-                  <span className="font-bold text-slate-800">Instrumento activo: </span>
-                  <span className="font-extrabold text-amber-900">{selectedTemplate.title}</span>
-                  <span className="text-slate-500 ml-1.5 text-[11px]">
+                  <span className="text-slate-500 font-medium">Instrumento activo: </span>
+                  <strong className="text-slate-950 font-bold">{selectedTemplate.title}</strong>
+                  <span className="text-slate-400 ml-2 font-mono text-[11px]">
                     ({selectedTemplate.fields.length} variables disponibles)
                   </span>
                 </div>
@@ -684,15 +693,15 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                   type="button"
                   onClick={openVariables}
                   aria-label="Rellenar variables en lote"
-                  className="inline-flex items-center gap-1 rounded-lg bg-amber-800 hover:bg-amber-900 px-3 py-1.5 text-[11px] font-extrabold text-white transition cursor-pointer shadow-2xs active:scale-95"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-800 transition active:scale-95 shadow-card cursor-pointer"
                 >
-                  <SlidersHorizontal size={12} />
+                  <SlidersHorizontal size={12} className="text-legal-golddark" />
                   <span>Rellenar variables en lote</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowCatalogModal(true)}
-                  className="text-[11px] font-bold text-slate-600 hover:text-slate-900 underline px-1 py-1 cursor-pointer"
+                  className="text-xs font-medium text-slate-500 hover:text-slate-900 underline px-1 py-1 cursor-pointer"
                 >
                   Cambiar
                 </button>
@@ -701,7 +710,7 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
           )}
 
           {/* Quick Format & Title Header */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3 border-b border-slate-100 pb-2 sm:pb-3 mb-2 sm:mb-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4 border-b border-slate-100 pb-3 mb-4">
             {/* Document Title Input */}
             <div className="flex-1 min-w-0">
               <input
@@ -712,17 +721,17 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                 onChange={(event) =>
                   setCurrentDocument((doc) => ({ ...doc, title: event.target.value, updatedAt: new Date().toISOString() }))
                 }
-                className="w-full rounded-lg border border-transparent bg-transparent px-1.5 sm:px-2 py-1 text-base sm:text-base font-extrabold text-slate-900 outline-none transition focus:border-legal-gold focus:bg-slate-50"
+                className="w-full rounded-lg border border-transparent bg-transparent px-2 py-1 font-serif text-lg sm:text-xl font-bold text-slate-900 outline-none transition focus:border-legal-gold focus:bg-slate-50 placeholder:font-sans placeholder:text-sm placeholder:font-normal placeholder:text-slate-400"
                 placeholder="Título del documento o contrato…"
               />
             </div>
 
-            {/* In-Editor Quick Toolbar (Desktop/Tablet only; mobile uses native selection menu) */}
-            <div className="hidden sm:flex items-center justify-end gap-1 rounded-xl bg-slate-50 border border-slate-200/70 p-1 self-end sm:self-auto">
+            {/* In-Editor Quick Toolbar */}
+            <div className="hidden sm:flex items-center gap-0.5 rounded-xl bg-slate-50 border border-slate-200/80 p-1 self-end sm:self-auto shadow-card">
               <button
                 type="button"
                 onClick={() => editor?.chain().focus().undo().run()}
-                className="studio-icon-button h-7 w-7 min-h-7 min-w-7 text-slate-600"
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-600 hover:bg-white hover:text-slate-900 hover:shadow-card transition cursor-pointer"
                 title="Deshacer"
               >
                 <Undo2 size={13} />
@@ -730,16 +739,20 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
               <button
                 type="button"
                 onClick={() => editor?.chain().focus().redo().run()}
-                className="studio-icon-button h-7 w-7 min-h-7 min-w-7 text-slate-600"
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-600 hover:bg-white hover:text-slate-900 hover:shadow-card transition cursor-pointer"
                 title="Rehacer"
               >
                 <Redo2 size={13} />
               </button>
-              <div className="h-4 w-px bg-slate-200 mx-0.5" />
+              <div className="h-4 w-px bg-slate-200 mx-1" />
               <button
                 type="button"
                 onClick={() => editor?.chain().focus().toggleBold().run()}
-                className={`studio-icon-button h-7 w-7 min-h-7 min-w-7 ${editor?.isActive('bold') ? 'bg-slate-900 text-amber-300' : 'text-slate-600'}`}
+                className={`flex h-7 w-7 items-center justify-center rounded-lg transition cursor-pointer ${
+                  editor?.isActive('bold')
+                    ? 'bg-slate-900 text-white font-bold shadow-card'
+                    : 'text-slate-600 hover:bg-white hover:text-slate-900'
+                }`}
                 title="Negrita"
               >
                 <Bold size={13} />
@@ -747,7 +760,11 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
               <button
                 type="button"
                 onClick={() => editor?.chain().focus().toggleItalic().run()}
-                className={`studio-icon-button h-7 w-7 min-h-7 min-w-7 ${editor?.isActive('italic') ? 'bg-slate-900 text-amber-300' : 'text-slate-600'}`}
+                className={`flex h-7 w-7 items-center justify-center rounded-lg transition cursor-pointer ${
+                  editor?.isActive('italic')
+                    ? 'bg-slate-900 text-white font-bold shadow-card'
+                    : 'text-slate-600 hover:bg-white hover:text-slate-900'
+                }`}
                 title="Cursiva"
               >
                 <Italic size={13} />
@@ -755,7 +772,11 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
               <button
                 type="button"
                 onClick={() => editor?.chain().focus().toggleBulletList().run()}
-                className={`studio-icon-button h-7 w-7 min-h-7 min-w-7 ${editor?.isActive('bulletList') ? 'bg-slate-900 text-amber-300' : 'text-slate-600'}`}
+                className={`flex h-7 w-7 items-center justify-center rounded-lg transition cursor-pointer ${
+                  editor?.isActive('bulletList')
+                    ? 'bg-slate-900 text-white font-bold shadow-card'
+                    : 'text-slate-600 hover:bg-white hover:text-slate-900'
+                }`}
                 title="Lista con viñetas"
               >
                 <List size={13} />
@@ -781,9 +802,9 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
           <FootnotesAppendix citations={currentDocument.citations} onRemoveCitation={removeCitation} />
 
           {/* Institutional Letterhead Footer */}
-          <footer className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-between gap-1.5 sm:gap-2 border-t border-slate-200 pt-3 sm:pt-4 text-[9px] text-slate-400">
+          <footer className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-2 border-t border-slate-200 pt-3 sm:pt-4 text-[9px] text-slate-400">
             <span>Lex Corporativo PWA · Borradores locales</span>
-            <span className="font-extrabold uppercase text-slate-500 text-[8px] sm:text-[9px]">
+            <span className="font-bold uppercase text-slate-500 text-[8px] sm:text-[9px]">
               Vista de edición · Paginación al exportar
             </span>
           </footer>
@@ -802,7 +823,7 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
           }}
         >
           <aside
-            className="flex max-h-[88vh] sm:max-h-full h-auto sm:h-full w-full max-w-lg sm:max-w-md flex-col rounded-t-3xl sm:rounded-none bg-white shadow-2xl border-t sm:border-t-0 sm:border-l border-slate-200 animate-slideUp sm:animate-slideLeft"
+            className="flex max-h-[88vh] sm:max-h-full h-auto sm:h-full w-full max-w-lg sm:max-w-md flex-col rounded-t-3xl sm:rounded-none bg-white shadow-dialog border-t sm:border-t-0 sm:border-l border-slate-200 animate-slideUp sm:animate-slideLeft"
           >
             {/* Mobile Pull Handle */}
             <div className="pt-3 pb-1 flex justify-center sm:hidden">
@@ -810,7 +831,7 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3.5 bg-slate-50 rounded-t-3xl sm:rounded-none">
+            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 bg-slate-50 rounded-t-3xl sm:rounded-none">
               <div className="flex items-center gap-2">
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-amber-300">
                   <Search size={16} />
@@ -818,7 +839,7 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                 <div>
                   <div className="flex items-center gap-2">
                     <h2 className="font-serif text-sm font-bold text-slate-950">Asistente de Fundamentación</h2>
-                    <kbd className="hidden sm:inline-block rounded bg-slate-200/80 px-1.5 py-0.2 text-[9px] font-mono font-bold text-slate-600">
+                    <kbd className="hidden sm:inline-block rounded bg-slate-200/80 px-2 py-px text-[9px] font-mono font-bold text-slate-600">
                       Ctrl+K
                     </kbd>
                   </div>
@@ -836,7 +857,7 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
             </div>
 
             {/* Search Form */}
-            <form onSubmit={handleSearchSubmit} className="p-4 border-b border-slate-100 bg-white space-y-2.5">
+            <form onSubmit={handleSearchSubmit} className="p-4 border-b border-slate-100 bg-white space-y-3">
               <div className="relative">
                 <input
                   type="search"
@@ -903,14 +924,14 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                 return (
                   <article
                     key={article.id}
-                    className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs transition hover:border-slate-300"
+                    className="rounded-xl border border-slate-200 bg-white p-4 shadow-card transition hover:border-slate-300"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <span className="rounded bg-slate-900 px-1.5 py-0.5 text-[9px] font-black uppercase text-amber-300">
+                        <span className="rounded bg-slate-900 px-2 py-0.5 text-[9px] font-bold uppercase text-amber-300">
                           {article.lawCode}
                         </span>
-                        <strong className="ml-1.5 text-xs font-extrabold text-slate-900">
+                        <strong className="ml-2 text-xs font-bold text-slate-900">
                           {article.articleNumber}
                         </strong>
                       </div>
@@ -929,11 +950,11 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                       {article.content}
                     </p>
 
-                    <div className="mt-3 flex items-center gap-1.5 border-t border-slate-100 pt-2.5">
+                    <div className="mt-3 flex items-center gap-2 border-t border-slate-100 pt-3">
                       <button
                         type="button"
                         onClick={() => insertFootnote(article)}
-                        className="flex-1 rounded-lg bg-slate-900 px-2 py-1.5 text-[10px] font-extrabold text-white transition hover:bg-slate-800 active:scale-95 shadow-xs flex items-center justify-center gap-1"
+                        className="flex-1 rounded-lg bg-slate-900 px-2 py-2 text-[10px] font-bold text-white transition hover:bg-slate-800 active:scale-95 shadow-card flex items-center justify-center gap-1"
                       >
                         <Plus size={11} className="text-amber-300" />
                         <span>Nota al Pie <sup>[N]</sup></span>
@@ -941,7 +962,7 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                       <button
                         type="button"
                         onClick={() => insertBlockquote(article)}
-                        className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-[10px] font-bold text-slate-700 transition hover:bg-slate-100 active:scale-95"
+                        className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-2 text-[10px] font-bold text-slate-700 transition hover:bg-slate-100 active:scale-95"
                         title="Insertar como cita textual en bloque"
                       >
                         Cita en Bloque
@@ -950,7 +971,7 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                         type="button"
                         onClick={() => addCitation(article)}
                         disabled={isAlreadyCited}
-                        className={`rounded-lg px-2 py-1.5 text-[10px] font-bold transition ${
+                        className={`rounded-lg px-2 py-2 text-[10px] font-bold transition ${
                           isAlreadyCited
                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                             : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -967,10 +988,10 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
 
             {/* Footer Info */}
             <div className="border-t border-slate-200 p-3 bg-slate-50 flex items-center justify-between text-[10px] font-bold">
-              <span className="flex items-center gap-1.5 text-emerald-700">
+              <span className="flex items-center gap-2 text-emerald-700">
                 <CheckCircle2 size={13} className="text-emerald-600" /> Motor local SQLite activo
               </span>
-              <span className="flex items-center gap-1.5 text-slate-500">
+              <span className="flex items-center gap-2 text-slate-500">
                 <Database size={12} className="text-slate-400" /> Corpus federal en memoria
               </span>
             </div>
@@ -1025,7 +1046,7 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
           className="fixed inset-0 z-[80] flex items-end justify-center bg-slate-950/60 p-0 sm:items-center sm:p-4 backdrop-blur-xs"
         >
           <div className="flex max-h-[85vh] w-full max-w-xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-white shadow-dialog sm:rounded-2xl">
-            <div className="flex justify-center pb-0 pt-2.5 sm:hidden">
+            <div className="flex justify-center pb-0 pt-3 sm:hidden">
               <div className="h-1 w-10 rounded-full bg-slate-300" />
             </div>
             <div className="flex items-center justify-between border-b border-slate-200 p-4">
@@ -1058,7 +1079,7 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
                       value={formData[field.id] ?? ''}
                       onChange={(e) => setFormData((prev) => ({ ...prev, [field.id]: e.target.value }))}
                       placeholder={field.placeholder}
-                      className="studio-input p-2.5 text-base sm:text-xs"
+                      className="studio-input p-3 text-base sm:text-xs"
                     />
                   ) : (
                     <input
@@ -1104,12 +1125,12 @@ export function DraftingStudio({ onNavigateToDesktop, registerBeforeLeave, sessi
           className="fixed inset-0 z-[80] flex items-end justify-center bg-slate-950/60 p-0 sm:items-center sm:p-4 backdrop-blur-xs"
         >
           <div className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-white shadow-dialog sm:rounded-2xl">
-            <div className="flex justify-center pb-0 pt-2.5 sm:hidden">
+            <div className="flex justify-center pb-0 pt-3 sm:hidden">
               <div className="h-1 w-10 rounded-full bg-slate-300" />
             </div>
             <div className="flex items-center justify-between border-b border-slate-200 p-4">
               <div>
-                <h2 className="font-serif text-lg font-semibold text-slate-950">Borradores locales</h2>
+                <h2 className="font-serif text-lg font-medium text-slate-950">Borradores locales</h2>
                 <p className="text-xs text-slate-500">Guardados en IndexedDB en este dispositivo.</p>
               </div>
               <button

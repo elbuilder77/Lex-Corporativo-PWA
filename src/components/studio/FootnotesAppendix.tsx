@@ -30,7 +30,7 @@ export function FootnotesAppendix({ citations, onRemoveCitation }: FootnotesAppe
             Notas al Pie y Apéndice de Fundamentación Legal ({citations.length})
           </h3>
         </div>
-        <span className="text-[10px] font-semibold text-slate-400">
+        <span className="text-[10px] font-medium text-slate-400">
           Corpus Federal Vigente · DOF
         </span>
       </div>
@@ -39,9 +39,9 @@ export function FootnotesAppendix({ citations, onRemoveCitation }: FootnotesAppe
         {citations.map((citation, index) => (
           <li
             key={citation.id}
-            className="group relative flex items-start gap-2.5 rounded-xl border border-slate-100 bg-slate-50/50 p-2.5 transition hover:border-slate-200 hover:bg-slate-50"
+            className="group relative flex items-start gap-2 rounded-xl border border-slate-100 bg-slate-50/50 p-3 transition hover:border-slate-200 hover:bg-slate-50"
           >
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-slate-900 text-[10px] font-extrabold text-white">
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-slate-900 text-[10px] font-bold text-white">
               {index + 1}
             </span>
             <div className="min-w-0 flex-1">
@@ -50,12 +50,12 @@ export function FootnotesAppendix({ citations, onRemoveCitation }: FootnotesAppe
                 {citation.title && <span className="font-normal text-slate-600"> — {citation.title}</span>}
               </p>
               <p className="mt-1 text-[11px] leading-relaxed text-slate-700">{citation.content}</p>
-              <div className="mt-1.5 flex flex-wrap items-center gap-3 text-[10px] text-slate-500">
+              <div className="mt-2 flex flex-wrap items-center gap-3 text-[10px] text-slate-500">
                 <a
                   href={citation.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 font-semibold text-legal-golddark hover:underline"
+                  className="inline-flex items-center gap-1 font-medium text-legal-golddark hover:underline"
                 >
                   <span>{citation.sourceName}</span>
                   <ExternalLink size={10} />

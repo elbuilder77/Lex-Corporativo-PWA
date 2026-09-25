@@ -45,7 +45,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
         }`}
       >
         {/* Brand Header */}
-        <div className="flex flex-col items-center gap-3.5 sm:gap-4">
+        <div className="flex flex-col items-center gap-4 sm:gap-4">
           <div className="w-full max-w-[360px] sm:max-w-[480px] md:max-w-[580px] flex justify-center">
             <img
               src={logoUrl}
@@ -59,7 +59,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
             />
           </div>
 
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-legal-gold/30 bg-legal-gold/10 px-4 py-1 text-[11px] sm:text-xs font-extrabold uppercase tracking-[0.2em] text-legal-gold shadow-xs">
+          <span className="inline-flex items-center gap-2 rounded-full border border-legal-gold/30 bg-legal-gold/10 px-4 py-1 text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] text-legal-gold shadow-card">
             <Sparkles size={13} /> Plataforma de Consulta e Ingeniería Jurídica
           </span>
         </div>
@@ -67,32 +67,32 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
         {/* Primary Interactive Cards: Core Web Modules (3-Column Grid) */}
         <div className="w-full grid gap-4 md:grid-cols-3 text-left">
           {/* Card 1: Ingeniería Jurídica (Primary Interactive Hub) */}
-          <div className="relative group rounded-2xl border border-legal-gold/40 bg-gradient-to-b from-slate-900/95 to-slate-950/95 p-5 shadow-xl backdrop-blur-md transition-all duration-300 hover:border-legal-gold/70 hover:shadow-2xl hover:shadow-legal-gold/15 flex flex-col justify-between">
+          <div className="relative group rounded-2xl border border-legal-gold/40 bg-gradient-to-b from-slate-900/95 to-slate-950/95 p-5 shadow-premium backdrop-blur-md transition-all duration-300 hover:border-legal-gold/70 hover:shadow-dialog hover:shadow-legal-gold/15 flex flex-col justify-between">
             <div>
               <div className="mb-3 flex items-center justify-between gap-2">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-legal-gold/30 bg-legal-gold/15 text-legal-gold">
                   <FilePenLine size={20} />
                 </span>
-                <span className="rounded-md bg-emerald-500/15 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-300">
+                <span className="rounded-md bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-300">
                   Local · 25 instrumentos
                 </span>
               </div>
               <h2 className="font-serif text-base font-bold text-white transition group-hover:text-legal-gold sm:text-lg">
                 Ingeniería Jurídica
               </h2>
-              <p className="mt-1.5 text-xs leading-relaxed text-slate-300">
+              <p className="mt-2 text-xs leading-relaxed text-slate-300">
                 Redacta instrumentos corporativos con variables guiadas, importa DOCX/PDF y estructura contratos con autoguardado local.
               </p>
-              <ul className="mt-3 space-y-1.5 border-t border-slate-800/60 pt-2.5 text-[11px] text-slate-400">
-                <li className="flex items-start gap-1.5">
+              <ul className="mt-3 space-y-2 border-t border-slate-800/60 pt-3 text-[11px] text-slate-400">
+                <li className="flex items-start gap-2">
                   <span className="font-bold text-legal-gold">•</span>
                   <span><strong>25 documentos:</strong> Asambleas, poderes, contratos mercantiles y laborales.</span>
                 </li>
-                <li className="flex items-start gap-1.5">
+                <li className="flex items-start gap-2">
                   <span className="font-bold text-legal-gold">•</span>
                   <span><strong>Importación:</strong> Procesamiento local de archivos DOCX y PDF.</span>
                 </li>
-                <li className="flex items-start gap-1.5">
+                <li className="flex items-start gap-2">
                   <span className="font-bold text-legal-gold">•</span>
                   <span><strong>Privacidad:</strong> Sin almacenamiento en la nube, sin rastreo ni telemetría.</span>
                 </li>
@@ -102,7 +102,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
               <button
                 type="button"
                 onClick={() => handleStart('estudio')}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-legal-gold hover:bg-legal-goldhover text-slate-950 px-4 py-3 text-xs font-extrabold transition shadow-md shadow-legal-gold/20 group-hover:scale-[1.01] active:scale-95 cursor-pointer"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-legal-gold hover:bg-legal-goldhover text-slate-950 px-4 py-3 text-xs font-bold transition shadow-premium group-hover:scale-[1.01] active:scale-95 cursor-pointer"
               >
                 <span>Abrir Ingeniería Jurídica</span>
                 <ArrowRight size={15} />
@@ -111,32 +111,32 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
           </div>
 
           {/* Card 2: Fundamentador Jurídico (Federal Legal Corpus) */}
-          <div className="relative group rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg backdrop-blur-md transition-all duration-300 hover:border-blue-500/40 hover:bg-slate-900/90 flex flex-col justify-between">
+          <div className="relative group rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-premium backdrop-blur-md transition-all duration-300 hover:border-blue-500/40 hover:bg-slate-900/90 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between gap-2 mb-3">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
                   <BookOpenCheck size={20} />
                 </span>
-                <span className="rounded-md bg-blue-500/20 px-2 py-0.5 text-[10px] font-extrabold text-blue-300 uppercase tracking-wider">
+                <span className="rounded-md bg-blue-500/20 px-2 py-0.5 text-[10px] font-bold text-blue-300 uppercase tracking-wider">
                   {CORPUS_STATS.provisions.toLocaleString('es-MX')} disposiciones · {CORPUS_STATS.instruments} leyes
                 </span>
               </div>
               <h2 className="font-serif text-base sm:text-lg font-bold text-white group-hover:text-blue-300 transition">
                 Fundamentador Jurídico
               </h2>
-              <p className="mt-1.5 text-xs text-slate-300 leading-relaxed">
+              <p className="mt-2 text-xs text-slate-300 leading-relaxed">
                 Búsqueda normativa instantánea entre {CORPUS_STATS.provisions.toLocaleString('es-MX')} artículos de {CORPUS_STATS.instruments} leyes federales con motor local SQLite.
               </p>
-              <ul className="mt-3 space-y-1.5 border-t border-slate-800/60 pt-2.5 text-[11px] text-slate-400">
-                <li className="flex items-start gap-1.5">
+              <ul className="mt-3 space-y-2 border-t border-slate-800/60 pt-3 text-[11px] text-slate-400">
+                <li className="flex items-start gap-2">
                   <span className="font-bold text-blue-400">•</span>
                   <span><strong>5 materias:</strong> Laboral, Mercantil, Fiscal, Aduanal y Comercio Exterior.</span>
                 </li>
-                <li className="flex items-start gap-1.5">
+                <li className="flex items-start gap-2">
                   <span className="font-bold text-blue-400">•</span>
                   <span><strong>Fuentes:</strong> Textos vigentes del DOF y Cámara de Diputados.</span>
                 </li>
-                <li className="flex items-start gap-1.5">
+                <li className="flex items-start gap-2">
                   <span className="font-bold text-blue-400">•</span>
                   <span><strong>Motor:</strong> SQLite WASM determinista en navegador, sin latencia de red.</span>
                 </li>
@@ -156,32 +156,32 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
           </div>
 
           {/* Card 3: Radar de Licitaciones Públicas (CompraNet) */}
-          <div className="relative group rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg backdrop-blur-md transition-all duration-300 hover:border-amber-500/40 hover:bg-slate-900/90 flex flex-col justify-between">
+          <div className="relative group rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-premium backdrop-blur-md transition-all duration-300 hover:border-amber-500/40 hover:bg-slate-900/90 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between gap-2 mb-3">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/20 text-legal-gold">
                   <Landmark size={20} />
                 </span>
-                <span className="rounded-md bg-amber-500/20 px-2 py-0.5 text-[10px] font-extrabold text-amber-300 uppercase tracking-wider">
+                <span className="rounded-md bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-300 uppercase tracking-wider">
                   {LICITACIONES_STATS.total.toLocaleString('es-MX')} procedimientos oficiales
                 </span>
               </div>
               <h2 className="font-serif text-base sm:text-lg font-bold text-white group-hover:text-legal-gold transition">
                 Radar de Licitaciones
               </h2>
-              <p className="mt-1.5 text-xs text-slate-300 leading-relaxed">
+              <p className="mt-2 text-xs text-slate-300 leading-relaxed">
                 Monitoreo oficial de contrataciones públicas federales (CompraNet) y estatales para proveedores y consultores.
               </p>
-              <ul className="mt-3 space-y-1.5 border-t border-slate-800/60 pt-2.5 text-[11px] text-slate-400">
-                <li className="flex items-start gap-1.5">
+              <ul className="mt-3 space-y-2 border-t border-slate-800/60 pt-3 text-[11px] text-slate-400">
+                <li className="flex items-start gap-2">
                   <span className="font-bold text-amber-400">•</span>
                   <span><strong>Cobertura:</strong> CompraNet federal + compras estatales (Yucatán).</span>
                 </li>
-                <li className="flex items-start gap-1.5">
+                <li className="flex items-start gap-2">
                   <span className="font-bold text-amber-400">•</span>
                   <span><strong>Seguimiento:</strong> Convocatorias, bases, juntas de aclaraciones y plazos.</span>
                 </li>
-                <li className="flex items-start gap-1.5">
+                <li className="flex items-start gap-2">
                   <span className="font-bold text-amber-400">•</span>
                   <span><strong>Filtros:</strong> Por dependencia, carácter nacional/internacional y estatus.</span>
                 </li>
@@ -202,7 +202,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
         </div>
 
         {/* Secondary Station Showcase: Desktop App for Windows */}
-        <div className="w-full rounded-2xl border border-legal-gold/30 bg-slate-950/80 p-4 sm:p-5 shadow-xl backdrop-blur-sm transition-all hover:border-legal-gold/50">
+        <div className="w-full rounded-2xl border border-legal-gold/30 bg-slate-950/80 p-4 sm:p-5 shadow-premium backdrop-blur-sm transition-all hover:border-legal-gold/50">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-left">
             <div className="flex items-center gap-3">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-900 border border-legal-gold/40 text-legal-gold">
@@ -213,11 +213,11 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
                   <span className="font-serif text-sm sm:text-base font-bold text-white">
                     Lex Corporativo Desktop
                   </span>
-                  <span className="rounded-md bg-legal-gold/20 px-1.5 py-0.5 text-[9px] font-extrabold text-legal-gold uppercase tracking-wider">
+                  <span className="rounded-md bg-legal-gold/20 px-2 py-0.5 text-[9px] font-bold text-legal-gold uppercase tracking-wider">
                     Windows .EXE
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                <p className="text-[11px] text-slate-400 mt-1 leading-snug">
                   Estación de trabajo local para auditoría contractual en 5 materias, redacción en Word/PDF y bóveda de expedientes privada (BYOK).
                 </p>
               </div>
@@ -226,7 +226,7 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
             <button
               type="button"
               onClick={() => handleStart('desktop')}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-legal-gold/40 bg-legal-gold/10 hover:bg-legal-gold text-legal-gold hover:text-slate-950 px-5 py-2.5 text-xs font-extrabold transition shrink-0 cursor-pointer shadow-xs active:scale-95"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-legal-gold/40 bg-legal-gold/10 hover:bg-legal-gold text-legal-gold hover:text-slate-950 px-5 py-2 text-xs font-bold transition shrink-0 cursor-pointer shadow-card active:scale-95"
             >
               <span>Ficha Técnica Desktop</span>
               <ArrowRight size={14} />
@@ -235,16 +235,16 @@ export function Introduction({ onOpenStation }: IntroductionProps) {
         </div>
 
         {/* Trust Badges */}
-        <div className="flex flex-wrap justify-center items-center gap-4 text-[11px] font-semibold text-slate-400">
-          <span className="flex items-center gap-1.5">
+        <div className="flex flex-wrap justify-center items-center gap-4 text-[11px] font-medium text-slate-400">
+          <span className="flex items-center gap-2">
             <Zap size={13} className="text-legal-gold" /> Sin registro ni costo
           </span>
           <span className="text-slate-700">•</span>
-          <span className="flex items-center gap-1.5">
+          <span className="flex items-center gap-2">
             <Scale size={13} className="text-blue-400" /> Legislación federal oficial
           </span>
           <span className="text-slate-700">•</span>
-          <span className="flex items-center gap-1.5">
+          <span className="flex items-center gap-2">
             <ShieldCheck size={13} className="text-emerald-400" /> 100% privado en navegador
           </span>
         </div>
