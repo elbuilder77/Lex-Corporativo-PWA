@@ -23,20 +23,20 @@ export interface DesktopSpecification {
 }
 
 export const DESKTOP_SPECS: DesktopSpecification = {
-  version: '1.0.0-rc.15',
+  version: '1.0.0-rc.16',
   releaseDate: 'Septiembre 2026',
-  fileName: 'Lex-Corporativo-Setup-1.0.0-rc.15.exe',
-  fileSizeBytes: 359884723,
+  fileName: 'Lex-Corporativo-Setup-1.0.0-rc.16.exe',
+  fileSizeBytes: 359890543,
   fileSizeFormatted: '343.2 MB',
   platform: 'Windows 10 / Windows 11',
   architecture: 'x64 (64-bit)',
   installerType: 'Instalador NSIS asistido',
   isSigned: true,
   signatureDetails: 'Firma digital de código y binario verificada',
-  sha512: 'cmFo65id/4f5/T2XN0o+EZSRcQZd8EFz1LuKid+OUmBCCEww2SfDveu1JqSSBWrlhoyrNdY/4OO6u0+lw2Rn/Q==',
+  sha512: 'zsVRZ7DLqotwpilHqiYdllsq/yYcqoT4lKDnZDd7o8pZ/VCCqe7D/upNosLcE3RO8HgiaUW01o+B1YtPiUvjqw==',
   customProtocol: 'lexcorp://',
-  downloadUrl: 'https://github.com/elbuilder77/Lex-Corporativo-Desktop-app/releases/download/v1.0.0-rc.15/Lex-Corporativo-Setup-1.0.0-rc.15.exe',
-  githubReleaseUrl: 'https://github.com/elbuilder77/Lex-Corporativo-Desktop-app/releases/tag/v1.0.0-rc.15',
+  downloadUrl: 'https://github.com/elbuilder77/Lex-Corporativo-Desktop-app/releases/download/v1.0.0-rc.16/Lex-Corporativo-Setup-1.0.0-rc.16.exe',
+  githubReleaseUrl: 'https://github.com/elbuilder77/Lex-Corporativo-Desktop-app/releases/tag/v1.0.0-rc.16',
   requirements: [
     { label: 'Sistema Operativo', minimum: 'Windows 10 (64-bit) v1903+', recommended: 'Windows 11 (64-bit) actualizado' },
     { label: 'Procesador (CPU)', minimum: 'Intel Core i3 / AMD Ryzen 3 (2.0 GHz)', recommended: 'Intel Core i5 / AMD Ryzen 5 o superior' },
